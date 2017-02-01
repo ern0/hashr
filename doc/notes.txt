@@ -1,0 +1,5 @@
+- multi hash algorithm
+- dynamic size
+- syntax: rethink <size> <hash-algo>
+- overflow: linked list, count in head
+- hash elem: keyptr, listheadptr, listcount
