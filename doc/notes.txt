@@ -3,3 +3,6 @@
 - syntax: rethink <size> <hash-algo>
 - overflow: linked list, count in head
 - hash elem: keyptr, listheadptr, listcount
+- hash: real hash (stored), effective hash
+- api: get set del, ins upd, 200-codes
+- client noti/poll
