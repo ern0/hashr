@@ -6,3 +6,4 @@
 - hash: real hash (stored), effective hash
 - api: get set del, ins upd, 200-codes
 - client noti/poll
+- result save

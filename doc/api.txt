@@ -1,0 +1,87 @@
+Overview
+========
+Hash map daemon:
+- Key-value database
+- In-memory storage
+- TCP/IP interface
+- Functionality
+  + CRUD 
+  + info, incl. item count
+  + search (full-text k/v/k+v, no index)
+  + reorganize (hash method, hash capacity)
+
+
+TCP/IP
+======
+TCP/IP actions:
+- connect
+- command -> response
+- disconnect
+
+
+Protocol
+========
+Protocol format should be binary or JSON. The server always
+reports a status code, other fields are command-specific or
+result-specific.
+
+TODO: decide bin/json
+
+
+set
+---
+request:
+ - key
+ - value
+response:
+  - status: created / replaced
+  - panic-auto-reorganized: yes/no
+
+del
+---
+request:
+ - key
+response:
+ - status: deleted / not exists
+
+get
+---
+request:
+ - key
+response:
+ - status: provided / no such key
+ - payload: value / none
+
+zap
+---
+request:
+ (none)
+response:
+ - status: zapped
+
+info
+----
+request:
+ (none)
+response:
+ - status: provided
+ - hash method
+ - hash table capacity
+ - actual item count
+
+search
+------
+request:
+ - scope: key / value / key+value
+ - hit: first / all
+response:
+ - status: provided 
+ - payload: array of values
+
+reorganize
+----------
+request:
+ - hash method
+ - hash table capacity
+response:
+ - status: complete / refuse
