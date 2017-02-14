@@ -19,15 +19,19 @@
 
 	// private
 	struct Server {
+
 		int port;
+		int runningFlag;
+
 		int addrlen;
 		int mainSocket;
 		int maxSocket;
-		int clientSockets[MAX_CLIENT_NUMBER];
 		struct sockaddr_in address;
 
+		fd_set readfds;	
+
 		char buffer[1025];
-		fd_set readfds;		
+		int clientSockets[MAX_CLIENT_NUMBER];		
 	};
 	typedef struct Server Server;
 
@@ -36,7 +40,8 @@
 	void Server_dtor(Server* self);
 	void Server_setPort(Server* self,int port);
 	int Server_getPort(Server* self);
-	void Server_prepare(Server* self);
+	void Server_start(Server* self);
+	void Server_stop(Server* self);
 	void Server_run(Server* self);
 
 	// protected

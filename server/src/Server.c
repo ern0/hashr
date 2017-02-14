@@ -31,7 +31,7 @@
 	} // getPort()
 
 
-	void Server_prepare(Server* self) {
+	void Server_start(Server* self) {
 
 		self->mainSocket = socket(AF_INET,SOCK_STREAM,0);
 		if (self->mainSocket == -1) {
@@ -54,16 +54,27 @@
 		if ( -1 == listen(self->mainSocket,5) ) {
 			Utils_fatal("listen failed");
 		}
+
+		self->runningFlag = 1;
 	     
-	} // prepare()
+	} // start()
+
+
+	void Server_stop(Server* self) {
+
+		self->runningFlag = 0;
+
+	} // stop()
 
 
 	void Server_run(Server* self) {
 
-		while (1) {
+		while ( self->runningFlag ) {
 			Server__buildFds(self);
-			break;
+sleep(1); ////
 		}
+
+		close(self->mainSocket);
 
 	} // run()
 

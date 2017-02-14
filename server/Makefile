@@ -1,8 +1,7 @@
 #### Makefile for hashr ################################
 
 PLATFORM=$(shell uname -s)-$(shell uname -p)
-CC=gcc -c -std=c99
-CL=gcc -std=c99
+CC=gcc -std=c99
 SRC=src
 OBJ=/tmp/hashr/${PLATFORM}
 BIN=bin/${PLATFORM}
@@ -13,7 +12,7 @@ ${BIN}/hashr-server: \
 		Makefile ${OBJ} ${BIN} \
 		${SRC}/main.c \
 		${OBJ}/Server.o
-	${CL} \
+	${CC} \
 		${SRC}/main.c \
 		${OBJ}/Utils.o \
 		${OBJ}/Server.o \
@@ -23,7 +22,7 @@ ${OBJ}/Utils.o: \
 		Makefile ${OBJ} \
 		${SRC}/Utils.h \
 		${SRC}/Utils.c
-	${CC} \
+	${CC} -c \
 		${SRC}/Utils.c \
 		-o ${OBJ}/Utils.o
 
@@ -32,7 +31,7 @@ ${OBJ}/Server.o: \
 		${OBJ}/Utils.o \
 		${SRC}/Server.h \
 		${SRC}/Server.c
-	${CC} \
+	${CC} -c \
 		${SRC}/Server.c \
 		-o ${OBJ}/Server.o
 
