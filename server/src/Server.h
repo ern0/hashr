@@ -14,6 +14,8 @@
 #include <sys/time.h>
 
 #include "ClientConnection.h"
+#include "Logger.h"
+
 
 // class Server
 
@@ -22,6 +24,7 @@
 	// private
 	struct Server {
 
+		Logger* logger;
 		int port;
 		int runningFlag;
 
@@ -40,6 +43,7 @@
 	// public
 	Server* new_Server();
 	void delete_Server(Server* self);
+	void Server_setLogger(Server* self,Logger* logger);
 	void Server_setPort(Server* self,int port);
 	int Server_getPort(Server* self);
 	void Server_start(Server* self);
@@ -49,6 +53,7 @@
 	// protected
 	void Server_ctor(Server* self);
 	void Server_dtor(Server* self);
+	void Server_fatal(Server* self,const char* message);
 	void Server__buildFds(Server* self);
 
 #endif

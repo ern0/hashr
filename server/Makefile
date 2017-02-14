@@ -15,6 +15,7 @@ ${BIN}/hashr-server: \
 	${CC} \
 		${SRC}/main.c \
 		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
 		${OBJ}/Server.o \
 		${OBJ}/ClientConnection.o \
 		-o ${BIN}/hashr-server
@@ -27,9 +28,18 @@ ${OBJ}/Utils.o: \
 		${SRC}/Utils.c \
 		-o ${OBJ}/Utils.o
 
+${OBJ}/Logger.o: \
+		Makefile ${OBJ} \
+		${SRC}/Logger.h \
+		${SRC}/Logger.c
+	${CC} -c \
+		${SRC}/Logger.c \
+		-o ${OBJ}/Logger.o
+
 ${OBJ}/Server.o: \
 		Makefile ${OBJ} \
 		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
 		${OBJ}/ClientConnection.o \
 		${SRC}/Server.h \
 		${SRC}/Server.c
@@ -40,6 +50,7 @@ ${OBJ}/Server.o: \
 ${OBJ}/ClientConnection.o: \
 		Makefile ${OBJ} \
 		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
 		${SRC}/ClientConnection.h \
 		${SRC}/ClientConnection.c
 	${CC} -c \

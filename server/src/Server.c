@@ -1,5 +1,4 @@
 #include "Server.h"
-#include "Utils.h"
 
 
 	Server* new_Server() {
@@ -28,6 +27,7 @@
 
 		self->port = 8888;
 		self->mainSocket = -1;
+		self->logger = NULL;
 
 	} // ctor()
 
@@ -49,16 +49,26 @@
 	} // getPort()
 
 
+	void Server_setLogger(Server* self,Logger* logger) {
+		self->logger = logger;
+	} // setLogger()
+
+
+	void Server_fatal(Server* self,const char* message) {
+
+	} // fatal()
+
+
 	void Server_start(Server* self) {
 
 		self->mainSocket = socket(AF_INET,SOCK_STREAM,0);
 		if (self->mainSocket == -1) {
-			Utils_fatal("socket failed");
+			Server_fatal(self,"socket failed");
 		}
 
 		int opt = 1;
 		if ( -1 == setsockopt(self->mainSocket,SOL_SOCKET,SO_REUSEADDR,(char *)&opt,sizeof(opt)) ) {
-			Utils_fatal("setsockopt failed");
+			Server_fatal(self,"setsockopt failed");
 		}
 
 		self->address.sin_family = AF_INET;
@@ -66,11 +76,11 @@
 		self->address.sin_port = htons(self->port);
 
 		if ( -1 == bind(self->mainSocket,(struct sockaddr *)&(self->address),sizeof(self->address))) { 
-			Utils_fatal("bind failed");
+			Server_fatal(self,"bind failed");
 		}
 
 		if ( -1 == listen(self->mainSocket,5) ) {
-			Utils_fatal("listen failed");
+			Server_fatal(self,"listen failed");
 		}
 
 		self->runningFlag = 1;
@@ -88,9 +98,21 @@
 	void Server_run(Server* self) {
 
 		while ( self->runningFlag ) {
+
 			Server__buildFds(self);
-sleep(1); ////
-		}
+
+ 			struct timeval timeout;
+ 			timeout.tv_sec = 1;
+ 			timeout.tv_usec = 0;
+
+			int sel = select(self->maxSocket + 1,&self->readfds,NULL,NULL,&timeout);
+			if (sel == 0) continue;			
+			if (sel == -1) {
+				if (errno == EINTR) return;
+				Server_fatal(self,"select error");
+			}
+    
+		} // while running
 
 		close(self->mainSocket);
 
