@@ -1,5 +1,6 @@
 #include "Utils.h"
 
+
 	void Utils_getStamp(char* stamp) {
 
 		char fmt[64];

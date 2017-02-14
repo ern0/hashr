@@ -13,13 +13,13 @@
 #include <netinet/in.h>
 #include <sys/time.h>
 
-#include "ClientConnection.h"
 #include "Logger.h"
+#include "ClientConnection.h"
+
+#define MAX_CLIENT_NUMBER 20
 
 
 // class Server
-
-	#define MAX_CLIENT_NUMBER 20
 
 	// private
 	struct Server {
@@ -53,7 +53,9 @@
 	// protected
 	void Server_ctor(Server* self);
 	void Server_dtor(Server* self);
-	void Server_fatal(Server* self,const char* message);
-	void Server__buildFds(Server* self);
+	void Server_fatal(Server* self,int id,const char* message);
+	void Server_buildFds(Server* self);
+	void Server_connectNewClient(Server* self);
+	void Server_handleOldClient(Server* self);
 
 #endif

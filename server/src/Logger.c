@@ -57,16 +57,16 @@
 	} // getLevelString()
 
 
-	void Logger_logi(Logger* self,int level,const char* message,int value) {
+	void Logger_logi(Logger* self,int level,int id,const char* message,int value) {
 
 		char buffer[200];
 		snprintf(buffer,200,message,value);
-		Logger_log(self,level,buffer);
+		Logger_log(self,level,id,buffer);
 
 	} // logi()
 
 
-	void Logger_log(Logger* self,int level,const char* message) {
+	void Logger_log(Logger* self,int level,int id,const char* message) {
 
 		if (level & Logger_DISPLAY) fprintf(stderr,"\r%s \n",message);
 		if ((level &  0x0f) < self->level) return;
@@ -79,9 +79,10 @@
 
 		fprintf(
 			file
-			,"%s [%s] %s \n"
+			,"%s [%s] %d: %s \n"
 			,stamp
 			,Logger_getLevelString(level)
+			,id
 			,message
 		);
 

@@ -54,7 +54,10 @@
 	} // setLogger()
 
 
-	void Server_fatal(Server* self,const char* message) {
+	void Server_fatal(Server* self,int id,const char* message) {
+
+		Logger_log(self->logger,Logger_FATAL,id,message);
+		exit(2);
 
 	} // fatal()
 
@@ -63,12 +66,12 @@
 
 		self->mainSocket = socket(AF_INET,SOCK_STREAM,0);
 		if (self->mainSocket == -1) {
-			Server_fatal(self,"socket failed");
+			Server_fatal(self,1001,"socket failed");
 		}
 
 		int opt = 1;
 		if ( -1 == setsockopt(self->mainSocket,SOL_SOCKET,SO_REUSEADDR,(char *)&opt,sizeof(opt)) ) {
-			Server_fatal(self,"setsockopt failed");
+			Server_fatal(self,1002,"setsockopt failed");
 		}
 
 		self->address.sin_family = AF_INET;
@@ -76,11 +79,11 @@
 		self->address.sin_port = htons(self->port);
 
 		if ( -1 == bind(self->mainSocket,(struct sockaddr *)&(self->address),sizeof(self->address))) { 
-			Server_fatal(self,"bind failed");
+			Server_fatal(self,1003,"bind failed");
 		}
 
 		if ( -1 == listen(self->mainSocket,5) ) {
-			Server_fatal(self,"listen failed");
+			Server_fatal(self,1004,"listen failed");
 		}
 
 		self->runningFlag = 1;
@@ -99,7 +102,7 @@
 
 		while ( self->runningFlag ) {
 
-			Server__buildFds(self);
+			Server_buildFds(self);
 
  			struct timeval timeout;
  			timeout.tv_sec = 1;
@@ -107,9 +110,16 @@
 
 			int sel = select(self->maxSocket + 1,&self->readfds,NULL,NULL,&timeout);
 			if (sel == 0) continue;			
+			
 			if (sel == -1) {
 				if (errno == EINTR) return;
-				Server_fatal(self,"select error");
+				Server_fatal(self,1005,"select error");
+			}
+
+			if (FD_ISSET(self->mainSocket,&self->readfds)) {
+				Server_connectNewClient(self);
+			}	else {
+				Server_handleOldClient(self);
 			}
     
 		} // while running
@@ -119,7 +129,7 @@
 	} // run()
 
 
-	void Server__buildFds(Server* self) {
+	void Server_buildFds(Server* self) {
 
 
 		FD_ZERO(&self->readfds);
@@ -127,10 +137,10 @@
 		self->maxSocket = self->mainSocket;
 
 		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
-			ClientConnection* client = self->clientConnections[i];
-			if (client == NULL) continue;
+			ClientConnection* conn = self->clientConnections[i];
+			if (conn == NULL) continue;
 
-			int sd = ClientConnection_getSocket(client);
+			int sd = ClientConnection_getSocket(conn);
 			if (sd == -1) continue;
 			
 			FD_SET(sd,&self->readfds);
@@ -139,3 +149,43 @@
 
 	} // buildFds()
 
+
+	void Server_connectNewClient(Server* self) {
+
+		int sock = accept(self->mainSocket,(struct sockaddr *)&self->address,(socklen_t*)&self->addrlen);
+		if (sock == -1) Server_fatal(self,1006,"accept error");
+
+		ClientConnection* incoming = new_ClientConnection();
+		if (incoming == NULL) Server_fatal(self,1007,"no memory for new connection");
+
+		ClientConnection_setLogger(incoming,self->logger);
+		ClientConnection_setSocket(incoming,sock);
+
+		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
+			if (self->clientConnections[i] != NULL) continue;
+
+			self->clientConnections[i] = incoming;
+			ClientConnection_acceptConnection(incoming);
+			return;
+
+		} // foreach slot
+
+		ClientConnection_rejectConnection(incoming);
+		delete_ClientConnection(incoming);
+
+	} // connectNewClient()
+
+
+	void Server_handleOldClient(Server* self) {
+
+			for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
+
+				ClientConnection* conn = self->clientConnections[i];
+				if (conn != NULL) continue;
+
+				///self->clientConnections[i] = 4;
+				break;
+
+			} // foreach client connection
+
+	} // handleOldClient()

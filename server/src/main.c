@@ -16,12 +16,15 @@
 	int main(int argc,char* argv[]) {
 
 		logger = new_Logger();
-		Logger_setFilename(logger,"hashr.log");
+		Logger_setFilename(logger,"hashr.Log");
 		Logger_setLevel(logger,Logger_DEBUG);
+
+		Logger_log(logger,Logger_DEBUG,9001,"Application started");
+
 
 		server = new_Server();
 		if (server == NULL) {
-			Logger_log(logger,Logger_ERROR,"out of memory");
+			Logger_log(logger,Logger_ERROR,9002,"Out of memory");
 			exit(2);
 		}
 
@@ -31,7 +34,7 @@
 		Logger_logi(
 			logger
 			,Logger_NOTICE | Logger_DISPLAY
-			,"Server is listening on port %d..."
+			,9003,"Server is listening on port %d..."
 			,Server_getPort(server)
 		);
 
@@ -43,11 +46,11 @@
 		Logger_log(
 			logger
 			,Logger_NOTICE | Logger_DISPLAY
-			,"Exiting..."
+			,9004,"Exiting..."
 		);
 		delete_Server(server);
 		delete_Logger(logger);
 
-		Logger_log(logger,Logger_DEBUG,"Application finished");
+		Logger_log(logger,Logger_DEBUG,9005,"Application finished normally");
 
 	} // main()

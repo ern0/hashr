@@ -1,2 +1,4 @@
 clear
+rm hashr.log
 bin/`uname -s`-`uname -p`/hashr-server
+tail hashr.log
