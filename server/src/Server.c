@@ -2,10 +2,28 @@
 #include "Utils.h"
 
 
+	Server* new_Server() {
+
+		Server* self;
+		self = (Server*)malloc(sizeof(Server));
+		if (self != NULL) Server_ctor(self);
+
+		return self;
+	} // new Server
+
+
+	void delete_Server(Server* self) {
+
+		Server_dtor(self);
+		free(self);
+
+	} // delete Server
+
+
 	void Server_ctor(Server* self) {
 
 		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
-			self->clientSockets[i] = -1;
+			self->clientConnections[i] = NULL;
 		}
 
 		self->port = 8888;
@@ -87,9 +105,13 @@ sleep(1); ////
 		self->maxSocket = self->mainSocket;
 
 		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
-			int sd = self->clientSockets[i];
+			ClientConnection* client = self->clientConnections[i];
+			if (client == NULL) continue;
+
+			int sd = ClientConnection_getSocket(client);
+			if (sd == -1) continue;
 			
-			if (sd != -1) FD_SET(sd,&self->readfds);
+			FD_SET(sd,&self->readfds);
 			if (sd > self->maxSocket) self->maxSocket = sd;
 		}	// for sockets
 

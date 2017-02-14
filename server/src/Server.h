@@ -1,6 +1,7 @@
 #ifndef Server_h_included
 #define Server_h_included
 
+#include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -12,6 +13,7 @@
 #include <netinet/in.h>
 #include <sys/time.h>
 
+#include "ClientConnection.h"
 
 // class Server
 
@@ -31,13 +33,13 @@
 		fd_set readfds;	
 
 		char buffer[1025];
-		int clientSockets[MAX_CLIENT_NUMBER];		
+		ClientConnection* clientConnections[MAX_CLIENT_NUMBER];		
 	};
 	typedef struct Server Server;
 
 	// public
-	void Server_ctor(Server* self);
-	void Server_dtor(Server* self);
+	Server* new_Server();
+	void delete_Server(Server* self);
 	void Server_setPort(Server* self,int port);
 	int Server_getPort(Server* self);
 	void Server_start(Server* self);
@@ -45,6 +47,8 @@
 	void Server_run(Server* self);
 
 	// protected
+	void Server_ctor(Server* self);
+	void Server_dtor(Server* self);
 	void Server__buildFds(Server* self);
 
 #endif
