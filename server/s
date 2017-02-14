@@ -1,2 +1,2 @@
 clear
-bin/hashr-server
+bin/`uname -s`-`uname -p`/hashr-server

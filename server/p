@@ -1,2 +1,2 @@
 clear
-make -j4 bin/hashr-server
+make -j4 bin/`uname -s`-`uname -p`/hashr-server

@@ -1,15 +1,16 @@
 #### Makefile for hashr ################################
 
+PLATFORM=$(shell uname -s)-$(shell uname -p)
 CC=gcc -c -std=c99
 CL=gcc -std=c99
 SRC=src
-OBJ=/tmp/hashr
-BIN=bin
+OBJ=/tmp/hashr/${PLATFORM}
+BIN=bin/${PLATFORM}
 
 ########################################################
 
 ${BIN}/hashr-server: \
-		Makefile \
+		Makefile ${OBJ} ${BIN} \
 		${SRC}/main.c \
 		${OBJ}/Server.o
 	${CL} \
@@ -19,7 +20,7 @@ ${BIN}/hashr-server: \
 		-o ${BIN}/hashr-server
 
 ${OBJ}/Utils.o: \
-		Makefile \
+		Makefile ${OBJ} \
 		${SRC}/Utils.h \
 		${SRC}/Utils.c
 	${CC} \
@@ -27,7 +28,7 @@ ${OBJ}/Utils.o: \
 		-o ${OBJ}/Utils.o
 
 ${OBJ}/Server.o: \
-		Makefile \
+		Makefile ${OBJ} \
 		${OBJ}/Utils.o \
 		${SRC}/Server.h \
 		${SRC}/Server.c
