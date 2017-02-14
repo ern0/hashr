@@ -9,7 +9,7 @@
 		if (self != NULL) Server_ctor(self);
 
 		return self;
-	} // new Server
+	} // new 
 
 
 	void delete_Server(Server* self) {
@@ -17,7 +17,7 @@
 		Server_dtor(self);
 		free(self);
 
-	} // delete Server
+	} // delete
 
 
 	void Server_ctor(Server* self) {
