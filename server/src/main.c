@@ -16,7 +16,7 @@
 	int main(int argc,char* argv[]) {
 
 		logger = new_Logger();
-		Logger_setFilename(logger,"hashr.Log");
+		Logger_setFilename(logger,"hashr.log");
 		Logger_setLevel(logger,Logger_DEBUG);
 
 		Logger_log(logger,Logger_DEBUG,9001,"Application started");

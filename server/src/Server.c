@@ -12,10 +12,8 @@
 
 
 	void delete_Server(Server* self) {
-
 		Server_dtor(self);
 		free(self);
-
 	} // delete
 
 
@@ -28,14 +26,13 @@
 		self->port = 8888;
 		self->mainSocket = -1;
 		self->logger = NULL;
+		self->session = 0;
 
 	} // ctor()
 
 
 	void Server_dtor(Server* self) {
-
 		if (self->mainSocket != -1) close(self->mainSocket);
-
 	} // dtor()
 
 
@@ -55,10 +52,8 @@
 
 
 	void Server_fatal(Server* self,int id,const char* message) {
-
 		Logger_log(self->logger,Logger_FATAL,id,message);
 		exit(2);
-
 	} // fatal()
 
 
@@ -92,9 +87,7 @@
 
 
 	void Server_stop(Server* self) {
-
 		self->runningFlag = 0;
-
 	} // stop()
 
 
@@ -131,12 +124,12 @@
 
 	void Server_buildFds(Server* self) {
 
-
 		FD_ZERO(&self->readfds);
 		FD_SET(self->mainSocket,&self->readfds);
 		self->maxSocket = self->mainSocket;
 
 		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
+
 			ClientConnection* conn = self->clientConnections[i];
 			if (conn == NULL) continue;
 
@@ -145,6 +138,7 @@
 			
 			FD_SET(sd,&self->readfds);
 			if (sd > self->maxSocket) self->maxSocket = sd;
+
 		}	// for sockets
 
 	} // buildFds()
@@ -165,7 +159,8 @@
 			if (self->clientConnections[i] != NULL) continue;
 
 			self->clientConnections[i] = incoming;
-			ClientConnection_acceptConnection(incoming);
+			self->session++;
+			ClientConnection_acceptConnection(incoming,self->session);
 			return;
 
 		} // foreach slot
@@ -181,11 +176,17 @@
 			for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
 
 				ClientConnection* conn = self->clientConnections[i];
-				if (conn != NULL) continue;
+				if (conn == NULL) continue;
 
-				///self->clientConnections[i] = 4;
-				break;
+				if (!FD_ISSET(ClientConnection_getSocket(conn),&self->readfds)) continue;
+				if ( ClientConnection_process(conn) ) return;
+
+				delete_ClientConnection(conn);
+				self->clientConnections[i] = NULL;
+				return;
 
 			} // foreach client connection
+
+			Server_fatal(self,1008,"internal error, invalid client socket");
 
 	} // handleOldClient()

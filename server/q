@@ -1,0 +1,2 @@
+clear
+nc localhost 8000

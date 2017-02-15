@@ -12,9 +12,15 @@
 
 // class ClientConnection
 
+	// const
+	#define ClientConnection_BUFLEN 20000
+	
+	// private
 	struct ClientConnection {
+		int session;
 		Logger* logger;
 		int socket;
+		char buffer[ClientConnection_BUFLEN];
 	};
 	typedef struct ClientConnection ClientConnection;
 
@@ -24,8 +30,10 @@
 	void ClientConnection_setLogger(ClientConnection* self,Logger* logger);
 	int ClientConnection_getSocket(ClientConnection* self);
 	void ClientConnection_setSocket(ClientConnection* self,int sock);
-	void ClientConnection_acceptConnection(ClientConnection* self);	
+	void ClientConnection_acceptConnection(ClientConnection* self,int session);	
 	void ClientConnection_rejectConnection(ClientConnection* self);
+	void ClientConnection_closeConnection(ClientConnection* self);
+	int ClientConnection_process(ClientConnection* self);
 
 	// protected
 	void ClientConnection_ctor(ClientConnection* self);

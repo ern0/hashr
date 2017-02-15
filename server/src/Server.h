@@ -16,7 +16,8 @@
 #include "Logger.h"
 #include "ClientConnection.h"
 
-#define MAX_CLIENT_NUMBER 20
+
+#define MAX_CLIENT_NUMBER 2
 
 
 // class Server
@@ -27,6 +28,7 @@
 		Logger* logger;
 		int port;
 		int runningFlag;
+		int session;
 
 		int addrlen;
 		int mainSocket;
