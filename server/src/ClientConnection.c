@@ -97,29 +97,73 @@
 
 	int ClientConnection_process(ClientConnection* self) {
 
-		int len = read(self->socket,self->buffer,ClientConnection_BUFLEN);
+		self->len = read(self->socket,self->buffer,ClientConnection_BUFLEN);
 
-		if (len == -1) {
+		if (self->len == -1) {
 			ClientConnection_log(self,Logger_NOTICE | Logger_DISPLAY,2014,"Error reading client socket, disconnecting");
 			ClientConnection_closeConnection(self);
 			return 0;
 		} // if read error
 
-		if (len == 0) {
+		if (self->len == 0) {
 			ClientConnection_log(self,Logger_NOTICE | Logger_DISPLAY,2015,"Client disconnected");
 			ClientConnection_closeConnection(self);
 			return 0;
 		} // if disconnect
 
-		self->buffer[len - 1] = 0;
-		printf("proc started session=%d: [%s] \n",self->session,self->buffer);
+		printf("processing request, session=%d \n",self->session);
 
-		send(self->socket,"OK...\n",6,0);
-		sleep(2);
-		send(self->socket,"...OK\n",6,0);
-
-		printf("proc finished session=%d: [%s] \n",self->session,self->buffer);
+		ClientConnection_dumpBuffer(self);
+		send(self->socket,"OK\n",3,0);
 
 		return 1;
 	} // process()
 
+
+	void ClientConnection_dumpBuffer(ClientConnection* self) {
+
+		int ptr = 0;
+
+		while (1) {
+			if (ptr >= self->len) break;
+
+			printf("  %04X: ",ptr);
+
+			for (int i = 0; i < 8; i++) {
+				int index = ptr + i;
+
+				if (index < self->len) {
+					unsigned char b = self->buffer[ptr + i];
+					printf("%02X ",b);
+				} // if payload
+
+				else {
+					printf("   ");
+				} // else fill
+
+			} // for numbers
+
+			printf(" \e[7m");
+
+			for (int i = 0; i < 8; i++) {
+				int index = ptr + i;
+
+				if (index < self->len) {
+					unsigned char b = self->buffer[ptr + i];
+					if (b < ' ') b = '.';
+					if (b > 126) b = '.';
+					printf("%c",b);
+				} // if payload
+
+				else {
+					printf(" ");
+				} // else fill
+
+			} // for characters
+
+			printf("\e[0m\n");
+
+			ptr += 8;
+		} // while buffer
+
+	} // dumpBuffer()

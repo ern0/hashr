@@ -21,6 +21,7 @@
 		Logger* logger;
 		int socket;
 		char buffer[ClientConnection_BUFLEN];
+		int len;
 	};
 	typedef struct ClientConnection ClientConnection;
 
@@ -28,6 +29,7 @@
 	ClientConnection* new_ClientConnection();
 	void delete_ClientConnection(ClientConnection* self);
 	void ClientConnection_setLogger(ClientConnection* self,Logger* logger);
+	void ClientConnection_log(ClientConnection* self,int level,int id,const char* message);
 	int ClientConnection_getSocket(ClientConnection* self);
 	void ClientConnection_setSocket(ClientConnection* self,int sock);
 	void ClientConnection_acceptConnection(ClientConnection* self,int session);	
@@ -39,6 +41,7 @@
 	void ClientConnection_ctor(ClientConnection* self);
 	void ClientConnection_dtor(ClientConnection* self);
 	void ClientConnection_fatal(ClientConnection* self,int id,const char* message);
+	void ClientConnection_dumpBuffer(ClientConnection* self);
 
 
 #endif
