@@ -37,17 +37,17 @@ Request block types:
   "CMND" - specifies command, e.g. "set", "del" etc.
   "QKEY" - request key 
   "QVAL" - request value (payload)
-  "SMOD" - search hit mode (first/all)
-  "SKEY" - search key (may be partial)
-  "SVAL" - search key (may be partial)
+  "SFIL" - search filter ("key"/"value"/"all")
+  "SPAT" - search pattern
+  "SMAX" - search max. number of results
   "RMET" - reorg method
   "RCAP" - reorg capacity
 
 Response block types:
+  "INFO" - info response
   "STAT" - status
   "AKEY" - response key
   "AVAL" - response value (payload)
-  "INFO" - info response
   "SRES" - search result number of items
 
 Push block types:

@@ -74,6 +74,8 @@ search
 request:
  - scope: key / value / key+value
  - hit: first / all
+ - key
+ - value
 response:
  - status: provided 
  - payload: array of values

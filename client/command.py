@@ -11,17 +11,13 @@ class Command:
 		self.requestKey = None
 		self.requestValue = None
 		
-		self.searchMode = None
-		self.searchKey = None
-		self.searchValue = None
+		self.searchFilter = None
+		self.searchPattern = None
+		self.searchMaxResults = None
 
 		self.reorgMethod = None
 		self.reorgCapacity = None
 		
-		self.responseStatus = None
-		self.responseKey = None
-		self.responseValue = None
-
 
 	def setCommand(self,cmd):
 		self.cmd = cmd
@@ -30,6 +26,9 @@ class Command:
 	def setCounter(self,counter):
 		self.counter = counter
 		return self
+
+	def getCounter(self):
+		return self.counter
 
 
 	def setRequestKey(self,key):
@@ -41,16 +40,16 @@ class Command:
 		return self
 
 
-	def setSearchMode(self,mode):
-		self.searchMode = mode
+	def setSearchFilter(self,filter):
+		self.searchFilter = filter
 		return self
 
-	def setSearchKey(self,key):
-		self.searchKey = key
+	def setSearchPattern(self,pattern):
+		self.searchPattern = pattern
 		return self
 
-	def setSearchValue(self,value):
-		self.searchValue = value
+	def setSearchMaxResults(self,maxres):
+		self.searchMaxResults = maxres
 		return self
 
 
@@ -59,30 +58,39 @@ class Command:
 		return self
 
 	def setReorgCapacity(self,capacity):
-		self.setReorgCapacity = capacity
+		self.reorgCapacity = capacity
 		return self
-
-
-	def getResponseStatus(self):
-		return self.responseStatus
-
-	def getResponseKey(self):
-		return self.responseKey
-
-	def getResponseValue(self):
-		return self.responseValue
 
 
 	def render(self):
 
 		packet = Packet()
+
 		if self.cmd is not None: 
 			packet.addTextBlock("CMND",self.cmd)
+
 		if self.counter is not None:
 			packet.addIntBlock("cntr",self.counter)
+
 		if self.requestKey is not None: 
 			packet.addTextBlock("QKEY",self.requestKey)
+
 		if self.requestValue is not None:
 			packet.addTextBlock("QVAL",self.requestValue)
+
+		if self.searchFilter is not None:
+			packet.addTextBlock("SFIL",self.searchFilter)
+
+		if self.searchPattern is not None:
+			packet.addTextBlock("SPAT",self.searchPattern)
+
+		if self.searchMaxResults is not None:
+			packet.addIntBlock("SMAX",self.searchMaxResults)
+
+		if self.reorgMethod is not None:
+			packet.addTextBlock("RMET",self.reorgMethod)
+
+		if self.reorgCapacity is not None:
+			packet.addIntBlock("RCAP",self.reorgCapacity)
 
 		return packet.render()

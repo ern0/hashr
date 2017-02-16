@@ -1,6 +1,9 @@
 from block import *
 
 
+class FileNotFoundException(Exception): pass
+
+
 class Packet:
 
 	def __init__(self):
@@ -21,7 +24,9 @@ class Packet:
 		block = Block()
 		block.setType(bytearray(type,"UTF-8"))
 
-		file = open(fnam,mode="rb")
+		try: file = open(fnam,mode="rb")
+		except: file = None
+		if file is None: raise FileNotFoundException
 		data = file.read()
 		file.close()
 		block.setData(data)
@@ -30,6 +35,8 @@ class Packet:
 
 
 	def addTextBlock(self,type,value):
+		value = str(value)
+
 		if value[0] == '@': self._addFileBlock(type,value[1:])
 		else: self._addStringBlock(type,value)
 
