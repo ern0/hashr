@@ -29,9 +29,18 @@ class Packet:
 		self.blockList.append(block)
 
 
-	def addBlock(self,type,value):
+	def addTextBlock(self,type,value):
 		if value[0] == '@': self._addFileBlock(type,value[1:])
 		else: self._addStringBlock(type,value)
+
+
+	def addIntBlock(self,type,value):
+
+		block = Block()
+		block.setType(bytearray(type,"UTF-8"))
+		block.setInt(value)
+
+		self.blockList.append(block)
 
 
 	def render(self):
@@ -42,6 +51,6 @@ class Packet:
 		for block in self.blockList:
 			r += block.render()
 
-		r += b"ENDm"
+		r += b"endm"
 
 		return r

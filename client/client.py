@@ -16,6 +16,15 @@ from command import *
 class Client(Thread):
 
 
+	def __init__(self):
+
+		Thread.__init__(self)
+		self.fakeAbort = False
+		self.counter = 0
+
+		self.responseTimeout = 4
+
+
 	def fatal(self,message,abort = False):
 
 		print("FATAL: " + message)
@@ -60,18 +69,20 @@ class Client(Thread):
 
 	def run(self):
 
-		self.fakeAbort = False
-
 		while True:
 
 			command = Command()
-			command.setCommand("info")
+			command.setCommand("INFO")
 			self.fireCommand( command )
 
 			time.sleep(1)
 
 
 	def fireCommand(self,command):
+
+		command.setCounter(self.counter)
+		self.counter += 1;
+
 		self.fireRaw( command.render() )
 
 
@@ -81,6 +92,13 @@ class Client(Thread):
 			self.sock.send(data)
 		except BrokenPipeError:	
 			self.fatal("server is not connected",True)
+			return None
+
+		ready = select([self.sock],[],[],self.responseTimeout)
+		if ready[0]: result = self.sock.recv(9999)
+		else: result = None
+
+		print(result)
 
 
 	def main(self):
@@ -108,7 +126,7 @@ class Client(Thread):
 			print(line)
 
 			command = Command()
-			command.setCommand("quit")
+			command.setCommand("QUIT")
 			self.fireCommand( command )
 
 		try: self.sock.shutdown(0)

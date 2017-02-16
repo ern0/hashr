@@ -9,6 +9,18 @@ class Block:
 		self.setData(bytearray(stringValue,"UTF-8"))
 
 
+	def setInt(self,value):
+
+		v = bytearray()
+		v.append( (value >> 24) & 0xff );
+		v.append( (value >> 16) & 0xff );
+		v.append( (value >> 8) & 0xff );
+		v.append( value & 0xff );
+
+		self.setData(v)
+
+
+
 	def setData(self,binaryValue):
 		self.data = binaryValue
 

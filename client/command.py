@@ -6,6 +6,7 @@ class Command:
 	def __init__(self):
 
 		self.cmd = None
+		self.counter = None
 		
 		self.requestKey = None
 		self.requestValue = None
@@ -22,9 +23,12 @@ class Command:
 		self.responseValue = None
 
 
-
 	def setCommand(self,cmd):
 		self.cmd = cmd
+		return self
+
+	def setCounter(self,counter):
+		self.counter = counter
 		return self
 
 
@@ -73,10 +77,12 @@ class Command:
 
 		packet = Packet()
 		if self.cmd is not None: 
-			packet.addBlock("CMND",self.cmd)
+			packet.addTextBlock("CMND",self.cmd)
+		if self.counter is not None:
+			packet.addIntBlock("cntr",self.counter)
 		if self.requestKey is not None: 
-			packet.addBlock("QKEY",self.requestKey)
+			packet.addTextBlock("QKEY",self.requestKey)
 		if self.requestValue is not None:
-			packet.addBlock("QVAL",self.requestValue)
+			packet.addTextBlock("QVAL",self.requestValue)
 
 		return packet.render()
