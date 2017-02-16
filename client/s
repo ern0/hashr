@@ -1,0 +1,4 @@
+#!/bin/bash
+
+clear
+./client.py localhost 8000

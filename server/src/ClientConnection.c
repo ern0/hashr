@@ -67,7 +67,7 @@
 		ClientConnection_log(self,Logger_NOTICE | Logger_DISPLAY,2001,"Accepting connection");
 
 		char message[20];
-		sprintf(message,"ACCEPT %d\n",self->session);
+		sprintf(message,"%d\n",self->session);
 		int sent = send(self->socket,message,strlen(message),0);
 		if (sent == -1) {
 			ClientConnection_log(self,Logger_ERROR,2011,"client send failed");
@@ -83,7 +83,7 @@
 
 		Logger_log(self->logger,Logger_ERROR | Logger_DISPLAY,2011,"No more connections available, rejecting");
 
-		const char* message = "REJECT\n";
+		const char* message = "0\n";
 		int sent = send(self->socket,message,strlen(message),0);
 		if (sent == -1) ClientConnection_log(self,Logger_ERROR,2002,"client send failed");
 
@@ -154,10 +154,6 @@
 					if (b > 126) b = '.';
 					printf("%c",b);
 				} // if payload
-
-				else {
-					printf(" ");
-				} // else fill
 
 			} // for characters
 

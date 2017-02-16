@@ -37,10 +37,11 @@ Request block types:
   "CMND" - specifies command, e.g. "set", "del" etc.
   "QKEY" - request key 
   "QVAL" - request value (payload)
+  "SMOD" - search hit mode (first/all)
   "SKEY" - search key (may be partial)
   "SVAL" - search key (may be partial)
-  "SMOD" - search hit mode (first/all)
-  "RORG" - reorg parameters
+  "RMET" - reorg method
+  "RCAP" - reorg capacity
 
 Response block types:
   "STAT" - status
