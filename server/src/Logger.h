@@ -14,12 +14,14 @@
 	#define Logger_NOTICE 0x02
 	#define Logger_ERROR 0x03
 	#define Logger_FATAL 0x04
+	#define Logger_MUTE 0x20  /* only for testing */
 	#define Logger_DISPLAY 0x80
 
 	// private
 	struct Logger {
 		const char* filename;
 		int level;
+		int lastId;
 	};
 	typedef struct Logger Logger;
 
@@ -31,6 +33,7 @@
 	void Logger_setLevel(Logger* self,int value);
 	void Logger_log(Logger* self,int level,int id,const char* message);
 	void Logger_logi(Logger* self,int level,int id,const char* message,int value);
+	int Logger_getLastId(Logger* self);
 
 	// protected
 	void Logger_ctor(Logger* self);

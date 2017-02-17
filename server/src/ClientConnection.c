@@ -18,14 +18,23 @@
 
 
 	void ClientConnection_ctor(ClientConnection* self) {
+
 		self->socket = -1;
 		self->session = 0;
+
+		ClientConnection_setBuffer(self,self->internalBuffer);
+
 	} // ctor
 
 
 	void ClientConnection_dtor(ClientConnection* self) {
 		ClientConnection_closeConnection(self);
 	} // dtor
+
+
+	void ClientConnection_setBuffer(ClientConnection* self,unsigned char* buffer) {
+		self->buffer = buffer;
+	} // setBuffer()
 
 
 	void ClientConnection_setLogger(ClientConnection* self,Logger* logger) {
@@ -95,71 +104,91 @@
 	} // closeConnection()
 
 
-	int ClientConnection_process(ClientConnection* self) {
+	// return: 0 - okay, other - fail
+	int ClientConnection_readPacket(ClientConnection* self) {
 
 		self->len = read(self->socket,self->buffer,ClientConnection_BUFLEN);
 
 		if (self->len == -1) {
 			ClientConnection_log(self,Logger_NOTICE | Logger_DISPLAY,2014,"Error reading client socket, disconnecting");
 			ClientConnection_closeConnection(self);
-			return 0;
+			return -1;
 		} // if read error
 
 		if (self->len == 0) {
 			ClientConnection_log(self,Logger_NOTICE | Logger_DISPLAY,2015,"Client disconnected");
 			ClientConnection_closeConnection(self);
-			return 0;
+			return -1;
 		} // if disconnect
 
-		printf("processing request, session=%d \n",self->session);
+		if (!ClientConnection_isHeaderOk(self)) {
+			ClientConnection_log(self,Logger_ERROR | Logger_DISPLAY,2018,"Invalid request");
+			ClientConnection_closeConnection(self);
+			return -1;		
+		} // if invalid request
 
-		ClientConnection_dumpBuffer(self);
+		return 0;
+	} // readPacket()
+
+
+	int ClientConnection_isHeaderOk(ClientConnection* self) {
+
+		if ( self->buffer[0] != 'H' ) return 0;
+		if ( self->buffer[1] != 'S' ) return 0;
+		if ( self->buffer[2] != 'H' ) return 0;
+		if ( self->buffer[3] != 'r' ) return 0;
+
+		return 1;
+	} // isHeaderOk()
+
+
+	int ClientConnection_countChunks(ClientConnection* self) {
+
+		int result = 0;
+		int index = 4;
+
+		while (1) {
+			if (self->len < index + 4) return -1;
+			
+			if (Utils_isEqSigs(&self->buffer[index],(const unsigned char*)"endm")) {
+				break;
+			}
+
+			int chunkLength = Utils_getBufInt(&self->buffer[index + 4]);
+			printf("he: %c%c%c%c %d\n"
+				,self->buffer[index + 0]
+				,self->buffer[index + 1]
+				,self->buffer[index + 2]
+				,self->buffer[index + 3]
+				,chunkLength
+			);
+			index += chunkLength + 8;
+			result++;
+					
+		} // loop
+
+		return result;
+	} // countChunks()
+
+
+	// return: 0 - okay, other - fail
+	int ClientConnection_process(ClientConnection* self) {
+
+		if ( ClientConnection_readPacket(self) ) return -1;
+
+printf("processing request, session=%d \n",self->session);
+
+		int chunkCount = ClientConnection_countChunks(self);
+		if (chunkCount == -1) {
+			ClientConnection_log(self,Logger_ERROR | Logger_DISPLAY,2019,"Damaged request");
+			ClientConnection_closeConnection(self);
+			return 0;		
+		} // if invalid request
+
 		send(self->socket,"OK\n",3,0);
 
 		return 1;
 	} // process()
 
 
-	void ClientConnection_dumpBuffer(ClientConnection* self) {
-
-		int ptr = 0;
-
-		while (1) {
-			if (ptr >= self->len) break;
-
-			printf("  %04X: ",ptr);
-
-			for (int i = 0; i < 8; i++) {
-				int index = ptr + i;
-
-				if (index < self->len) {
-					unsigned char b = self->buffer[ptr + i];
-					printf("%02X ",b);
-				} // if payload
-
-				else {
-					printf("   ");
-				} // else fill
-
-			} // for numbers
-
-			printf(" \e[7m");
-
-			for (int i = 0; i < 8; i++) {
-				int index = ptr + i;
-
-				if (index < self->len) {
-					unsigned char b = self->buffer[ptr + i];
-					if (b < ' ') b = '.';
-					if (b > 126) b = '.';
-					printf("%c",b);
-				} // if payload
-
-			} // for characters
-
-			printf("\e[0m\n");
-
-			ptr += 8;
-		} // while buffer
-
-	} // dumpBuffer()
+	

@@ -1,4 +1,6 @@
 clear
 rm hashr.log
-bin/`uname -s`-`uname -p`/hashr-server
-tail hashr.log
+bin/`uname -s`-`uname -p`/hashr-server &
+../client/client.py -c info
+pkill hashr-server
+#tail hashr.log

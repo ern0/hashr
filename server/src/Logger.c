@@ -24,6 +24,7 @@
 
 		self->level = Logger_ERROR;
 		self->filename = "error.log";
+		self->lastId = 0;
 
 	} // ctor
 
@@ -34,6 +35,11 @@
 
 	} // dtor
 
+
+	int Logger_getLastId(Logger* self) {
+		return self->lastId;
+	} // getLastId()
+	
 
 	void Logger_setFilename(Logger* self,const char* fnam) {
 		self->filename = fnam;

@@ -2,7 +2,9 @@
 
 PLATFORM=$(shell uname -s)-$(shell uname -p)
 CC=gcc -std=c99
+TC=g++
 SRC=src
+TST=test
 OBJ=/tmp/hashr/${PLATFORM}
 BIN=bin/${PLATFORM}
 
@@ -56,6 +58,34 @@ ${OBJ}/ClientConnection.o: \
 	${CC} -c \
 		${SRC}/ClientConnection.c \
 		-o ${OBJ}/ClientConnection.o
+
+########################################################
+
+test: \
+	${BIN}/test-Utils \
+	${BIN}/test-ClientConnection \
+
+${BIN}/test-Utils: \
+		Makefile ${OBJ} ${BIN} \
+		${TST}/test-Utils.cpp \
+		${OBJ}/Utils.o
+	${TC} \
+		${TST}/test-Utils.cpp \
+		${OBJ}/Utils.o \
+		-o ${BIN}/test-Utils
+
+${BIN}/test-ClientConnection: \
+		Makefile ${OBJ} ${BIN} \
+		${TST}/test-ClientConnection.cpp \
+		${OBJ}/ClientConnection.o \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o
+	${TC} \
+		${TST}/test-ClientConnection.cpp \
+		${OBJ}/ClientConnection.o \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
+		-o ${BIN}/test-ClientConnection
 
 ########################################################
 

@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/socket.h>
 
+#include "Utils.h"
 #include "Logger.h"
 
 
@@ -20,10 +21,14 @@
 		int session;
 		Logger* logger;
 		int socket;
-		char buffer[ClientConnection_BUFLEN];
+		unsigned char* buffer;
+		unsigned char internalBuffer[ClientConnection_BUFLEN];
 		int len;
 	};
 	typedef struct ClientConnection ClientConnection;
+
+	// test
+	void ClientConnection_setBuffer(ClientConnection* self,unsigned char* buffer);
 
 	// public
 	ClientConnection* new_ClientConnection();
@@ -41,7 +46,8 @@
 	void ClientConnection_ctor(ClientConnection* self);
 	void ClientConnection_dtor(ClientConnection* self);
 	void ClientConnection_fatal(ClientConnection* self,int id,const char* message);
-	void ClientConnection_dumpBuffer(ClientConnection* self);
-
+	int ClientConnection_readPacket(ClientConnection* self);
+	int ClientConnection_isHeaderOk(ClientConnection* self);
+	int ClientConnection_countChunks(ClientConnection* self);
 
 #endif

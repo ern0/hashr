@@ -173,20 +173,20 @@
 
 	void Server_handleOldClient(Server* self) {
 
-			for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
+		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
 
-				ClientConnection* conn = self->clientConnections[i];
-				if (conn == NULL) continue;
+			ClientConnection* conn = self->clientConnections[i];
+			if (conn == NULL) continue;
 
-				if (!FD_ISSET(ClientConnection_getSocket(conn),&self->readfds)) continue;
-				if ( ClientConnection_process(conn) ) return;
+			if (!FD_ISSET(ClientConnection_getSocket(conn),&self->readfds)) continue;
+			if ( 0 == ClientConnection_process(conn) ) return;
 
-				delete_ClientConnection(conn);
-				self->clientConnections[i] = NULL;
-				return;
+			delete_ClientConnection(conn);
+			self->clientConnections[i] = NULL;
+			return;
 
-			} // foreach client connection
+		} // foreach client connection
 
-			Server_fatal(self,1008,"internal error, invalid client socket");
+		Server_fatal(self,1008,"internal error, invalid client socket");
 
 	} // handleOldClient()

@@ -20,7 +20,6 @@ class Block:
 		self.setData(v)
 
 
-
 	def setData(self,binaryValue):
 		self.data = binaryValue
 
