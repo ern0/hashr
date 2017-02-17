@@ -39,7 +39,7 @@
 	int Logger_getLastId(Logger* self) {
 		return self->lastId;
 	} // getLastId()
-	
+
 
 	void Logger_setFilename(Logger* self,const char* fnam) {
 		self->filename = fnam;
@@ -74,7 +74,14 @@
 
 	void Logger_log(Logger* self,int level,int id,const char* message) {
 
-		if (level & Logger_DISPLAY) fprintf(stderr,"\r%s \n",message);
+		self->lastId = id;
+
+		if ((self->level & 0x0f) == Logger_MUTE) {
+			level &= (~Logger_DISPLAY);
+		}
+		if (level & Logger_DISPLAY) {
+			fprintf(stderr,"\r%s \n",message);
+		}
 		if ((level &  0x0f) < self->level) return;
 
 		FILE* file = fopen(self->filename,"a+");

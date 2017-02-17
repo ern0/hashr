@@ -21,8 +21,9 @@
 
 		self->socket = -1;
 		self->session = 0;
+		self->chunkCount = -1;
 
-		ClientConnection_setBuffer(self,self->internalBuffer);
+		ClientConnection_setBuffer(self,self->internalBuffer,-1);
 
 	} // ctor
 
@@ -32,8 +33,9 @@
 	} // dtor
 
 
-	void ClientConnection_setBuffer(ClientConnection* self,unsigned char* buffer) {
+	void ClientConnection_setBuffer(ClientConnection* self,unsigned char* buffer,int len) {
 		self->buffer = buffer;
+		self->len = len;
 	} // setBuffer()
 
 
@@ -121,12 +123,6 @@
 			return -1;
 		} // if disconnect
 
-		if (!ClientConnection_isHeaderOk(self)) {
-			ClientConnection_log(self,Logger_ERROR | Logger_DISPLAY,2018,"Invalid request");
-			ClientConnection_closeConnection(self);
-			return -1;		
-		} // if invalid request
-
 		return 0;
 	} // readPacket()
 
@@ -142,12 +138,13 @@
 	} // isHeaderOk()
 
 
-	int ClientConnection_countChunks(ClientConnection* self) {
+	int ClientConnection_scanChunks(ClientConnection* self) {
 
 		int result = 0;
 		int index = 4;
 
 		while (1) {
+
 			if (self->len < index + 4) return -1;
 			
 			if (Utils_isEqSigs(&self->buffer[index],(const unsigned char*)"endm")) {
@@ -155,40 +152,71 @@
 			}
 
 			int chunkLength = Utils_getBufInt(&self->buffer[index + 4]);
-			printf("he: %c%c%c%c %d\n"
-				,self->buffer[index + 0]
-				,self->buffer[index + 1]
-				,self->buffer[index + 2]
-				,self->buffer[index + 3]
-				,chunkLength
-			);
-			index += chunkLength + 8;
+			if (chunkLength < 0) return -1;
+
 			result++;
+			index += chunkLength + 8;
 					
 		} // loop
 
 		return result;
-	} // countChunks()
+	} // scanChunks()
 
 
-	// return: 0 - okay, other - fail
-	int ClientConnection_process(ClientConnection* self) {
+	int ClientConnection_findChunk(ClientConnection* self,unsigned char* sig) {
 
-		if ( ClientConnection_readPacket(self) ) return -1;
+		int index = 4;
 
-printf("processing request, session=%d \n",self->session);
+		while (1) {
 
-		int chunkCount = ClientConnection_countChunks(self);
-		if (chunkCount == -1) {
-			ClientConnection_log(self,Logger_ERROR | Logger_DISPLAY,2019,"Damaged request");
-			ClientConnection_closeConnection(self);
-			return 0;		
+			if (Utils_isEqSigs(&self->buffer[index],(const unsigned char*)"endm")) {
+				return -1;
+			}
+
+			if (Utils_isEqSigs(&self->buffer[index],sig)) break;
+
+			int chunkLength = Utils_getBufInt(&self->buffer[index + 4]);
+			index += chunkLength + 8;
+					
+		} // loop
+
+		return index + 8;
+	} // findChunks()
+
+
+	int ClientConnection_processPacket(ClientConnection* self) {
+
+		if (!ClientConnection_isHeaderOk(self)) {
+			ClientConnection_log(self,Logger_ERROR | Logger_DISPLAY,2018,"Invalid request");
+			return -1;		
 		} // if invalid request
+
+		self->chunkCount = ClientConnection_scanChunks(self);
+		if (self->chunkCount == -1) {
+			ClientConnection_log(self,Logger_ERROR | Logger_DISPLAY,2019,"Damaged request");
+			return -1;		
+		} // if damaged request
+	
+		return 0;
+	} // processPacket()
+
+
+	void ClientConnection_processRequest(ClientConnection* self) {
+
+		if ( ClientConnection_readPacket(self) ) {
+			ClientConnection_closeConnection(self);
+			return;
+		}
+
+		if (-1 == ClientConnection_processPacket(self)) {
+			return;
+		}
+
+		// TODO: response
 
 		send(self->socket,"OK\n",3,0);
 
-		return 1;
-	} // process()
+	} // processRequest()
 
 
 	

@@ -24,11 +24,12 @@
 		unsigned char* buffer;
 		unsigned char internalBuffer[ClientConnection_BUFLEN];
 		int len;
+		int chunkCount;
 	};
 	typedef struct ClientConnection ClientConnection;
 
 	// test
-	void ClientConnection_setBuffer(ClientConnection* self,unsigned char* buffer);
+	void ClientConnection_setBuffer(ClientConnection* self,unsigned char* buffer,int len);
 
 	// public
 	ClientConnection* new_ClientConnection();
@@ -40,14 +41,16 @@
 	void ClientConnection_acceptConnection(ClientConnection* self,int session);	
 	void ClientConnection_rejectConnection(ClientConnection* self);
 	void ClientConnection_closeConnection(ClientConnection* self);
-	int ClientConnection_process(ClientConnection* self);
+	void ClientConnection_processRequest(ClientConnection* self);
 
 	// protected
 	void ClientConnection_ctor(ClientConnection* self);
 	void ClientConnection_dtor(ClientConnection* self);
 	void ClientConnection_fatal(ClientConnection* self,int id,const char* message);
 	int ClientConnection_readPacket(ClientConnection* self);
+	int ClientConnection_processPacket(ClientConnection* self);	
 	int ClientConnection_isHeaderOk(ClientConnection* self);
-	int ClientConnection_countChunks(ClientConnection* self);
+	int ClientConnection_scanChunks(ClientConnection* self);
+	int ClientConnection_findChunk(ClientConnection* self,unsigned char* sig);
 
 #endif

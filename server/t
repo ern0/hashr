@@ -3,5 +3,5 @@ PLATFORM=`uname -s`-`uname -p`
 
 make -j4 test
 
-bin/$PLATFORM/test-Utils
+#bin/$PLATFORM/test-Utils
 bin/$PLATFORM/test-ClientConnection

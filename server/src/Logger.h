@@ -10,11 +10,11 @@
 // class Logger
 
 	// consts
-	#define Logger_DEBUG 0x01
-	#define Logger_NOTICE 0x02
-	#define Logger_ERROR 0x03
-	#define Logger_FATAL 0x04
-	#define Logger_MUTE 0x20  /* only for testing */
+	#define Logger_DEBUG 1
+	#define Logger_NOTICE 2
+	#define Logger_ERROR 3
+	#define Logger_FATAL 4
+	#define Logger_MUTE 5  /* only for testing */
 	#define Logger_DISPLAY 0x80
 
 	// private

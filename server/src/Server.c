@@ -178,12 +178,16 @@
 			ClientConnection* conn = self->clientConnections[i];
 			if (conn == NULL) continue;
 
-			if (!FD_ISSET(ClientConnection_getSocket(conn),&self->readfds)) continue;
-			if ( 0 == ClientConnection_process(conn) ) return;
+			if (!FD_ISSET(ClientConnection_getSocket(conn),&self->readfds)) {
+				continue;
+			}
 
-			delete_ClientConnection(conn);
-			self->clientConnections[i] = NULL;
-			return;
+			ClientConnection_processRequest(conn);
+
+			if (ClientConnection_getSocket(conn) == -1) {
+				delete_ClientConnection(conn);
+				self->clientConnections[i] = NULL;
+			} // if fail
 
 		} // foreach client connection
 
