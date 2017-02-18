@@ -23,6 +23,7 @@ typedef struct Packet Packet;
 	struct Command {
 		Packet* packet;
 		char cmd[20];
+		int counter;
 	};
 	typedef struct Command Command;
 

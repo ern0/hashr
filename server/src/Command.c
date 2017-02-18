@@ -78,6 +78,7 @@
 
 		Packet_prepareForReply(self->packet);
 		Packet_appendHeader(self->packet);
+		Packet_appendCounter(self->packet);
 		Command_reportStatus(self,Command_ST_OK,2202,"Info provided");
 		Packet_beginChunk(self->packet,"INFO");
 

@@ -22,6 +22,7 @@
 		unsigned char* buffer;
 		unsigned char internalBuffer[Packet_BUFLEN];
 		int length;
+		int counter;
 		int chunkCount;
 		int chunkBegin;
 	};
@@ -52,6 +53,7 @@
 	void Packet_appendInt(Packet* self,int value);
 	void Packet_appendStr(Packet* self,const char* value);
 	void Packet_appendHeader(Packet* self);
+	void Packet_appendCounter(Packet* self);
 	void Packet_appendEndmark(Packet* self);
 	void Packet_beginChunk(Packet* self,const char* id);
 	void Packet_endChunk(Packet* self);

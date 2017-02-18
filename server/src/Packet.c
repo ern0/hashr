@@ -21,6 +21,7 @@
 	void Packet_ctor(Packet* self) {
 
 		self->session = -1;
+		self->counter = -1;
 		self->chunkCount = -1;
 		Packet_setBuffer(self,self->internalBuffer,-1);
 
@@ -161,6 +162,13 @@
 		unsigned char* cmdBuffer = &self->buffer[cmdIndex];
 		int cmdLen = Utils_getBufInt(&self->buffer[cmdIndex - 4]);
 
+		int counterIndex = Packet_findChunk(self,(unsigned char*)"cntr");
+		if (counterIndex != -1) {
+			self->counter = Utils_getBufInt(&self->buffer[counterIndex]);
+		}	else {
+			self->counter = -1;
+		}	
+
 		Command* command = new_Command();
 		Command_setPacket(command,self);
 		Command_setCommand(command,cmdBuffer,cmdLen);
@@ -222,6 +230,15 @@
 	void Packet_appendHeader(Packet* self) {
 		Packet_append(self,(unsigned char*)"HSHr",4);
 	} // appendHeader()
+
+
+	void Packet_appendCounter(Packet* self) {
+
+		Packet_beginChunk(self,"cntr");
+		Packet_appendInt(self,self->counter);
+		Packet_endChunk(self);
+
+	} // appendCounter()
 
 
 	void Packet_appendEndmark(Packet* self) {
