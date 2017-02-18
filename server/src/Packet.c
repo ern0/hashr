@@ -232,6 +232,7 @@
 	void Packet_beginChunk(Packet* self,const char* id) {
 		Packet_appendStr(self,id);
 		self->chunkBegin = self->length;
+		self->length += 4;
 	} // beginChunk()
 
 
@@ -239,7 +240,7 @@
 
 		int tmp = self->length;
 		self->length = self->chunkBegin;
-		Packet_appendInt(self,tmp - self->length);
+		Packet_appendInt(self,tmp - self->length - 4);
 		self->length = tmp;
 
 	} // endChunk()

@@ -25,7 +25,7 @@ TEST_CASE("Packet build") {
 		Packet_appendStr(packet,"ABC");
 
 		char* result = (char*)Packet_getBuffer(packet);
-		REQUIRE( 0 == strncmp(result,data,sizeof(data)) );
+		REQUIRE( 0 == memcmp(result,data,sizeof(data)) );
 
 	}
 
@@ -37,7 +37,7 @@ TEST_CASE("Packet build") {
 		Packet_appendInt(packet,0x12345678);
 
 		char* result = (char*)Packet_getBuffer(packet);
-		REQUIRE( 0 == strncmp(result,data,sizeof(data)) );
+		REQUIRE( 0 == memcmp(result,data,sizeof(data)) );
 
 	}
 
@@ -55,9 +55,10 @@ TEST_CASE("Packet build") {
 		Packet_beginChunk(packet,"XMPL");
 		Packet_appendStr(packet,"abc123");
 		Packet_endChunk(packet);
+		Packet_appendEndmark(packet);
 
 		char* result = (char*)Packet_getBuffer(packet);
-		REQUIRE( 0 == strncmp(result,data,sizeof(data)) );
+		REQUIRE( 0 == memcmp(result,data,sizeof(data)) );
 
 	}
 

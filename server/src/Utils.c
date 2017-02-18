@@ -42,21 +42,20 @@
 	} // getBufInt()
 
 
-	void Utils_dumpBuffer(const unsigned char* buffer,int len,int offset) {
+	void Utils_dump(const char* buffer,int len) {
 
 		int ptr = 0;
 
-/*
 		while (1) {
-			if (ptr >= self->len) break;
+			if (ptr >= len) break;
 
 			printf("  %04X: ",ptr);
 
 			for (int i = 0; i < 8; i++) {
 				int index = ptr + i;
 
-				if (index < self->len) {
-					unsigned char b = self->buffer[ptr + i];
+				if (index < len) {
+					unsigned char b = buffer[ptr + i];
 					printf("%02X ",b);
 				} // if payload
 
@@ -71,8 +70,8 @@
 			for (int i = 0; i < 8; i++) {
 				int index = ptr + i;
 
-				if (index < self->len) {
-					unsigned char b = self->buffer[ptr + i];
+				if (index < len) {
+					unsigned char b = buffer[ptr + i];
 					if (b < ' ') b = '.';
 					if (b > 126) b = '.';
 					printf("%c",b);
@@ -84,7 +83,5 @@
 
 			ptr += 8;
 		} // while buffer
-
-*/
 
 	} // dumpBuffer()

@@ -312,7 +312,7 @@ Available commands:
 
 			if response == None: continue
 
-			print("todo: show response")
+			print(response)
 
 
 	def main(self):
