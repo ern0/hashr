@@ -189,6 +189,7 @@
 				self->connections[i] = NULL;
 			} // if fail
 
+			return;
 		} // foreach connection
 
 		Server_fatal(self,1008,"internal error, invalid client socket");

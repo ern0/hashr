@@ -58,6 +58,7 @@
 		if (level == Logger_DEBUG) return "DEBUG";
 		if (level == Logger_NOTICE) return "NOTICE";
 		if (level == Logger_ERROR) return "ERROR";
+		if (level == Logger_FATAL) return "FATAL";
 
 		return "-";
 	} // getLevelString()

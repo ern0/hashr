@@ -45,6 +45,7 @@
 
 
 	void Connection_setSocket(Connection* self,int sock) {
+printf("socket %d \n",sock);
 		self->socket = sock;
 	} // setSocket()
 
@@ -104,6 +105,7 @@
 
 	void Connection_closeConnection(Connection* self) {
 		if (self->socket != -1) close(self->socket);
+		self->socket = -1;
 	} // closeConnection()
 
 
@@ -139,13 +141,15 @@
 			return;
 		}
 
-		// TODO: pass to Packet
-		printf("proc packet \n");
-		printf("socket=%d \n",self->socket);
+		if ( Packet_process(self->packet) == -1 ) {
+			// TODO: reply some error
+			return;
+		}
 
 		// TODO: response
 		send(self->socket,"OK\n",3,0);
 
+		return; 
 	} // process()
 
 
