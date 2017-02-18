@@ -20,7 +20,7 @@
 	void Server_ctor(Server* self) {
 
 		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
-			self->clientConnections[i] = NULL;
+			self->connections[i] = NULL;
 		}
 
 		self->port = 8888;
@@ -130,10 +130,10 @@
 
 		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
 
-			ClientConnection* conn = self->clientConnections[i];
+			Connection* conn = self->connections[i];
 			if (conn == NULL) continue;
 
-			int sd = ClientConnection_getSocket(conn);
+			int sd = Connection_getSocket(conn);
 			if (sd == -1) continue;
 			
 			FD_SET(sd,&self->readfds);
@@ -149,24 +149,24 @@
 		int sock = accept(self->mainSocket,(struct sockaddr *)&self->address,(socklen_t*)&self->addrlen);
 		if (sock == -1) Server_fatal(self,1006,"accept error");
 
-		ClientConnection* incoming = new_ClientConnection();
+		Connection* incoming = new_Connection();
 		if (incoming == NULL) Server_fatal(self,1007,"no memory for new connection");
 
-		ClientConnection_setLogger(incoming,self->logger);
-		ClientConnection_setSocket(incoming,sock);
+		Connection_setLogger(incoming,self->logger);
+		Connection_setSocket(incoming,sock);
 
 		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
-			if (self->clientConnections[i] != NULL) continue;
+			if (self->connections[i] != NULL) continue;
 
-			self->clientConnections[i] = incoming;
+			self->connections[i] = incoming;
 			self->session++;
-			ClientConnection_acceptConnection(incoming,self->session);
+			Connection_acceptConnection(incoming,self->session);
 			return;
 
 		} // foreach slot
 
-		ClientConnection_rejectConnection(incoming);
-		delete_ClientConnection(incoming);
+		Connection_rejectConnection(incoming);
+		delete_Connection(incoming);
 
 	} // connectNewClient()
 
@@ -175,21 +175,21 @@
 
 		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
 
-			ClientConnection* conn = self->clientConnections[i];
+			Connection* conn = self->connections[i];
 			if (conn == NULL) continue;
 
-			if (!FD_ISSET(ClientConnection_getSocket(conn),&self->readfds)) {
+			if (!FD_ISSET(Connection_getSocket(conn),&self->readfds)) {
 				continue;
 			}
 
-			ClientConnection_processRequest(conn);
+			Connection_processRequest(conn);
 
-			if (ClientConnection_getSocket(conn) == -1) {
-				delete_ClientConnection(conn);
-				self->clientConnections[i] = NULL;
+			if (Connection_getSocket(conn) == -1) {
+				delete_Connection(conn);
+				self->connections[i] = NULL;
 			} // if fail
 
-		} // foreach client connection
+		} // foreach connection
 
 		Server_fatal(self,1008,"internal error, invalid client socket");
 

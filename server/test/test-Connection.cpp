@@ -4,29 +4,29 @@
 extern "C" {
 	#include "../src/Utils.h"
 	#include "../src/Logger.h"
-	#include "../src/ClientConnection.h"
+	#include "../src/Connection.h"
 }
 
 
-TEST_CASE("ClientConnection") {
+TEST_CASE("Connection") {
 
 	Logger* logger = new_Logger();
 	Logger_setLevel(logger,Logger_MUTE);
-	ClientConnection* conn = new_ClientConnection();
-	ClientConnection_setLogger(conn,logger);
+	Connection* conn = new_Connection();
+	Connection_setLogger(conn,logger);
 
 
 	SECTION("packet header check pos") {
 		unsigned char validHeader[] = { 'H','S','H','r' };
-		ClientConnection_setBuffer(conn,validHeader,-1);
-		REQUIRE( ClientConnection_isHeaderOk(conn) );
+		Connection_setBuffer(conn,validHeader,-1);
+		REQUIRE( Connection_isHeaderOk(conn) );
 	}
 
 	SECTION("packet header check neg") {
 		unsigned char badHeader[] = { 'H','S','H', 0 };
-		ClientConnection_setBuffer(conn,badHeader,-1);
-		REQUIRE( !ClientConnection_isHeaderOk(conn) );
-		REQUIRE( ClientConnection_processPacket(conn) == -1 );
+		Connection_setBuffer(conn,badHeader,-1);
+		REQUIRE( !Connection_isHeaderOk(conn) );
+		REQUIRE( Connection_processPacket(conn) == -1 );
 		REQUIRE( Logger_getLastId(logger) == 2018 );
 	}
 
@@ -43,8 +43,8 @@ TEST_CASE("ClientConnection") {
 			'e','n','d','m'
 		};
 		
-		ClientConnection_setBuffer(conn,data,sizeof(data));
-		REQUIRE( ClientConnection_scanChunks(conn) == 3 );
+		Connection_setBuffer(conn,data,sizeof(data));
+		REQUIRE( Connection_scanChunks(conn) == 3 );
 
 	} // section
 
@@ -55,8 +55,8 @@ TEST_CASE("ClientConnection") {
 			'e','n','d','m'
 		};
 		
-		ClientConnection_setBuffer(conn,data,sizeof(data));
-		REQUIRE( ClientConnection_scanChunks(conn) == 0 );
+		Connection_setBuffer(conn,data,sizeof(data));
+		REQUIRE( Connection_scanChunks(conn) == 0 );
 
 	} // section
 
@@ -71,10 +71,10 @@ TEST_CASE("ClientConnection") {
 			'C','H','N','K',0,0,0,1,
 			'z'
 		};
-		ClientConnection_setBuffer(conn,data,sizeof(data));
+		Connection_setBuffer(conn,data,sizeof(data));
 		
-		REQUIRE( ClientConnection_scanChunks(conn) == -1 );
-		REQUIRE( ClientConnection_processPacket(conn) == -1 );
+		REQUIRE( Connection_scanChunks(conn) == -1 );
+		REQUIRE( Connection_processPacket(conn) == -1 );
 		REQUIRE( Logger_getLastId(logger) == 2019 );
 	
 	} // section
@@ -91,14 +91,14 @@ TEST_CASE("ClientConnection") {
 			'z',
 			'e','n','d','m'
 		};
-		ClientConnection_setBuffer(conn,data,sizeof(data));
+		Connection_setBuffer(conn,data,sizeof(data));
 
-		REQUIRE( ClientConnection_scanChunks(conn) -1 );
-		REQUIRE( ClientConnection_processPacket(conn) == -1 );
+		REQUIRE( Connection_scanChunks(conn) -1 );
+		REQUIRE( Connection_processPacket(conn) == -1 );
 		REQUIRE( Logger_getLastId(logger) == 2019 );
 	
 	} // section
 
-	delete_ClientConnection(conn);
+	delete_Connection(conn);
 
 } // test case

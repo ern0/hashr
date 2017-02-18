@@ -14,7 +14,7 @@
 #include <sys/time.h>
 
 #include "Logger.h"
-#include "ClientConnection.h"
+#include "Connection.h"
 
 
 #define MAX_CLIENT_NUMBER 2
@@ -38,7 +38,7 @@
 		fd_set readfds;	
 
 		char buffer[1025];
-		ClientConnection* clientConnections[MAX_CLIENT_NUMBER];		
+		Connection* connections[MAX_CLIENT_NUMBER];		
 	};
 	typedef struct Server Server;
 

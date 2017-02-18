@@ -19,7 +19,7 @@ ${BIN}/hashr-server: \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
 		${OBJ}/Server.o \
-		${OBJ}/ClientConnection.o \
+		${OBJ}/Connection.o \
 		-o ${BIN}/hashr-server
 
 ${OBJ}/Utils.o: \
@@ -42,28 +42,28 @@ ${OBJ}/Server.o: \
 		Makefile ${OBJ} \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
-		${OBJ}/ClientConnection.o \
+		${OBJ}/Connection.o \
 		${SRC}/Server.h \
 		${SRC}/Server.c
 	${CC} -c \
 		${SRC}/Server.c \
 		-o ${OBJ}/Server.o
 
-${OBJ}/ClientConnection.o: \
+${OBJ}/Connection.o: \
 		Makefile ${OBJ} \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
-		${SRC}/ClientConnection.h \
-		${SRC}/ClientConnection.c
+		${SRC}/Connection.h \
+		${SRC}/Connection.c
 	${CC} -c \
-		${SRC}/ClientConnection.c \
-		-o ${OBJ}/ClientConnection.o
+		${SRC}/Connection.c \
+		-o ${OBJ}/Connection.o
 
 ########################################################
 
 test: \
 	${BIN}/test-Utils \
-	${BIN}/test-ClientConnection \
+	${BIN}/test-Connection \
 
 ${BIN}/test-Utils: \
 		Makefile ${OBJ} ${BIN} \
@@ -74,18 +74,18 @@ ${BIN}/test-Utils: \
 		${OBJ}/Utils.o \
 		-o ${BIN}/test-Utils
 
-${BIN}/test-ClientConnection: \
+${BIN}/test-Connection: \
 		Makefile ${OBJ} ${BIN} \
-		${TST}/test-ClientConnection.cpp \
-		${OBJ}/ClientConnection.o \
+		${TST}/test-Connection.cpp \
+		${OBJ}/Connection.o \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o
 	${TC} \
-		${TST}/test-ClientConnection.cpp \
-		${OBJ}/ClientConnection.o \
+		${TST}/test-Connection.cpp \
+		${OBJ}/Connection.o \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
-		-o ${BIN}/test-ClientConnection
+		-o ${BIN}/test-Connection
 
 ########################################################
 
