@@ -164,14 +164,14 @@
 		Command* command = new_Command();
 		Command_setPacket(command,self);
 
-		if (0 == strncmp("info",(char*)cmdBuffer,cmdLen)) {
-			Command_processInfo(command);
+		if (0 == strncmp("get",(char*)cmdBuffer,cmdLen)) {
+			Command_processGet(command);
 		} else if (0 == strncmp("set",(char*)cmdBuffer,cmdLen)) {
 			Command_processSet(command);
-		} else if (0 == strncmp("get",(char*)cmdBuffer,cmdLen)) {
-			Command_processGet(command);
 		} else if (0 == strncmp("del",(char*)cmdBuffer,cmdLen)) {
 			Command_processDel(command);
+		} else if (0 == strncmp("info",(char*)cmdBuffer,cmdLen)) {
+			Command_processInfo(command);
 		} else if (0 == strncmp("zap",(char*)cmdBuffer,cmdLen)) {
 			Command_processZap(command);
 		} else if (0 == strncmp("ksearch",(char*)cmdBuffer,cmdLen)) {
