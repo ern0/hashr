@@ -45,7 +45,6 @@
 
 
 	void Connection_setSocket(Connection* self,int sock) {
-printf("socket %d \n",sock);
 		self->socket = sock;
 	} // setSocket()
 

@@ -15,15 +15,19 @@ ${BIN}/hashr-server: \
 		${SRC}/main.c \
 		${OBJ}/Logger.o \
 		${OBJ}/Server.o \
+		${OBJ}/HashTable.o \
 		${OBJ}/Connection.o \
-		${OBJ}/Packet.o
+		${OBJ}/Packet.o \
+		${OBJ}/Command.o 
 	${CC} \
 		${SRC}/main.c \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
 		${OBJ}/Server.o \
+		${OBJ}/HashTable.o \
 		${OBJ}/Connection.o \
 		${OBJ}/Packet.o \
+		${OBJ}/Command.o \
 		-o ${BIN}/hashr-server
 
 ${OBJ}/Utils.o: \
@@ -53,6 +57,16 @@ ${OBJ}/Server.o: \
 		${SRC}/Server.c \
 		-o ${OBJ}/Server.o
 
+${OBJ}/HashTable.o: \
+		Makefile ${OBJ} \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
+		${SRC}/HashTable.h \
+		${SRC}/HashTable.c
+	${CC} -c \
+		${SRC}/HashTable.c \
+		-o ${OBJ}/HashTable.o
+
 ${OBJ}/Connection.o: \
 		Makefile ${OBJ} \
 		${OBJ}/Utils.o \
@@ -74,6 +88,16 @@ ${OBJ}/Packet.o: \
 		${SRC}/Packet.c \
 		-o ${OBJ}/Packet.o
 
+${OBJ}/Command.o: \
+		Makefile ${OBJ} \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
+		${SRC}/Command.h \
+		${SRC}/Command.c
+	${CC} -c \
+		${SRC}/Command.c \
+		-o ${OBJ}/Command.o
+
 ########################################################
 
 test: \
@@ -94,12 +118,14 @@ ${BIN}/test-Packet: \
 		${TST}/test-Packet.cpp \
 		${OBJ}/Packet.o \
 		${OBJ}/Utils.o \
-		${OBJ}/Logger.o
+		${OBJ}/Logger.o \
+		${OBJ}/Command.o 
 	${TC} \
 		${TST}/test-Packet.cpp \
 		${OBJ}/Packet.o \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
+		${OBJ}/Command.o \
 		-o ${BIN}/test-Packet
 
 ########################################################

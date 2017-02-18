@@ -100,6 +100,26 @@ TEST_CASE("Packet") {
 	
 	} // section
 
+	SECTION("packet without command") {
+		
+		unsigned char data[] = { 
+			'H','S','H','r',
+			'C','H','N','K',0,0,0,1,
+			'x',
+			'X','Y','Z','W',0,0,0,1,
+			'y',
+			'A','B','C','D',0,0,0,1,
+			'z',
+			'e','n','d','m'
+		};
+		Packet_setBuffer(packet,data,sizeof(data));
+
+		REQUIRE( Packet_scanChunks(packet) -1 );
+		REQUIRE( Packet_process(packet) == -1 );
+		REQUIRE( Logger_getLastId(logger) == 2020 );
+	
+	} // section
+
 	delete_Packet(packet);
 
 } // test case

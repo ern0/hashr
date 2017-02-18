@@ -60,3 +60,4 @@ bin/
 *.log
 trashcan/
 __pycache__
+*.swp

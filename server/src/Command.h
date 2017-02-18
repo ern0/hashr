@@ -1,5 +1,5 @@
-#ifndef Connection_h_included
-#define Connection_h_included
+#ifndef Command_h_included
+#define Command_h_included
 
 #include <malloc.h>
 #include <stdlib.h>
@@ -8,18 +8,17 @@
 
 #include "Utils.h"
 #include "Logger.h"
-#include "Connection.h"
+
+// class Packet;
+struct Packet;
+typedef struct Packet Packet;
 
 
 // class Command
 
 	// private
 	struct Command {
-		Logger* logger;
-		Connection* connection;
-		unsigned char* buffer;
-		int len;
-		int chunkCount;
+		Packet* packet;
 	};
 	typedef struct Command Command;
 
@@ -27,17 +26,21 @@
 	// public
 	Command* new_Command();
 	void delete_Command(Command* self);
-	void Command_setLogger(Command* self,Logger* logger);
-	void Command_setConnection(Command* self,Connection* connection);
-	void Command_setBuffer(Command* self,unsigned char* buffer,int len);
-	void Command_log(Connection* self,int level,int id,const char* message);
+	void Command_setPacket(Command* cmd,Packet* packet);
+	void Command_processUnknown(Command* cmd);
+	void Command_processInfo(Command* cmd);
+	void Command_processSet(Command* cmd);
+	void Command_processGet(Command* cmd);
+	void Command_processDel(Command* cmd);
+	void Command_processZap(Command* cmd);
+	void Command_processKsearch(Command* cmd);
+	void Command_processVsearch(Command* cmd);
+	void Command_processSearch(Command* cmd);
+	void Command_processReorg(Command* cmd);
 
 	// protected
 	void Command_ctor(Command* self);
 	void Command_dtor(Command* self);
-	void Command_fatal(Command* self,int id,const char* message);
-	int Connection_isHeaderOk(Connection* self);
-	int Connection_scanChunks(Connection* self);
-	int Connection_findChunk(Connection* self,unsigned char* sig);
+
 
 #endif

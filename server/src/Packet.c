@@ -1,3 +1,4 @@
+#include "Command.h"
 #include "Packet.h"
 
 
@@ -151,7 +152,41 @@
 			return -1;		
 		} // if damaged request
 
-		printf("todo: proc \n");
+		int cmdIndex = Packet_findChunk(self,(unsigned char*)"CMND");
+		if (cmdIndex == -1) {
+			Packet_log(self,Logger_ERROR | Logger_DISPLAY,2020,"No command in request");
+			return -1;
+		} // if no command in packet
+
+		unsigned char* cmdBuffer = &self->buffer[cmdIndex];
+		int cmdLen = Utils_getBufInt(&self->buffer[cmdIndex - 4]);
+
+		Command* command = new_Command();
+		Command_setPacket(command,self);
+
+		if (0 == strncmp("info",(char*)cmdBuffer,cmdLen)) {
+			Command_processInfo(command);
+		} else if (0 == strncmp("set",(char*)cmdBuffer,cmdLen)) {
+			Command_processSet(command);
+		} else if (0 == strncmp("get",(char*)cmdBuffer,cmdLen)) {
+			Command_processGet(command);
+		} else if (0 == strncmp("del",(char*)cmdBuffer,cmdLen)) {
+			Command_processDel(command);
+		} else if (0 == strncmp("zap",(char*)cmdBuffer,cmdLen)) {
+			Command_processZap(command);
+		} else if (0 == strncmp("ksearch",(char*)cmdBuffer,cmdLen)) {
+			Command_processKsearch(command);
+		} else if (0 == strncmp("vsearch",(char*)cmdBuffer,cmdLen)) {
+			Command_processVsearch(command);
+		} else if (0 == strncmp("search",(char*)cmdBuffer,cmdLen)) {
+			Command_processSearch(command);
+		} else if (0 == strncmp("reorg",(const char*)cmdBuffer,cmdLen)) {
+			Command_processReorg(command);
+		} else {
+			Command_processUnknown(command);
+		}
+
+		delete_Command(command);
 	
 		return 0;
 	} // process()

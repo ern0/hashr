@@ -14,6 +14,7 @@
 #include <sys/time.h>
 
 #include "Logger.h"
+#include "HashTable.h"
 #include "Connection.h"
 
 
@@ -26,6 +27,7 @@
 	struct Server {
 
 		Logger* logger;
+		HashTable* hashTable;
 		int port;
 		int runningFlag;
 		int session;

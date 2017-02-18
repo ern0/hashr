@@ -19,6 +19,8 @@
 
 	void Server_ctor(Server* self) {
 
+		self->hashTable = new_HashTable();
+
 		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
 			self->connections[i] = NULL;
 		}
