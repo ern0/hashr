@@ -102,7 +102,8 @@ ${OBJ}/Command.o: \
 
 test: \
 	${BIN}/test-Utils \
-	${BIN}/test-Packet \
+	${BIN}/test-Packet_scan \
+	${BIN}/test-Packet_build \
 
 ${BIN}/test-Utils: \
 		Makefile ${OBJ} ${BIN} \
@@ -113,20 +114,35 @@ ${BIN}/test-Utils: \
 		${OBJ}/Utils.o \
 		-o ${BIN}/test-Utils
 
-${BIN}/test-Packet: \
+${BIN}/test-Packet_scan: \
 		Makefile ${OBJ} ${BIN} \
-		${TST}/test-Packet.cpp \
+		${TST}/test-Packet_scan.cpp \
 		${OBJ}/Packet.o \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
 		${OBJ}/Command.o 
 	${TC} \
-		${TST}/test-Packet.cpp \
+		${TST}/test-Packet_scan.cpp \
 		${OBJ}/Packet.o \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
 		${OBJ}/Command.o \
-		-o ${BIN}/test-Packet
+		-o ${BIN}/test-Packet_scan
+
+${BIN}/test-Packet_build: \
+		Makefile ${OBJ} ${BIN} \
+		${TST}/test-Packet_build.cpp \
+		${OBJ}/Packet.o \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
+		${OBJ}/Command.o 
+	${TC} \
+		${TST}/test-Packet_build.cpp \
+		${OBJ}/Packet.o \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
+		${OBJ}/Command.o \
+		-o ${BIN}/test-Packet_build
 
 ########################################################
 

@@ -8,7 +8,7 @@ extern "C" {
 }
 
 
-TEST_CASE("Packet") {
+TEST_CASE("Packet scan") {
 
 	Logger* logger = new_Logger();
 	Logger_setLevel(logger,Logger_MUTE);

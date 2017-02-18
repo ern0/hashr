@@ -21,12 +21,16 @@
 		int session;
 		unsigned char* buffer;
 		unsigned char internalBuffer[Packet_BUFLEN];
-		int len;
+		int length;
 		int chunkCount;
+		int chunkBegin;
 	};
 	typedef struct Packet Packet;
 
 
+	// protected
+	void Packet_ctor(Packet* self);
+	void Packet_dtor(Packet* self);
 
 	// public
 	Packet* new_Packet();
@@ -43,9 +47,14 @@
 	int Packet_scanChunks(Packet* self);
 	int Packet_findChunk(Packet* self,unsigned char* sig);
 	int Packet_process(Packet* self);
+	void Packet_prepareForReply(Packet* self);
+	void Packet_append(Packet* self,unsigned char* data,int len);
+	void Packet_appendInt(Packet* self,int value);
+	void Packet_appendStr(Packet* self,const char* value);
+	void Packet_appendHeader(Packet* self);
+	void Packet_appendEndmark(Packet* self);
+	void Packet_beginChunk(Packet* self,const char* id);
+	void Packet_endChunk(Packet* self);
 
-	// protected
-	void Packet_ctor(Packet* self);
-	void Packet_dtor(Packet* self);
 
 #endif

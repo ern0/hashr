@@ -14,11 +14,15 @@ struct Packet;
 typedef struct Packet Packet;
 
 
+#define Command_ST_OK 0
+#define Command_ST_INVALID_COMMAND 1
+
 // class Command
 
 	// private
 	struct Command {
 		Packet* packet;
+		char cmd[20];
 	};
 	typedef struct Command Command;
 
@@ -28,6 +32,7 @@ typedef struct Packet Packet;
 	void delete_Command(Command* self);
 	void Command_setPacket(Command* cmd,Packet* packet);
 	void Command_processUnknown(Command* cmd);
+	void Command_setCommand(Command* self,unsigned char* cmd,int len);
 	void Command_processInfo(Command* cmd);
 	void Command_processSet(Command* cmd);
 	void Command_processGet(Command* cmd);
@@ -41,6 +46,8 @@ typedef struct Packet Packet;
 	// protected
 	void Command_ctor(Command* self);
 	void Command_dtor(Command* self);
+	void Command_fail(Command* self,int id,const char* message);
+	void Command_reportStatus(Command* self,int st,int id,const char* message);
 
 
 #endif

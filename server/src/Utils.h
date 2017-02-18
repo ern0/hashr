@@ -12,6 +12,7 @@
 
 	// public static
 	void Utils_getStamp(char* stamp);
+	void Utils_setBufInt(unsigned char* buffer,int value);
 	int Utils_getBufInt(const unsigned char* buffer);
 	int Utils_isEqSigs(const unsigned char* sig1,const unsigned char* sig2);
 	void Utils_dumpBuffer(const unsigned char* buffer,int len,int offset);

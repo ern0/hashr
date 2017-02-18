@@ -20,7 +20,7 @@
 
 
 	void Command_ctor(Command* self) {
-		// NOP
+		strcpy(self->cmd,"n.a.");
 	} // ctor
 
 
@@ -29,19 +29,65 @@
 	} // dtor
 
 
+	void Command_reportStatus(Command* self,int st,int id,const char* message) {
+
+		int logLevel;
+		if (st == Command_ST_OK) {
+			logLevel = Logger_NOTICE | Logger_DISPLAY;
+		} else {
+			logLevel = Logger_ERROR | Logger_DISPLAY;
+		}
+
+		char extendedMessage[200];
+		snprintf(extendedMessage,200,"Command '%s' result: %d - %s",self->cmd,st,message);
+		Packet_log(self->packet,logLevel,id,extendedMessage);
+
+		Packet_beginChunk(self->packet,"STAT");
+		Packet_appendInt(self->packet,st);
+		Packet_appendStr(self->packet,message);
+		Packet_endChunk(self->packet);
+
+	} // reportStatus()
+
+
 	void Command_setPacket(Command* self,Packet* packet) {
 		self->packet = packet;
 	} // setPacket()
 
 
+	void Command_setCommand(Command* self,unsigned char* cmd,int len) {
+		if (len > 19) len = 19;
+		strncpy(self->cmd,(char*)cmd,len);
+	} // setCommand()
+
+
 	void Command_processUnknown(Command* self) {
-		printf("todo: unknown cmd \n");
-	}
+
+		Packet_prepareForReply(self->packet);
+		Packet_appendHeader(self->packet);
+		Command_reportStatus(self
+			,Command_ST_INVALID_COMMAND
+			,2201,"Invalid command"
+		);
+		Packet_appendEndmark(self->packet);
+
+	} // processUnknownCommand()
 
 
 	void Command_processInfo(Command* self) {
-		Packet_log(self->packet,Logger_NOTICE | Logger_DISPLAY,2201,"todo: implement info command");
-	}
+
+		Packet_prepareForReply(self->packet);
+		Packet_appendHeader(self->packet);
+		Command_reportStatus(self,Command_ST_OK,2202,"Info provided");
+		Packet_beginChunk(self->packet,"INFO");
+
+		// TODO: provide some info
+		Packet_appendStr(self->packet,"important information");
+
+		Packet_endChunk(self->packet);		
+		Packet_appendEndmark(self->packet);
+
+	} // processInfo()
 
 
 	void Command_processSet(Command* self) {

@@ -141,12 +141,18 @@
 		}
 
 		if ( Packet_process(self->packet) == -1 ) {
-			// TODO: reply some error
+			Packet_prepareForReply(self->packet);
+			Packet_appendHeader(self->packet);
+			Packet_beginChunk(self->packet,"ftal");
+			Packet_appendStr(self->packet,"[bad request]");
+			Packet_endChunk(self->packet);
+			Packet_appendEndmark(self->packet);
 			return;
-		}
+		} // if wrong packet
 
-		// TODO: response
-		send(self->socket,"OK\n",3,0);
+		unsigned char* data = Packet_getBuffer(self->packet);
+		int len = Packet_getLength(self->packet);
+		send(self->socket,data,len,0);
 
 		return; 
 	} // process()

@@ -46,7 +46,7 @@
 
 	void Packet_setBuffer(Packet* self,unsigned char* buffer,int len) {
 		self->buffer = buffer;
-		self->len = len;
+		self->length = len;
 	} // setBuffer()
 
 
@@ -56,12 +56,12 @@
 
 
 	void Packet_setLength(Packet* self,int len) {
-		self->len = len;
+		self->length = len;
 	} // setLength()
 
 
 	int Packet_getLength(Packet* self) {
-		return self->len;
+		return self->length;
 	} // getLength()
 
 
@@ -100,7 +100,7 @@
 
 		while (1) {
 
-			if (self->len < index + 4) return -1;
+			if (self->length < index + 4) return -1;
 			
 			if (Utils_isEqSigs(&self->buffer[index],(const unsigned char*)"endm")) {
 				break;
@@ -163,6 +163,7 @@
 
 		Command* command = new_Command();
 		Command_setPacket(command,self);
+		Command_setCommand(command,cmdBuffer,cmdLen);
 
 		if (0 == strncmp("get",(char*)cmdBuffer,cmdLen)) {
 			Command_processGet(command);
@@ -192,4 +193,53 @@
 	} // process()
 
 
-	
+	void Packet_prepareForReply(Packet* self) {
+		Packet_setBuffer(self,self->internalBuffer,0);
+	} // prepareForReply()
+
+
+	void Packet_append(Packet* self,unsigned char* data,int len) {
+		memcpy(&self->buffer[self->length],data,len);
+		self->length += len;
+	} // append()
+
+
+	void Packet_appendInt(Packet* self,int value) {
+		
+		unsigned char buf[4];
+		Utils_setBufInt(buf,value);
+
+		Packet_append(self,buf,4);
+
+	} // appendInt()
+
+
+	void Packet_appendStr(Packet* self,const char* value) {
+		Packet_append(self,(unsigned char*)value,strlen(value));
+	} // appendStr()
+
+
+	void Packet_appendHeader(Packet* self) {
+		Packet_append(self,(unsigned char*)"HSHr",4);
+	} // appendHeader()
+
+
+	void Packet_appendEndmark(Packet* self) {
+		Packet_append(self,(unsigned char*)"endm",4);
+	} // appendHeader()
+
+
+	void Packet_beginChunk(Packet* self,const char* id) {
+		Packet_appendStr(self,id);
+		self->chunkBegin = self->length;
+	} // beginChunk()
+
+
+	void Packet_endChunk(Packet* self) {
+
+		int tmp = self->length;
+		self->length = self->chunkBegin;
+		Packet_appendInt(self,tmp - self->length);
+		self->length = tmp;
+
+	} // endChunk()

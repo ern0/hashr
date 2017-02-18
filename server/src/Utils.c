@@ -27,6 +27,16 @@
 	} // isEqSigs()
 
 
+	void Utils_setBufInt(unsigned char* buffer,int value) {
+
+		buffer[0] = (value >> 24) & 0xff;
+		buffer[1] = (value >> 16) & 0xff;
+		buffer[2] = (value >> 8) & 0xff;
+		buffer[3] = value & 0xff;
+		
+	} // setBufInt()
+
+
 	int Utils_getBufInt(const unsigned char* buffer) {
 		return buffer[0] << 24 | buffer[1] << 16 | buffer[2] << 8 | buffer[3];
 	} // getBufInt()
