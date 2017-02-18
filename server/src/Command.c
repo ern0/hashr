@@ -65,6 +65,7 @@
 
 		Packet_prepareForReply(self->packet);
 		Packet_appendHeader(self->packet);
+		Packet_appendCounter(self->packet);
 		Command_reportStatus(self
 			,Command_ST_INVALID_COMMAND
 			,2201,"Invalid command"

@@ -234,6 +234,8 @@
 
 	void Packet_appendCounter(Packet* self) {
 
+		if (self->counter == -1) return;
+		
 		Packet_beginChunk(self,"cntr");
 		Packet_appendInt(self,self->counter);
 		Packet_endChunk(self);
