@@ -1,5 +1,4 @@
 #include "Connection.h"
-#include "Packet.h"
 
 
 	Connection* new_Connection() {
@@ -22,8 +21,9 @@
 
 		self->socket = -1;
 		self->session = 0;
+		self->chunkCount = -1;
 
-		self->packet = new_Packet();
+		Connection_setBuffer(self,self->internalBuffer,-1);
 
 	} // ctor
 
@@ -33,9 +33,14 @@
 	} // dtor
 
 
+	void Connection_setBuffer(Connection* self,unsigned char* buffer,int len) {
+		self->buffer = buffer;
+		self->len = len;
+	} // setBuffer()
+
+
 	void Connection_setLogger(Connection* self,Logger* logger) {
 		self->logger = logger;
-		Packet_setLogger(self->packet,logger);
 	} // setLogger()
 
 
@@ -47,12 +52,6 @@
 	void Connection_setSocket(Connection* self,int sock) {
 		self->socket = sock;
 	} // setSocket()
-
-
-	void Connection_setSession(Connection* self,int session) {
-		self->session = session;
-		Packet_setSession(self->packet,session);
-	} // setSession()
 
 
 	void Connection_log(Connection* self,int level,int id,const char* message) {
@@ -74,7 +73,7 @@
 
 	void Connection_acceptConnection(Connection* self,int session) {
 
-		Connection_setSession(self,session);
+		self->session = session;
 
 		Connection_log(self,Logger_NOTICE | Logger_DISPLAY,2001,"Accepting connection");
 
@@ -107,46 +106,117 @@
 	} // closeConnection()
 
 
-	// return: -1 - fail, other: okay
+	// return: 0 - okay, other - fail
 	int Connection_readPacket(Connection* self) {
 
-		Packet_setLength(self->packet,0);
+		self->len = read(self->socket,self->buffer,Connection_BUFLEN);
 
-		int len = read(self->socket,Packet_getBuffer(self->packet),Packet_BUFLEN);
-
-		if (len == -1) {
+		if (self->len == -1) {
 			Connection_log(self,Logger_NOTICE | Logger_DISPLAY,2014,"Error reading client socket, disconnecting");
 			Connection_closeConnection(self);
 			return -1;
 		} // if read error
 
-		if (len == 0) {
+		if (self->len == 0) {
 			Connection_log(self,Logger_NOTICE | Logger_DISPLAY,2015,"Client disconnected");
 			Connection_closeConnection(self);
 			return -1;
 		} // if disconnect
 
-		Packet_setLength(self->packet,len);
-
 		return 0;
 	} // readPacket()
 
 
-	void Connection_process(Connection* self) {
+	int Connection_isHeaderOk(Connection* self) {
 
-		if ( Connection_readPacket(self) == -1 ) {
+		if ( self->buffer[0] != 'H' ) return 0;
+		if ( self->buffer[1] != 'S' ) return 0;
+		if ( self->buffer[2] != 'H' ) return 0;
+		if ( self->buffer[3] != 'r' ) return 0;
+
+		return 1;
+	} // isHeaderOk()
+
+
+	int Connection_scanChunks(Connection* self) {
+
+		int result = 0;
+		int index = 4;
+
+		while (1) {
+
+			if (self->len < index + 4) return -1;
+			
+			if (Utils_isEqSigs(&self->buffer[index],(const unsigned char*)"endm")) {
+				break;
+			}
+
+			int chunkLength = Utils_getBufInt(&self->buffer[index + 4]);
+			if (chunkLength < 0) return -1;
+
+			result++;
+			index += chunkLength + 8;
+					
+		} // loop
+
+		return result;
+	} // scanChunks()
+
+
+	int Connection_findChunk(Connection* self,unsigned char* sig) {
+
+		int index = 4;
+
+		while (1) {
+
+			if (Utils_isEqSigs(&self->buffer[index],(const unsigned char*)"endm")) {
+				return -1;
+			}
+
+			if (Utils_isEqSigs(&self->buffer[index],sig)) break;
+
+			int chunkLength = Utils_getBufInt(&self->buffer[index + 4]);
+			index += chunkLength + 8;
+					
+		} // loop
+
+		return index + 8;
+	} // findChunks()
+
+
+	int Connection_processPacket(Connection* self) {
+
+		if (!Connection_isHeaderOk(self)) {
+			Connection_log(self,Logger_ERROR | Logger_DISPLAY,2018,"Invalid request");
+			return -1;		
+		} // if invalid request
+
+		self->chunkCount = Connection_scanChunks(self);
+		if (self->chunkCount == -1) {
+			Connection_log(self,Logger_ERROR | Logger_DISPLAY,2019,"Damaged request");
+			return -1;		
+		} // if damaged request
+	
+		return 0;
+	} // processPacket()
+
+
+	void Connection_processRequest(Connection* self) {
+
+		if ( Connection_readPacket(self) ) {
 			Connection_closeConnection(self);
 			return;
 		}
 
-		// TODO: pass to Packet
-		printf("proc packet \n");
-		printf("socket=%d \n",self->socket);
+		if (-1 == Connection_processPacket(self)) {
+			return;
+		}
 
 		// TODO: response
+
 		send(self->socket,"OK\n",3,0);
 
-	} // process()
+	} // processRequest()
 
 
 	

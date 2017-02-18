@@ -182,7 +182,7 @@
 				continue;
 			}
 
-			Connection_processRequest(conn);
+			Connection_process(conn);
 
 			if (Connection_getSocket(conn) == -1) {
 				delete_Connection(conn);

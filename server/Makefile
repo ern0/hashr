@@ -1,7 +1,7 @@
 #### Makefile for hashr ################################
 
 PLATFORM=$(shell uname -s)-$(shell uname -p)
-CC=gcc -std=c99
+CC=gcc -std=c11
 TC=g++
 SRC=src
 TST=test
@@ -13,13 +13,17 @@ BIN=bin/${PLATFORM}
 ${BIN}/hashr-server: \
 		Makefile ${OBJ} ${BIN} \
 		${SRC}/main.c \
-		${OBJ}/Server.o
+		${OBJ}/Logger.o \
+		${OBJ}/Server.o \
+		${OBJ}/Connection.o \
+		${OBJ}/Packet.o
 	${CC} \
 		${SRC}/main.c \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
 		${OBJ}/Server.o \
 		${OBJ}/Connection.o \
+		${OBJ}/Packet.o \
 		-o ${BIN}/hashr-server
 
 ${OBJ}/Utils.o: \
@@ -59,11 +63,22 @@ ${OBJ}/Connection.o: \
 		${SRC}/Connection.c \
 		-o ${OBJ}/Connection.o
 
+${OBJ}/Packet.o: \
+		Makefile ${OBJ} \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
+		${OBJ}/Connection.o \
+		${SRC}/Packet.h \
+		${SRC}/Packet.c
+	${CC} -c \
+		${SRC}/Packet.c \
+		-o ${OBJ}/Packet.o
+
 ########################################################
 
 test: \
 	${BIN}/test-Utils \
-	${BIN}/test-Connection \
+	${BIN}/test-Packet \
 
 ${BIN}/test-Utils: \
 		Makefile ${OBJ} ${BIN} \
@@ -74,18 +89,18 @@ ${BIN}/test-Utils: \
 		${OBJ}/Utils.o \
 		-o ${BIN}/test-Utils
 
-${BIN}/test-Connection: \
+${BIN}/test-Packet: \
 		Makefile ${OBJ} ${BIN} \
-		${TST}/test-Connection.cpp \
-		${OBJ}/Connection.o \
+		${TST}/test-Packet.cpp \
+		${OBJ}/Packet.o \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o
 	${TC} \
-		${TST}/test-Connection.cpp \
-		${OBJ}/Connection.o \
+		${TST}/test-Packet.cpp \
+		${OBJ}/Packet.o \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
-		-o ${BIN}/test-Connection
+		-o ${BIN}/test-Packet
 
 ########################################################
 
@@ -97,5 +112,6 @@ ${OBJ}:
 
 clean: ${OBJ}
 	rm -rf ${OBJ}/*.o
+	rm -rf ${BIN}/*.o
 
 all: clean ${BIN}/hashr-server

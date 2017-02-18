@@ -4,29 +4,30 @@
 extern "C" {
 	#include "../src/Utils.h"
 	#include "../src/Logger.h"
-	#include "../src/Connection.h"
+	#include "../src/Packet.h"
 }
 
 
-TEST_CASE("Connection") {
+TEST_CASE("Packet") {
 
 	Logger* logger = new_Logger();
 	Logger_setLevel(logger,Logger_MUTE);
-	Connection* conn = new_Connection();
-	Connection_setLogger(conn,logger);
+	Packet* packet = new_Packet();
+	Packet_setLogger(packet,logger);
+	Packet_setSession(packet,1);
 
 
 	SECTION("packet header check pos") {
 		unsigned char validHeader[] = { 'H','S','H','r' };
-		Connection_setBuffer(conn,validHeader,-1);
-		REQUIRE( Connection_isHeaderOk(conn) );
+		Packet_setBuffer(packet,validHeader,-1);
+		REQUIRE( Packet_isHeaderOk(packet) );
 	}
 
 	SECTION("packet header check neg") {
 		unsigned char badHeader[] = { 'H','S','H', 0 };
-		Connection_setBuffer(conn,badHeader,-1);
-		REQUIRE( !Connection_isHeaderOk(conn) );
-		REQUIRE( Connection_processPacket(conn) == -1 );
+		Packet_setBuffer(packet,badHeader,-1);
+		REQUIRE( !Packet_isHeaderOk(packet) );
+		REQUIRE( Packet_process(packet) == -1 );
 		REQUIRE( Logger_getLastId(logger) == 2018 );
 	}
 
@@ -43,8 +44,8 @@ TEST_CASE("Connection") {
 			'e','n','d','m'
 		};
 		
-		Connection_setBuffer(conn,data,sizeof(data));
-		REQUIRE( Connection_scanChunks(conn) == 3 );
+		Packet_setBuffer(packet,data,sizeof(data));
+		REQUIRE( Packet_scanChunks(packet) == 3 );
 
 	} // section
 
@@ -55,8 +56,8 @@ TEST_CASE("Connection") {
 			'e','n','d','m'
 		};
 		
-		Connection_setBuffer(conn,data,sizeof(data));
-		REQUIRE( Connection_scanChunks(conn) == 0 );
+		Packet_setBuffer(packet,data,sizeof(data));
+		REQUIRE( Packet_scanChunks(packet) == 0 );
 
 	} // section
 
@@ -71,10 +72,10 @@ TEST_CASE("Connection") {
 			'C','H','N','K',0,0,0,1,
 			'z'
 		};
-		Connection_setBuffer(conn,data,sizeof(data));
+		Packet_setBuffer(packet,data,sizeof(data));
 		
-		REQUIRE( Connection_scanChunks(conn) == -1 );
-		REQUIRE( Connection_processPacket(conn) == -1 );
+		REQUIRE( Packet_scanChunks(packet) == -1 );
+		REQUIRE( Packet_process(packet) == -1 );
 		REQUIRE( Logger_getLastId(logger) == 2019 );
 	
 	} // section
@@ -91,14 +92,14 @@ TEST_CASE("Connection") {
 			'z',
 			'e','n','d','m'
 		};
-		Connection_setBuffer(conn,data,sizeof(data));
+		Packet_setBuffer(packet,data,sizeof(data));
 
-		REQUIRE( Connection_scanChunks(conn) -1 );
-		REQUIRE( Connection_processPacket(conn) == -1 );
+		REQUIRE( Packet_scanChunks(packet) -1 );
+		REQUIRE( Packet_process(packet) == -1 );
 		REQUIRE( Logger_getLastId(logger) == 2019 );
 	
 	} // section
 
-	delete_Connection(conn);
+	delete_Packet(packet);
 
 } // test case
