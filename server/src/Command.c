@@ -108,7 +108,14 @@
 		int noOfConns = Server_getNumberOfConnections(self->server);
 		Packet_appendIntChunk(self->packet,"NCON",noOfConns);
 
-HashTable_hello(self->hashTable);
+		int method = HashTable_getMethod(self->hashTable);
+		Packet_appendIntChunk(self->packet,"METD",method);
+
+		int capacity = HashTable_getCapacity(self->hashTable);
+		Packet_appendIntChunk(self->packet,"CPTY",capacity);
+		
+		int noOfElms = HashTable_getNumberOfElms(self->hashTable);
+		Packet_appendIntChunk(self->packet,"NELM",noOfConns);
 
 		Packet_appendEndmark(self->packet);
 

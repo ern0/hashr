@@ -18,7 +18,11 @@
 
 
 	void HashTable_ctor(HashTable* self) {
-		// NOP
+
+		self->method = HashTable_METHOD_DEFAULT;
+		self->capacity = HashTable_CAPACITY_DEFAULT;
+		self->numberOfElms = 0;
+
 	} // ctor
 
 
@@ -32,6 +36,16 @@
 	} // setLogger()
 
 
-	void HashTable_hello(HashTable* self) {
-		printf("Hi \n");
-	} // hello()
+	int HashTable_getMethod(HashTable* self) {
+		return self->method;
+	} // getMethod()
+
+
+	int HashTable_getCapacity(HashTable* self) {
+		return self->capacity;
+	} // getCapacity()
+
+
+	int HashTable_getNumberOfElms(HashTable* self) {
+		return self->numberOfElms;
+	} // getNumberOfElms()
