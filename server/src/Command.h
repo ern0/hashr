@@ -24,6 +24,7 @@ typedef struct Packet Packet;
 	// private
 	struct Command {
 		Packet* packet;
+		Server* server;
 		char cmd[20];
 		int counter;
 		HashTable* hashTable;
@@ -35,9 +36,11 @@ typedef struct Packet Packet;
 	Command* new_Command();
 	void delete_Command(Command* self);
 	void Command_setPacket(Command* self,Packet* packet);
+	void Command_setServer(Command* self,Server* server);
 	void Command_setHashTable(Command* self,HashTable* hashTable);
 	void Command_processUnknown(Command* cmd);
 	void Command_setCommand(Command* self,unsigned char* cmd,int len);
+	void Command_processHeartbeat(Command* cmd);
 	void Command_processInfo(Command* cmd);
 	void Command_processSet(Command* cmd);
 	void Command_processGet(Command* cmd);

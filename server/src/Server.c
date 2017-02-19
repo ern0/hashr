@@ -203,3 +203,16 @@
 		Server_fatal(self,1008,"internal error, invalid client socket");
 
 	} // handleOldClient()
+
+
+	int Server_getNumberOfConnections(Server* self) {
+
+		int result = 0;
+
+		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {
+			Connection* conn = self->connections[i];
+			if (conn != NULL) result++;
+		}
+
+		return result;
+	} // getNumberOfConnections()

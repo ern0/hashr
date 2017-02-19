@@ -45,10 +45,12 @@
 
 		self->server = server;
 
+		Command_setServer(self->command,self->server);
+
 		HashTable* hashTable = Server_getHashTable(self->server);
 		Command_setHashTable(self->command,hashTable);
 
-	} // seServer()
+	} // setServer()
 
 
 	void Packet_setSession(Packet* self,int session) {
@@ -183,7 +185,9 @@
 		Command_setPacket(self->command,self);
 		Command_setCommand(self->command,cmdBuffer,cmdLen);
 
-		if (0 == strncmp("get",(char*)cmdBuffer,cmdLen)) {
+		if (0 == strncmp("beat",(char*)cmdBuffer,cmdLen)) {
+			Command_processHeartbeat(self->command);
+		} else if (0 == strncmp("get",(char*)cmdBuffer,cmdLen)) {
 			Command_processGet(self->command);
 		} else if (0 == strncmp("set",(char*)cmdBuffer,cmdLen)) {
 			Command_processSet(self->command);
@@ -241,13 +245,8 @@
 
 
 	void Packet_appendCounter(Packet* self) {
-
 		if (self->counter == -1) return;
-
-		Packet_beginChunk(self,"cntr");
-		Packet_appendInt(self,self->counter);
-		Packet_endChunk(self);
-
+		Packet_appendIntChunk(self,"cntr",self->counter);
 	} // appendCounter()
 
 
@@ -271,3 +270,21 @@
 		self->length = tmp;
 
 	} // endChunk()
+
+
+	void Packet_appendIntChunk(Packet* self,const char* id,int value) {
+
+		Packet_beginChunk(self,id);
+		Packet_appendInt(self,value);
+		Packet_endChunk(self);
+ 
+	} // appendIntChunk()
+
+
+	void Packet_appendStrChunk(Packet* self,const char* id,const char* value) {
+
+		Packet_beginChunk(self,id);
+		Packet_appendStr(self,value);
+		Packet_endChunk(self);
+
+	} // appendStrChunk()

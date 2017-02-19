@@ -55,6 +55,7 @@
 	void Server_stop(Server* self);
 	void Server_run(Server* self);
 	HashTable* getHashTable(Server* self);
+	int Server_getNumberOfConnections(Server* self);
 
 	// protected
 	void Server_ctor(Server* self);

@@ -65,17 +65,16 @@ request:
  (none)
 response:
  - status: provided
+ - number of connections
  - hash method
  - hash table capacity
  - actual item count
 
-search
-------
+search, ksearch, vsearch
+------------------------
 request:
- - scope: key / value / key+value
- - hit: first / all
- - key
- - value
+ - max. result items
+ - pattern
 response:
  - status: provided 
  - payload: array of values

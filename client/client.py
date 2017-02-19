@@ -117,15 +117,13 @@ Available commands:
 
 
 	def run(self):
+
+		command = Command()
+		command.setCommand("beat")
+
 		while True:
 
-			command = Command()
-			command.setCommand("info")
-			result = self.performCommand( command )
-
-			# TODO: show result
-			#print(result)
-
+			self.performCommand( command )
 			time.sleep(1)
 
 

@@ -1,6 +1,7 @@
 #include "Command.h"
 #include "Packet.h"
 #include "Logger.h"
+#include "Server.h"
 
 
 	Command* new_Command() {
@@ -29,11 +30,14 @@
 	} // dtor
 
 
-	void Command_setPacket(Command* self,Packet* packet) {
+	void Command_setServer(Command* self,Server* server) {
+		self->server = server;
+	} // setServer()
 
+
+	void Command_setPacket(Command* self,Packet* packet) {
 		self->packet = packet;
 		strcpy(self->cmd,"n.a.");
-
 	} // setPacket()
 
 
@@ -83,20 +87,29 @@
 	} // processUnknownCommand()
 
 
+	void Command_processHeartbeat(Command* self) {
+
+		Packet_prepareForReply(self->packet);
+		Packet_appendHeader(self->packet);
+		Packet_appendCounter(self->packet);
+		Packet_appendEndmark(self->packet);
+
+	} // processHeartbeat()
+
+
 	void Command_processInfo(Command* self) {
 
 		Packet_prepareForReply(self->packet);
 		Packet_appendHeader(self->packet);
 		Packet_appendCounter(self->packet);
+
 		Command_reportStatus(self,Command_ST_OK,2202,"Info provided");
-		Packet_beginChunk(self->packet,"INFO");
+	
+		int noOfConns = Server_getNumberOfConnections(self->server);
+		Packet_appendIntChunk(self->packet,"NCON",noOfConns);
 
-		// TODO: provide some info
-		Packet_appendStr(self->packet,"important information");
+HashTable_hello(self->hashTable);
 
-		HashTable_hello(self->hashTable);
-
-		Packet_endChunk(self->packet);		
 		Packet_appendEndmark(self->packet);
 
 	} // processInfo()
