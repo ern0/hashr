@@ -120,12 +120,18 @@ ${BIN}/test-Packet_scan: \
 		${OBJ}/Packet.o \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
+		${OBJ}/Server.o \
+		${OBJ}/Connection.o \
+		${OBJ}/HashTable.o \
 		${OBJ}/Command.o 
 	${TC} \
 		${TST}/test-Packet_scan.cpp \
 		${OBJ}/Packet.o \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
+		${OBJ}/Server.o \
+		${OBJ}/Connection.o \
+		${OBJ}/HashTable.o \
 		${OBJ}/Command.o \
 		-o ${BIN}/test-Packet_scan
 
@@ -135,12 +141,18 @@ ${BIN}/test-Packet_build: \
 		${OBJ}/Packet.o \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
+		${OBJ}/Server.o \
+		${OBJ}/Connection.o \
+		${OBJ}/HashTable.o \
 		${OBJ}/Command.o 
 	${TC} \
 		${TST}/test-Packet_build.cpp \
 		${OBJ}/Packet.o \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
+		${OBJ}/Server.o \
+		${OBJ}/Connection.o \
+		${OBJ}/HashTable.o \
 		${OBJ}/Command.o \
 		-o ${BIN}/test-Packet_build
 

@@ -41,7 +41,7 @@ TEST_CASE("Packet build") {
 
 	}
 
-	SECTION("packet build chunk") {
+	SECTION("packet build chunk 1") {
 
 		char data[] = {
 			'H','S','H','r',
@@ -55,6 +55,26 @@ TEST_CASE("Packet build") {
 		Packet_beginChunk(packet,"XMPL");
 		Packet_appendStr(packet,"abc123");
 		Packet_endChunk(packet);
+		Packet_appendEndmark(packet);
+
+		char* result = (char*)Packet_getBuffer(packet);
+		REQUIRE( 0 == memcmp(result,data,sizeof(data)) );
+
+	}
+
+	SECTION("packet build chunk 2") {
+
+		char data[] = {
+			'H','S','H','r',
+			'C','I','N','T',0,0,0,4,0,0,0,99,
+			'C','S','T','R',0,0,0,6,'q','w','e','r','t','y',
+			'e','n','d','m'
+		};
+
+		Packet_prepareForReply(packet);
+		Packet_appendHeader(packet);
+		Packet_appendIntChunk(packet,"CINT",99);
+		Packet_appendStrChunk(packet,"CSTR","qwerty");
 		Packet_appendEndmark(packet);
 
 		char* result = (char*)Packet_getBuffer(packet);
