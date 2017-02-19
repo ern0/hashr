@@ -8,6 +8,7 @@
 
 #include "Utils.h"
 #include "Logger.h"
+#include "Command.h"
 
 
 // class Packet
@@ -25,6 +26,7 @@
 		int counter;
 		int chunkCount;
 		int chunkBegin;
+		Command* command;
 	};
 	typedef struct Packet Packet;
 

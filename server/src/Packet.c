@@ -25,13 +25,13 @@
 		self->chunkCount = -1;
 		Packet_setBuffer(self,self->internalBuffer,-1);
 
+		self->command = new_Command();
+
 	} // ctor
 
 
 	void Packet_dtor(Packet* self) {
-
-		// NOP
-
+		delete_Command(self->command);
 	} // dtor
 
 
@@ -169,33 +169,30 @@
 			self->counter = -1;
 		}	
 
-		Command* command = new_Command();
-		Command_setPacket(command,self);
-		Command_setCommand(command,cmdBuffer,cmdLen);
+		Command_setPacket(self->command,self);
+		Command_setCommand(self->command,cmdBuffer,cmdLen);
 
 		if (0 == strncmp("get",(char*)cmdBuffer,cmdLen)) {
-			Command_processGet(command);
+			Command_processGet(self->command);
 		} else if (0 == strncmp("set",(char*)cmdBuffer,cmdLen)) {
-			Command_processSet(command);
+			Command_processSet(self->command);
 		} else if (0 == strncmp("del",(char*)cmdBuffer,cmdLen)) {
-			Command_processDel(command);
+			Command_processDel(self->command);
 		} else if (0 == strncmp("info",(char*)cmdBuffer,cmdLen)) {
-			Command_processInfo(command);
+			Command_processInfo(self->command);
 		} else if (0 == strncmp("zap",(char*)cmdBuffer,cmdLen)) {
-			Command_processZap(command);
+			Command_processZap(self->command);
 		} else if (0 == strncmp("ksearch",(char*)cmdBuffer,cmdLen)) {
-			Command_processKsearch(command);
+			Command_processKsearch(self->command);
 		} else if (0 == strncmp("vsearch",(char*)cmdBuffer,cmdLen)) {
-			Command_processVsearch(command);
+			Command_processVsearch(self->command);
 		} else if (0 == strncmp("search",(char*)cmdBuffer,cmdLen)) {
-			Command_processSearch(command);
+			Command_processSearch(self->command);
 		} else if (0 == strncmp("reorg",(const char*)cmdBuffer,cmdLen)) {
-			Command_processReorg(command);
+			Command_processReorg(self->command);
 		} else {
-			Command_processUnknown(command);
+			Command_processUnknown(self->command);
 		}
-
-		delete_Command(command);
 	
 		return 0;
 	} // process()
@@ -235,7 +232,7 @@
 	void Packet_appendCounter(Packet* self) {
 
 		if (self->counter == -1) return;
-		
+
 		Packet_beginChunk(self,"cntr");
 		Packet_appendInt(self,self->counter);
 		Packet_endChunk(self);

@@ -1,10 +1,10 @@
 clear
-rm hashr.log
+rm -f /tmp/hashr.log
 
-bin/`uname -s`-`uname -p`/hashr-server ; exit
+#bin/`uname -s`-`uname -p`/hashr-server ; exit
 
-bin/`uname -s`-`uname -p`/hashr-server &
+bin/`uname -s`-`uname -p`/hashr-server -f /tmp/hashr.pid -d -l /tmp/hashr.log 
 ../client/client.py -c info
-sleep 0.1
-pkill hashr-server
-tail hashr.log
+sleep .2
+kill `cat /tmp/hashr.pid`
+tail /tmp/hashr.log
