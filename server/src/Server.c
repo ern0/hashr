@@ -53,6 +53,11 @@
 	} // setLogger()
 
 
+	HashTable* Server_getHashTable(Server* self) {
+		return self->hashTable;
+	} // getHashTable()
+
+
 	void Server_fatal(Server* self,int id,const char* message) {
 		Logger_log(self->logger,Logger_FATAL,id,message);
 		exit(2);
@@ -155,6 +160,7 @@
 		if (incoming == NULL) Server_fatal(self,1007,"no memory for new connection");
 
 		Connection_setLogger(incoming,self->logger);
+		Connection_setServer(incoming,self);
 		Connection_setSocket(incoming,sock);
 
 		for (int i = 0; i < MAX_CLIENT_NUMBER; i++) {

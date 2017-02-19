@@ -32,3 +32,6 @@
 	} // setLogger()
 
 
+	void HashTable_hello(HashTable* self) {
+		printf("Hi \n");
+	} // hello()

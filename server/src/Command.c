@@ -20,13 +20,26 @@
 
 
 	void Command_ctor(Command* self) {
-		strcpy(self->cmd,"n.a.");
+		// NOP
 	} // ctor
 
 
 	void Command_dtor(Command* self) {
 		// NOP
 	} // dtor
+
+
+	void Command_setPacket(Command* self,Packet* packet) {
+
+		self->packet = packet;
+		strcpy(self->cmd,"n.a.");
+
+	} // setPacket()
+
+
+	void Command_setHashTable(Command* self,HashTable* hashTable) {
+		self->hashTable = hashTable;
+	} // setHashTable()
 
 
 	void Command_reportStatus(Command* self,int st,int id,const char* message) {
@@ -48,11 +61,6 @@
 		Packet_endChunk(self->packet);
 
 	} // reportStatus()
-
-
-	void Command_setPacket(Command* self,Packet* packet) {
-		self->packet = packet;
-	} // setPacket()
 
 
 	void Command_setCommand(Command* self,unsigned char* cmd,int len) {
@@ -85,6 +93,8 @@
 
 		// TODO: provide some info
 		Packet_appendStr(self->packet,"important information");
+
+		HashTable_hello(self->hashTable);
 
 		Packet_endChunk(self->packet);		
 		Packet_appendEndmark(self->packet);

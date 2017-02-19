@@ -39,6 +39,12 @@
 	} // setLogger()
 
 
+	void Connection_setServer(Connection* self,Server* server) {
+		self->server = server;
+		Packet_setServer(self->packet,self->server);
+	} // setServer()
+
+
 	int Connection_getSocket(Connection* self) {
 		return self->socket;
 	} // getSocket()

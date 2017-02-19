@@ -15,6 +15,10 @@
 struct Packet;
 typedef struct Packet Packet;
 
+// class Server;
+struct Server;
+typedef struct Server Server;
+
 
 // class Connection
 
@@ -24,6 +28,7 @@ typedef struct Packet Packet;
 		Logger* logger;
 		int socket;
 		Packet* packet;
+		Server* server;
 	};
 	typedef struct Connection Connection;
 
@@ -34,6 +39,7 @@ typedef struct Packet Packet;
 	Connection* new_Connection();
 	void delete_Connection(Connection* self);
 	void Connection_setLogger(Connection* self,Logger* logger);
+	void Connection_setServer(Connection* self,Server* server);
 	void Connection_log(Connection* self,int level,int id,const char* message);
 	int Connection_getSocket(Connection* self);
 	void Connection_setSocket(Connection* self,int sock);

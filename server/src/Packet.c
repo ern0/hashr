@@ -1,4 +1,5 @@
 #include "Command.h"
+#include "Server.h"
 #include "Packet.h"
 
 
@@ -38,6 +39,16 @@
 	void Packet_setLogger(Packet* self,Logger* logger) {
 		self->logger = logger;
 	} // setLogger()
+
+
+	void Packet_setServer(Packet* self,Server* server) {
+
+		self->server = server;
+
+		HashTable* hashTable = Server_getHashTable(self->server);
+		Command_setHashTable(self->command,hashTable);
+
+	} // seServer()
 
 
 	void Packet_setSession(Packet* self,int session) {

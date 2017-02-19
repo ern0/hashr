@@ -9,6 +9,7 @@
 #include "Utils.h"
 #include "Logger.h"
 #include "Command.h"
+#include "Server.h"
 
 
 // class Packet
@@ -19,6 +20,7 @@
 	// private
 	struct Packet {
 		Logger* logger;
+		Server* server;
 		int session;
 		unsigned char* buffer;
 		unsigned char internalBuffer[Packet_BUFLEN];
@@ -39,6 +41,7 @@
 	Packet* new_Packet();
 	void delete_Packet(Packet* self);
 	void Packet_setLogger(Packet* self,Logger* logger);
+	void Packet_setServer(Packet* self,Server* server);
 	void Packet_setSession(Packet* self,int session);
 	void Packet_log(Packet* self,int level,int id,const char* message);
 	void Packet_fatal(Packet* self,int id,const char* message);

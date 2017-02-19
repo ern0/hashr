@@ -48,11 +48,13 @@
 	Server* new_Server();
 	void delete_Server(Server* self);
 	void Server_setLogger(Server* self,Logger* logger);
+	HashTable* Server_getHashTable(Server*self);
 	void Server_setPort(Server* self,int port);
 	int Server_getPort(Server* self);
 	void Server_start(Server* self);
 	void Server_stop(Server* self);
 	void Server_run(Server* self);
+	HashTable* getHashTable(Server* self);
 
 	// protected
 	void Server_ctor(Server* self);

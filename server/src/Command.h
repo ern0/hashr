@@ -8,6 +8,8 @@
 
 #include "Utils.h"
 #include "Logger.h"
+#include "Server.h"
+#include "HashTable.h"
 
 // class Packet;
 struct Packet;
@@ -24,6 +26,7 @@ typedef struct Packet Packet;
 		Packet* packet;
 		char cmd[20];
 		int counter;
+		HashTable* hashTable;
 	};
 	typedef struct Command Command;
 
@@ -31,7 +34,8 @@ typedef struct Packet Packet;
 	// public
 	Command* new_Command();
 	void delete_Command(Command* self);
-	void Command_setPacket(Command* cmd,Packet* packet);
+	void Command_setPacket(Command* self,Packet* packet);
+	void Command_setHashTable(Command* self,HashTable* hashTable);
 	void Command_processUnknown(Command* cmd);
 	void Command_setCommand(Command* self,unsigned char* cmd,int len);
 	void Command_processInfo(Command* cmd);

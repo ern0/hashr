@@ -22,6 +22,7 @@
 	HashTable* new_HashTable();
 	void delete_HashTable(HashTable* self);
 	void HashTable_setLogger(HashTable* self,Logger* logger);
+	void HashTable_hello(HashTable* self);	
 
 	// protected
 	void HashTable_ctor(HashTable* self);
