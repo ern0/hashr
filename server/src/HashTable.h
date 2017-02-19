@@ -41,5 +41,4 @@
 	int HashTable_getCapacity(HashTable* self);
 	int HashTable_getNumberOfElms(HashTable* self);
 
-
 #endif

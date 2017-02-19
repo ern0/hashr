@@ -156,7 +156,7 @@
 			return;
 		} // if wrong packet
 
-		unsigned char* data = Packet_getBuffer(self->packet);
+		char* data = (char*)Packet_getBuffer(self->packet);
 		int len = Packet_getLength(self->packet);
 		send(self->socket,data,len,0);
 

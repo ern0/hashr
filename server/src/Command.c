@@ -56,7 +56,14 @@
 		}
 
 		char extendedMessage[200];
-		snprintf(extendedMessage,200,"Command '%s' result: %d - %s",self->cmd,st,message);
+		snprintf(
+			extendedMessage
+			,200
+			,"Command '%s' result: %d - %s"
+			,self->cmd
+			,st
+			,message
+		);
 		Packet_log(self->packet,logLevel,id,extendedMessage);
 
 		Packet_beginChunk(self->packet,"STAT");
@@ -67,7 +74,7 @@
 	} // reportStatus()
 
 
-	void Command_setCommand(Command* self,unsigned char* cmd,int len) {
+	void Command_setCommand(Command* self,char* cmd,int len) {
 		if (len > 19) len = 19;
 		strncpy(self->cmd,(char*)cmd,len);
 	} // setCommand()
@@ -78,7 +85,8 @@
 		Packet_prepareForReply(self->packet);
 		Packet_appendHeader(self->packet);
 		Packet_appendCounter(self->packet);
-		Command_reportStatus(self
+		Command_reportStatus(
+			self
 			,Command_ST_INVALID_COMMAND
 			,2201,"Invalid command"
 		);
@@ -115,7 +123,7 @@
 		Packet_appendIntChunk(self->packet,"CPTY",capacity);
 		
 		int noOfElms = HashTable_getNumberOfElms(self->hashTable);
-		Packet_appendIntChunk(self->packet,"NELM",noOfConns);
+		Packet_appendIntChunk(self->packet,"NELM",noOfElms);
 
 		Packet_appendEndmark(self->packet);
 
@@ -123,8 +131,13 @@
 
 
 	void Command_processSet(Command* self) {
-		printf("todo: set cmd \n");
-	}
+
+		int keyChunk = Packet_findChunk(self->packet,"QKEY");
+		int length = Packet_getLength(self->packet);
+		//Utils_dump((char*)keyChunk,length);
+
+		printf("set \n");
+	} // processSet()
 
 
 	void Command_processGet(Command* self) {

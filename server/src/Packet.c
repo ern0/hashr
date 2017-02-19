@@ -116,7 +116,7 @@
 
 			if (self->length < index + 4) return -1;
 			
-			if (Utils_isEqSigs(&self->buffer[index],(const unsigned char*)"endm")) {
+			if (Utils_isEqSigs((char*)&self->buffer[index],"endm")) {
 				break;
 			}
 
@@ -132,17 +132,17 @@
 	} // scanChunks()
 
 
-	int Packet_findChunk(Packet* self,unsigned char* sig) {
+	int Packet_findChunk(Packet* self,char* sig) {
 
 		int index = 4;
 
 		while (1) {
 
-			if (Utils_isEqSigs(&self->buffer[index],(const unsigned char*)"endm")) {
+			if (Utils_isEqSigs((char*)&self->buffer[index],"endm")) {
 				return -1;
 			}
 
-			if (Utils_isEqSigs(&self->buffer[index],sig)) break;
+			if (Utils_isEqSigs((char*)&self->buffer[index],sig)) break;
 
 			int chunkLength = Utils_getBufInt(&self->buffer[index + 4]);
 			index += chunkLength + 8;
@@ -166,16 +166,16 @@
 			return -1;		
 		} // if damaged request
 
-		int cmdIndex = Packet_findChunk(self,(unsigned char*)"CMND");
+		int cmdIndex = Packet_findChunk(self,"CMND");
 		if (cmdIndex == -1) {
 			Packet_log(self,Logger_ERROR | Logger_DISPLAY,2020,"No command in request");
 			return -1;
 		} // if no command in packet
 
-		unsigned char* cmdBuffer = &self->buffer[cmdIndex];
+		char* cmdBuffer = (char*)&self->buffer[cmdIndex];
 		int cmdLen = Utils_getBufInt(&self->buffer[cmdIndex - 4]);
 
-		int counterIndex = Packet_findChunk(self,(unsigned char*)"cntr");
+		int counterIndex = Packet_findChunk(self,"cntr");
 		if (counterIndex != -1) {
 			self->counter = Utils_getBufInt(&self->buffer[counterIndex]);
 		}	else {
@@ -185,25 +185,25 @@
 		Command_setPacket(self->command,self);
 		Command_setCommand(self->command,cmdBuffer,cmdLen);
 
-		if (0 == strncmp("beat",(char*)cmdBuffer,cmdLen)) {
+		if (0 == strncmp("beat",cmdBuffer,cmdLen)) {
 			Command_processHeartbeat(self->command);
-		} else if (0 == strncmp("get",(char*)cmdBuffer,cmdLen)) {
+		} else if (0 == strncmp("get",cmdBuffer,cmdLen)) {
 			Command_processGet(self->command);
-		} else if (0 == strncmp("set",(char*)cmdBuffer,cmdLen)) {
+		} else if (0 == strncmp("set",cmdBuffer,cmdLen)) {
 			Command_processSet(self->command);
-		} else if (0 == strncmp("del",(char*)cmdBuffer,cmdLen)) {
+		} else if (0 == strncmp("del",cmdBuffer,cmdLen)) {
 			Command_processDel(self->command);
-		} else if (0 == strncmp("info",(char*)cmdBuffer,cmdLen)) {
+		} else if (0 == strncmp("info",cmdBuffer,cmdLen)) {
 			Command_processInfo(self->command);
-		} else if (0 == strncmp("zap",(char*)cmdBuffer,cmdLen)) {
+		} else if (0 == strncmp("zap",cmdBuffer,cmdLen)) {
 			Command_processZap(self->command);
-		} else if (0 == strncmp("ksearch",(char*)cmdBuffer,cmdLen)) {
+		} else if (0 == strncmp("ksearch",cmdBuffer,cmdLen)) {
 			Command_processKsearch(self->command);
-		} else if (0 == strncmp("vsearch",(char*)cmdBuffer,cmdLen)) {
+		} else if (0 == strncmp("vsearch",cmdBuffer,cmdLen)) {
 			Command_processVsearch(self->command);
-		} else if (0 == strncmp("search",(char*)cmdBuffer,cmdLen)) {
+		} else if (0 == strncmp("search",cmdBuffer,cmdLen)) {
 			Command_processSearch(self->command);
-		} else if (0 == strncmp("reorg",(const char*)cmdBuffer,cmdLen)) {
+		} else if (0 == strncmp("reorg",cmdBuffer,cmdLen)) {
 			Command_processReorg(self->command);
 		} else {
 			Command_processUnknown(self->command);
@@ -218,7 +218,7 @@
 	} // prepareForReply()
 
 
-	void Packet_append(Packet* self,unsigned char* data,int len) {
+	void Packet_append(Packet* self,const char* data,int len) {
 		memcpy(&self->buffer[self->length],data,len);
 		self->length += len;
 	} // append()
@@ -229,18 +229,18 @@
 		unsigned char buf[4];
 		Utils_setBufInt(buf,value);
 
-		Packet_append(self,buf,4);
+		Packet_append(self,(char*)buf,4);
 
 	} // appendInt()
 
 
 	void Packet_appendStr(Packet* self,const char* value) {
-		Packet_append(self,(unsigned char*)value,strlen(value));
+		Packet_append(self,value,strlen(value));
 	} // appendStr()
 
 
 	void Packet_appendHeader(Packet* self) {
-		Packet_append(self,(unsigned char*)"HSHr",4);
+		Packet_append(self,"HSHr",4);
 	} // appendHeader()
 
 
@@ -251,7 +251,7 @@
 
 
 	void Packet_appendEndmark(Packet* self) {
-		Packet_append(self,(unsigned char*)"endm",4);
+		Packet_append(self,"endm",4);
 	} // appendHeader()
 
 

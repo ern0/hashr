@@ -16,7 +16,7 @@
 	} // getStamp()
 
 
-	int Utils_isEqSigs(const unsigned char* sig1,const unsigned char* sig2) {
+	int Utils_isEqSigs(const char* sig1,const char* sig2) {
 
 		if (sig1[0] != sig2[0]) return 0;
 		if (sig1[1] != sig2[1]) return 0;
@@ -55,7 +55,7 @@
 				int index = ptr + i;
 
 				if (index < len) {
-					unsigned char b = buffer[ptr + i];
+					char b = buffer[ptr + i];
 					printf("%02X ",b);
 				} // if payload
 
@@ -71,7 +71,7 @@
 				int index = ptr + i;
 
 				if (index < len) {
-					unsigned char b = buffer[ptr + i];
+					char b = buffer[ptr + i];
 					if (b < ' ') b = '.';
 					if (b > 126) b = '.';
 					printf("%c",b);

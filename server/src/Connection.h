@@ -33,7 +33,7 @@ typedef struct Server Server;
 	typedef struct Connection Connection;
 
 	// test
-	void Connection_setBuffer(Connection* self,unsigned char* buffer,int len);
+	void Connection_setBuffer(Connection* self,char* buffer,int len);
 
 	// public
 	Connection* new_Connection();

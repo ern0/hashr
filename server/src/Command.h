@@ -39,7 +39,7 @@ typedef struct Packet Packet;
 	void Command_setServer(Command* self,Server* server);
 	void Command_setHashTable(Command* self,HashTable* hashTable);
 	void Command_processUnknown(Command* cmd);
-	void Command_setCommand(Command* self,unsigned char* cmd,int len);
+	void Command_setCommand(Command* self,char* cmd,int len);
 	void Command_processHeartbeat(Command* cmd);
 	void Command_processInfo(Command* cmd);
 	void Command_processSet(Command* cmd);

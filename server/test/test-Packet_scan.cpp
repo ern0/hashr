@@ -18,13 +18,13 @@ TEST_CASE("Packet scan") {
 
 
 	SECTION("packet header check pos") {
-		unsigned char validHeader[] = { 'H','S','H','r' };
+		char validHeader[] = { 'H','S','H','r' };
 		Packet_setBuffer(packet,validHeader,-1);
 		REQUIRE( Packet_isHeaderOk(packet) );
 	}
 
 	SECTION("packet header check neg") {
-		unsigned char badHeader[] = { 'H','S','H', 0 };
+		char badHeader[] = { 'H','S','H', 0 };
 		Packet_setBuffer(packet,badHeader,-1);
 		REQUIRE( !Packet_isHeaderOk(packet) );
 		REQUIRE( Packet_process(packet) == -1 );
@@ -33,7 +33,7 @@ TEST_CASE("Packet scan") {
 
 	SECTION("packet chunk count 3") {
 
-		unsigned char data[] = { 
+		char data[] = { 
 			'H','S','H','r',
 			'C','H','N','K',0,0,0,1,
 			'x',
@@ -51,7 +51,7 @@ TEST_CASE("Packet scan") {
 
 	SECTION("packet chunk count 0") {
 		
-		unsigned char data[] = { 
+		char data[] = { 
 			'H','S','H','r',
 			'e','n','d','m'
 		};
@@ -63,7 +63,7 @@ TEST_CASE("Packet scan") {
 
 	SECTION("packet chunk no endmark") {
 		
-		unsigned char data[] = { 
+		char data[] = { 
 			'H','S','H','r',
 			'C','H','N','K',0,0,0,1,
 			'x',
@@ -82,7 +82,7 @@ TEST_CASE("Packet scan") {
 
 	SECTION("packet chunk wrong chunk length") {
 		
-		unsigned char data[] = { 
+		char data[] = { 
 			'H','S','H','r',
 			'C','H','N','K',0,0,0,1,
 			'x',
@@ -102,7 +102,7 @@ TEST_CASE("Packet scan") {
 
 	SECTION("packet without command") {
 		
-		unsigned char data[] = { 
+		char data[] = { 
 			'H','S','H','r',
 			'C','H','N','K',0,0,0,1,
 			'x',

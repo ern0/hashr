@@ -51,10 +51,10 @@
 	int Packet_getLength(Packet* self);
 	int Packet_isHeaderOk(Packet* self);
 	int Packet_scanChunks(Packet* self);
-	int Packet_findChunk(Packet* self,unsigned char* sig);
+	int Packet_findChunk(Packet* self,char* sig);
 	int Packet_process(Packet* self);
 	void Packet_prepareForReply(Packet* self);
-	void Packet_append(Packet* self,unsigned char* data,int len);
+	void Packet_append(Packet* self,const char* data,int len);
 	void Packet_appendInt(Packet* self,int value);
 	void Packet_appendStr(Packet* self,const char* value);
 	void Packet_appendHeader(Packet* self);
