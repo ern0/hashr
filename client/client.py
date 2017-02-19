@@ -12,6 +12,7 @@ import shlex
 
 from packet import *
 from command import *
+from parser import *
 
 
 class ParameterNumberException(Exception): pass
@@ -192,11 +193,11 @@ Available commands:
 			if len(words) == 0: return None
 			cmd = words[0].lower()
 
-			if cmd == "help":
+			if cmd == "help" or cmd == 'h':
 				self.printHelp()
 				return None
 
-			elif cmd == "quit":
+			elif cmd == "quit" or cmd == 'q':
 				raise UserExitException
 			
 			elif cmd == "exit":
@@ -217,19 +218,23 @@ Available commands:
 			command = Command()
 			command.setCommand(cmd)
 
-			if cmd == "info":
+			if cmd == "info" or cmd == 'i':
+				command.setCommand("info")
 				self.parmNumCheck(words,0)
 
-			elif cmd == "get":
+			elif cmd == "get" or cmd == 'g':
+				command.setCommand("get")
 				self.parmNumCheck(words,1)
 				command.setRequestKey(words[1])
 
-			elif cmd == "set":
+			elif cmd == "set" or cmd == 's':
+				command.setCommand("set")
 				self.parmNumCheck(words,2)
 				command.setRequestKey(words[1])
 				command.setRequestValue(words[2])
 
-			elif cmd == "del":
+			elif cmd == "del" or cmd == 'd':
+				command.setCommand("del")
 				self.parmNumCheck(words,1)
 				command.setRequestKey(words[1])
 
@@ -310,7 +315,8 @@ Available commands:
 
 			if response == None: continue
 
-			print(response)
+			parser = Parser(response)
+			parser.render()
 
 
 	def main(self):
@@ -321,7 +327,9 @@ Available commands:
 			self.welcome()
 			self.setDaemon(True)		
 			self.start()
+
 			self.cliLoop()
+
 		self.cleanup()
 
 

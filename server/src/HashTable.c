@@ -49,3 +49,6 @@
 	int HashTable_getNumberOfElms(HashTable* self) {
 		return self->numberOfElms;
 	} // getNumberOfElms()
+
+
+	
