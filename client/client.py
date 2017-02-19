@@ -120,7 +120,7 @@ Available commands:
 		while True:
 
 			command = Command()
-			command.setCommand("INFO")
+			command.setCommand("info")
 			result = self.performCommand( command )
 
 			# TODO: show result
@@ -322,7 +322,7 @@ Available commands:
 		if not self.performSingleShot():
 			self.welcome()
 			self.setDaemon(True)		
-			## self.start()
+			self.start()
 			self.cliLoop()
 		self.cleanup()
 
