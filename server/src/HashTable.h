@@ -8,14 +8,14 @@
 
 #include "Utils.h"
 #include "Logger.h"
-
+#include "HashItem.h"
+#include "Hasher.h"
 
 #define HashTable_CAPACITY_DEFAULT 8
-#define HashTable_CAPACITY_MAX 65536
+#define HashTable_CAPACITY_MAX 0x10000
 #define HashTable_METHOD_DEFAULT 1
 
 #define HashTable_METHOD_DEBUG 1
-
 
 
 // class HashTable
@@ -25,7 +25,9 @@
 		Logger* logger;
 		int method;
 		int capacity;
+		int hashMask;
 		int numberOfElms;
+		HashItem** items;
 	};
 	typedef struct HashTable HashTable;
 
@@ -41,5 +43,6 @@
 	int HashTable_getCapacity(HashTable* self);
 	int HashTable_getNumberOfElms(HashTable* self);
 	int HashTable_performSet(HashTable* self,char* keybuf,int keylen,char* valbuf,int vallen);
+	void HashTable_dump(HashTable* self);	
 
 #endif

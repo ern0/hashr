@@ -13,18 +13,15 @@ BIN=bin/${PLATFORM}
 ${BIN}/hashr-server: \
 		Makefile ${OBJ} ${BIN} \
 		${SRC}/main.c \
-		${OBJ}/Logger.o \
-		${OBJ}/Server.o \
-		${OBJ}/HashTable.o \
-		${OBJ}/Connection.o \
-		${OBJ}/Packet.o \
-		${OBJ}/Command.o 
+		${OBJ}/Server.o 
 	${CC} \
 		${SRC}/main.c \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
 		${OBJ}/Server.o \
 		${OBJ}/HashTable.o \
+		${OBJ}/HashItem.o \
+		${OBJ}/Hasher.o \
 		${OBJ}/Connection.o \
 		${OBJ}/Packet.o \
 		${OBJ}/Command.o \
@@ -50,6 +47,7 @@ ${OBJ}/Server.o: \
 		Makefile ${OBJ} \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
+		${OBJ}/HashTable.o \
 		${OBJ}/Connection.o \
 		${SRC}/Server.h \
 		${SRC}/Server.c
@@ -61,16 +59,35 @@ ${OBJ}/HashTable.o: \
 		Makefile ${OBJ} \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
+		${OBJ}/HashItem.o \
 		${SRC}/HashTable.h \
 		${SRC}/HashTable.c
 	${CC} -c \
 		${SRC}/HashTable.c \
 		-o ${OBJ}/HashTable.o
 
+${OBJ}/HashItem.o: \
+		Makefile ${OBJ} \
+		${OBJ}/Hasher.o \
+		${SRC}/HashItem.h \
+		${SRC}/HashItem.c
+	${CC} -c \
+		${SRC}/HashItem.c \
+		-o ${OBJ}/HashItem.o
+
+${OBJ}/Hasher.o: \
+		Makefile ${OBJ} \
+		${SRC}/Hasher.h \
+		${SRC}/Hasher.c
+	${CC} -c \
+		${SRC}/Hasher.c \
+		-o ${OBJ}/Hasher.o
+
 ${OBJ}/Connection.o: \
 		Makefile ${OBJ} \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
+		${OBJ}/Packet.o \
 		${SRC}/Connection.h \
 		${SRC}/Connection.c
 	${CC} -c \
@@ -81,7 +98,7 @@ ${OBJ}/Packet.o: \
 		Makefile ${OBJ} \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
-		${OBJ}/Connection.o \
+		${OBJ}/Command.o \
 		${SRC}/Packet.h \
 		${SRC}/Packet.c
 	${CC} -c \
@@ -117,13 +134,8 @@ ${BIN}/test-Utils: \
 ${BIN}/test-Packet_scan: \
 		Makefile ${OBJ} ${BIN} \
 		${TST}/test-Packet_scan.cpp \
-		${OBJ}/Packet.o \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
 		${OBJ}/Server.o \
-		${OBJ}/Connection.o \
-		${OBJ}/HashTable.o \
-		${OBJ}/Command.o 
+		${OBJ}/Utils.o
 	${TC} \
 		${TST}/test-Packet_scan.cpp \
 		${OBJ}/Packet.o \
@@ -132,19 +144,16 @@ ${BIN}/test-Packet_scan: \
 		${OBJ}/Server.o \
 		${OBJ}/Connection.o \
 		${OBJ}/HashTable.o \
+		${OBJ}/HashItem.o \
+		${OBJ}/Hasher.o \
 		${OBJ}/Command.o \
 		-o ${BIN}/test-Packet_scan
 
 ${BIN}/test-Packet_build: \
 		Makefile ${OBJ} ${BIN} \
 		${TST}/test-Packet_build.cpp \
-		${OBJ}/Packet.o \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
 		${OBJ}/Server.o \
-		${OBJ}/Connection.o \
-		${OBJ}/HashTable.o \
-		${OBJ}/Command.o 
+		${OBJ}/Utils.o
 	${TC} \
 		${TST}/test-Packet_build.cpp \
 		${OBJ}/Packet.o \
@@ -153,6 +162,8 @@ ${BIN}/test-Packet_build: \
 		${OBJ}/Server.o \
 		${OBJ}/Connection.o \
 		${OBJ}/HashTable.o \
+		${OBJ}/HashItem.o \
+		${OBJ}/Hasher.o \
 		${OBJ}/Command.o \
 		-o ${BIN}/test-Packet_build
 

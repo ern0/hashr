@@ -68,5 +68,32 @@ TEST_CASE("Utils") {
 		REQUIRE(buffer[4] == 0);
 	}
 
+	SECTION("round up to power of 2") {
+
+		REQUIRE( Utils_roundUp2Power(3) == 4 );
+
+		REQUIRE( Utils_roundUp2Power(12) == 16 );
+		REQUIRE( Utils_roundUp2Power(15) == 16 );
+		REQUIRE( Utils_roundUp2Power(16) == 16 );
+		REQUIRE( Utils_roundUp2Power(17) == 32 );
+
+		REQUIRE( Utils_roundUp2Power(65000) == 65536 );
+		REQUIRE( Utils_roundUp2Power(65536) == 65536 );
+
+	}
+
+	SECTION("calculate hash masks") {
+
+		REQUIRE( Utils_calcHashMask(3) == 0x03 );
+
+		REQUIRE( Utils_calcHashMask(7) == 0x07 );
+		REQUIRE( Utils_calcHashMask(8) == 0x07 );
+		REQUIRE( Utils_calcHashMask(9) == 0x0f );
+
+		REQUIRE( Utils_calcHashMask(65535) == 0xffff );
+		REQUIRE( Utils_calcHashMask(65536) == 0xffff );
+		REQUIRE( Utils_calcHashMask(65537) == 0x1ffff );
+
+	}
 
 } // test case

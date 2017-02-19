@@ -16,5 +16,7 @@
 	int Utils_getBufInt(const unsigned char* buffer);
 	int Utils_isEqSigs(const char* sig1,const char* sig2);
 	void Utils_dump(const char* buffer,int len);
+	int Utils_roundUp2Power(int value);
+	int Utils_calcHashMask(int value);		
 
 #endif

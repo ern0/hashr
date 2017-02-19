@@ -20,8 +20,23 @@
 	void HashTable_ctor(HashTable* self) {
 
 		self->method = HashTable_METHOD_DEFAULT;
-		self->capacity = HashTable_CAPACITY_DEFAULT;
+		self->capacity = Utils_roundUp2Power(HashTable_CAPACITY_DEFAULT);
+		self->hashMask = Utils_calcHashMask(self->capacity);		
 		self->numberOfElms = 0;
+
+		self->items = (HashItem**)malloc(self->capacity * sizeof(HashItem*));
+		if (self->items == NULL) {
+			Logger_log(
+				self->logger
+				,Logger_FATAL
+				,2801,"Out of memory"
+			);
+			exit(2);
+		} // if out of memory
+
+		for (int i = 0; i < self->capacity; i++) {
+			self->items[i] = NULL;
+		}
 
 	} // ctor
 
@@ -50,9 +65,26 @@
 		return self->numberOfElms;
 	} // getNumberOfElms()
 
-	
-	int HashTable_performSet(HashTable* self,char* keybuf,int keylen,char* valbuf,int vallen) {
 
+	void HashTable_dump(HashTable* self) {
+
+		for (int i = 0; i < self->capacity; i++) {
+			HashItem* item = self->items[i];
+			if ( (self->capacity > 32) && (item == NULL)) continue;
+
+			printf("%04X: ",i);
+			if (item != NULL) HashItem_dump(item);
+			printf("\n");
+		} // foreach items
+
+	} // dump()
+
+	
+	int HashTable_performSet(HashTable* self,char* keydata,int keylen,char* valdata,int vallen) {
+
+
+		int hash = Hasher_hash(self->method,keydata,keylen);
 
 		return 1;
 	} // performSet()
+

@@ -62,7 +62,6 @@
 
 
 	void Connection_log(Connection* self,int level,int id,const char* message) {
-
 		char extendedMessage[200];
 		strncpy(extendedMessage,message,199);
 		strncat(extendedMessage," (session=%d)",199);

@@ -85,3 +85,33 @@
 		} // while buffer
 
 	} // dumpBuffer()
+
+
+	int Utils_roundUp2Power(int value) {
+
+		--value;
+
+		value |= value >> 1;
+		value |= value >> 2;
+		value |= value >> 4;
+		value |= value >> 8;
+		value |= value >> 16;
+
+		value++;
+
+		return value;
+	} // roundUp2Power()
+
+
+	int Utils_calcHashMask(int value) {
+
+		--value;
+
+		value |= value >> 1;
+		value |= value >> 2;
+		value |= value >> 4;
+		value |= value >> 8;
+		value |= value >> 16;
+
+		return value;
+	} // calcHashMask()

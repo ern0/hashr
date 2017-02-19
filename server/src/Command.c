@@ -80,7 +80,7 @@
 		strncpy(self->cmd,(char*)cmd,len);
 
 		self->cmd[len] = 0;
-		
+
 	} // setCommand()
 
 
@@ -188,7 +188,7 @@
 				,Command_ST_UPDATED
 				,2211,"Data updated"
 			);
-		} // if updated
+		} // else updated
 
 		Packet_appendEndmark(self->packet);
 
@@ -196,8 +196,10 @@
 
 
 	void Command_processGet(Command* self) {
-		printf("todo: get cmd \n");
-	}
+
+		HashTable_dump(self->hashTable);
+		
+	} // get()
 
 	
 	void Command_processDel(Command* self) {
