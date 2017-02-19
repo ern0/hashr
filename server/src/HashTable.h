@@ -40,5 +40,6 @@
 	int HashTable_getMethod(HashTable* self);
 	int HashTable_getCapacity(HashTable* self);
 	int HashTable_getNumberOfElms(HashTable* self);
+	int HashTable_performSet(HashTable* self,char* keybuf,int keylen,char* valbuf,int vallen);
 
 #endif

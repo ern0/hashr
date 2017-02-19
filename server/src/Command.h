@@ -17,7 +17,10 @@ typedef struct Packet Packet;
 
 
 #define Command_ST_OK 0
-#define Command_ST_INVALID_COMMAND 1
+#define Command_ST_INSERTED 1
+#define Command_ST_UPDATED 2
+#define Command_ST_INVALID_COMMAND 21
+#define Command_ST_MISSING_PARAM 22
 
 // class Command
 
@@ -28,6 +31,8 @@ typedef struct Packet Packet;
 		char cmd[20];
 		int counter;
 		HashTable* hashTable;
+		char* data;
+		int length;
 	};
 	typedef struct Command Command;
 
@@ -56,6 +61,7 @@ typedef struct Packet Packet;
 	void Command_dtor(Command* self);
 	void Command_fail(Command* self,int id,const char* message);
 	void Command_reportStatus(Command* self,int st,int id,const char* message);
+	int Command_loadChunk(Command* self,char* id);
 
 
 #endif

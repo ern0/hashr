@@ -1,10 +1,10 @@
 clear
 rm -f /tmp/hashr.log
 
-#bin/`uname -s`-`uname -p`/hashr-server ; exit
+bin/`uname -s`-`uname -p`/hashr-server ; exit
 
 bin/`uname -s`-`uname -p`/hashr-server -f /tmp/hashr.pid -d -l /tmp/hashr.log
-../client/client.py -c set kekerekk vakjhaakav
+../client/client.py -c set kekerekk vvvlalaka
 sleep .2
 kill `cat /tmp/hashr.pid`
 tail /tmp/hashr.log

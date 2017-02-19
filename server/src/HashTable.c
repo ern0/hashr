@@ -50,5 +50,9 @@
 		return self->numberOfElms;
 	} // getNumberOfElms()
 
-
 	
+	int HashTable_performSet(HashTable* self,char* keybuf,int keylen,char* valbuf,int vallen) {
+
+
+		return 1;
+	} // performSet()
