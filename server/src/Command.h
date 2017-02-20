@@ -19,10 +19,14 @@ typedef struct Packet Packet;
 
 
 #define Command_ST_OK 0
+
 #define Command_ST_INSERTED 1
 #define Command_ST_UPDATED 2
 #define Command_ST_FOUND 3
 #define Command_ST_NOT_FOUND 4
+#define Command_ST_DELETED 5
+#define Command_ST_NOT_EXISTS 6
+
 #define Command_ST_INVALID_COMMAND 21
 #define Command_ST_MISSING_PARAM 22
 

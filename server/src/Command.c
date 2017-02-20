@@ -190,16 +190,16 @@
 		if (result == 1) {
 			Command_reportStatus(
 				self
-				,Command_ST_INSERTED
-				,2210,"Data inserted"
+				,Command_ST_UPDATED
+				,2210,"Data updated"
 			);
 		} // if inserted
 
 		else {
 			Command_reportStatus(
 				self
-				,Command_ST_UPDATED
-				,2211,"Data updated"
+				,Command_ST_INSERTED
+				,2211,"Data inserted"
 			);
 		} // else updated
 
@@ -251,8 +251,41 @@
 
 	
 	void Command_processDel(Command* self) {
-		printf("todo: del cmd \n");
-	}
+
+		if ( Command_loadChunk(self,"QKEY") == -1 ) return;
+		char* keyData = self->data;
+		int keyLength = self->length;
+
+		Packet_prepareForReply(self->packet);
+		Packet_appendHeader(self->packet);
+		Packet_appendCounter(self->packet);
+
+		char* valueData = NULL;
+		int valueLength = 0;
+		int result = HashTable_performDel(
+			self->hashTable
+			,keyData,keyLength
+		);
+
+		if (result == 1) {
+			Command_reportStatus(
+				self
+				,Command_ST_DELETED
+				,2214,"Data deleted"
+			);
+		} // if found
+
+		else {
+			Command_reportStatus(
+				self
+				,Command_ST_NOT_EXISTS
+				,2215,"Key not exists"
+			);
+		} // else not found
+
+		Packet_appendEndmark(self->packet);
+
+	} // processDel()
 
 	
 	void Command_processZap(Command* self) {

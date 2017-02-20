@@ -38,6 +38,8 @@
 	char* HashItem_getValueData(HashItem* self);
 	int HashItem_getValueLength(HashItem* self);
 	HashItem** HashItem_getNextPtr(HashItem* self);
+	HashItem* HashItem_getNext(HashItem* self);
+	void HashItem_setNext(HashItem* self,HashItem* next);
 	int HashItem_replaceValue(HashItem* self,char* data,int length);
 
 #endif

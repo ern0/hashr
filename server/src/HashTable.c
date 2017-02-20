@@ -168,3 +168,38 @@
 
 		return 1;
 	} // performGet()
+
+
+	int HashTable_performDel(HashTable* self,char* keydata,int keylen) {
+
+		int hash = HashTable_getHash(self,keydata,keylen);
+
+		HashItem** itemPtr = HashTable_findItem(self,hash,keydata,keylen);
+		if (itemPtr == NULL) return 2;
+
+		HashItem* item = *itemPtr;
+		HashItem* saved = HashItem_getNext(item);
+		HashItem* head = self->items[hash];
+
+		if (item == head) {
+			self->items[hash] = saved;
+		} // if head 
+
+		else {
+
+			HashItem* prev = head;
+			while (1) {
+				HashItem* next = HashItem_getNext(prev);
+				if (next == item) break;
+				prev = next;
+			} // scan linked list
+
+			HashItem_setNext(prev,saved);
+
+		} // else not head
+
+		delete_HashItem(item);
+		--self->numberOfElms;
+
+		return 1;
+	} // performDel()

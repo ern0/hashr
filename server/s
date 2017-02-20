@@ -4,10 +4,10 @@ rm -f /tmp/hashr.log
 #bin/`uname -s`-`uname -p`/hashr-server ; exit
 
 bin/`uname -s`-`uname -p`/hashr-server -f /tmp/hashr.pid -l /tmp/hashr.log &
-../client/client.py -c set 1 ein 
-../client/client.py -c set 2 zwei
-../client/client.py -c set 1 one
-../client/client.py -c set 2 two
+../client/client.py -c set 1a aa
+../client/client.py -c set 1b bb
+../client/client.py -c set 1c cc
+../client/client.py -c set 1d dd
 ../client/client.py
 sleep .2
 kill `cat /tmp/hashr.pid`

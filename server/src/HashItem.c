@@ -48,6 +48,11 @@
 
 	void HashItem_dump(HashItem* self) {
 		
+		if (self == NULL) {
+			printf("(null)");
+			return;
+		}
+
 		if (self->method != 1) printf("%d:",self->method);
 		for (int i = 0; i < self->keyLength; i++) {
 			printf("%c",self->keyData[i]);
@@ -114,6 +119,16 @@
 	HashItem** HashItem_getNextPtr(HashItem* self) {
 		return &self->next;  // yes, pointer to self->next
 	} // getNextPtr()
+
+
+	HashItem* HashItem_getNext(HashItem* self) {
+		return self->next;
+	} // getNext()
+
+
+	void HashItem_setNext(HashItem* self,HashItem* next) {
+		self->next = next;
+	} // setNext()
 
 
 	int HashItem_replaceValue(HashItem* self,char* data,int length) {

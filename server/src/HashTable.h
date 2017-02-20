@@ -49,5 +49,6 @@
 
 	int HashTable_performSet(HashTable* self,char* keydata,int keylen,char* valdata,int vallen);
 	int HashTable_performGet(HashTable* self,RET char** valdata,RET int* vallen,char* keydata,int keylen);
+	int HashTable_performDel(HashTable* self,char* keydata,int keylen);
 
 #endif
