@@ -96,9 +96,20 @@
 	} // dump()
 
 
-	HashItem** HashTable_findItem(HashTable* self,int hash,char* data,int lenght) {
+	HashItem** HashTable_findItem(HashTable* self,int hash,char* data,int length) {
 
-		// TODO
+		HashItem** itemPtr = &self->items[hash];
+		while (1) {
+			
+			if (*itemPtr == NULL) return NULL;
+			
+			if ( HashItem_getKeyLength(*itemPtr) == length ) {
+				if (0 == memcmp(HashItem_getKeyData(*itemPtr),data,length)) return itemPtr;
+			} // if length match
+
+			itemPtr = HashItem_getNextPtr(*itemPtr);
+
+		} // loop
 
 		return NULL;
 	} // findItem()
@@ -107,7 +118,9 @@
 	int HashTable_performSet(HashTable* self,char* keydata,int keylen,char* valdata,int vallen) {
 
 		int hash = Hasher_hash(self->method,keydata,keylen);
+		hash &= self->hashMask;
 
+		// if there's an item with the same key, replace value only
 		HashItem** oldItemPtr = HashTable_findItem(self,hash,keydata,keylen);
 		if (oldItemPtr != NULL) {
 			HashItem_replaceValue(*oldItemPtr,valdata,vallen);
@@ -120,7 +133,14 @@
 		if (-1 == HashItem_setKey(item,keydata,keylen)) HashTable_outOfMemory(self,2802);
 		if (-1 == HashItem_setValue(item,valdata,vallen)) HashTable_outOfMemory(self,2802);
 
-		// self->placeItem()
+		// put new item into slot, to the end of the linked list
+		HashItem** newItemPtr = &self->items[hash];
+		while (*newItemPtr != NULL) {
+			newItemPtr = HashItem_getNextPtr(*newItemPtr);
+		}
+		*newItemPtr = item;		
+
+		self->numberOfElms++;
 
 		return 1;
 	} // performSet()

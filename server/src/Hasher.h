@@ -9,5 +9,6 @@
 
 // static
 	int Hasher_hash(int method,char* key,int length);
+	int Hasher_hashDebug(char* key,int length);
 
 #endif

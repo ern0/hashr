@@ -47,12 +47,23 @@
 
 
 	void HashItem_dump(HashItem* self) {
-		printf(
-			"%d %c%c%c%c %c%c%c%c"
-			,self->method
-			,self->keyData[0],self->keyData[1],self->keyData[2],self->keyData[3]
-			,self->valueData[0],self->valueData[1],self->valueData[2],self->valueData[3]
-		);
+		
+		if (self->method != 1) printf("%d:",self->method);
+		for (int i = 0; i < self->keyLength; i++) {
+			printf("%c",self->keyData[i]);
+		}
+
+		printf("=");
+
+		for (int i = 0; i < self->valueLength; i++) {
+			printf("%c",self->valueData[i]);
+		}
+
+		if (self->next != NULL) {
+			printf(" ");
+			HashItem_dump(self->next);
+		}
+
 	} // dump()
 
 
@@ -68,6 +79,16 @@
 	} // setKey()
 
 
+	char* HashItem_getKeyData(HashItem* self) {
+		return self->keyData;
+	} // getKeyData()
+
+
+	int HashItem_getKeyLength(HashItem* self) {
+		return self->keyLength;
+	} // getKeyLength()
+
+
 	int HashItem_setValue(HashItem* self,char* data,int length) {
 
 		self->valueData = malloc(length);
@@ -78,6 +99,21 @@
 
 		return 0;
 	} // setValue()
+
+
+	char* HashItem_getValueData(HashItem* self) {
+		return self->valueData;
+	} // getValueData()
+
+
+	int HashItem_getValueLength(HashItem* self) {
+		return self->valueLength;
+	} // getValueLength()
+
+
+	HashItem** HashItem_getNextPtr(HashItem* self) {
+		return &self->next;  // yes, pointer to self->next
+	} // getNextPtr()
 
 
 	int HashItem_replaceValue(HashItem* self,char* data,int length) {

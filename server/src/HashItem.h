@@ -31,7 +31,12 @@
 	void HashItem_dump(HashItem* self);
 	void HashItem_setMethod(HashItem* self,int method);
 	int HashItem_setKey(HashItem* self,char* data,int length);
+	char* HashItem_getKeyData(HashItem* self);
+	int HashItem_getKeyLength(HashItem* self);
 	int HashItem_setValue(HashItem* self,char* buffer,int length);
+	char* HashItem_getValueData(HashItem* self);
+	int HashItem_getValueLength(HashItem* self);
+	HashItem** HashItem_getNextPtr(HashItem* self);
 	int HashItem_replaceValue(HashItem* self,char* data,int length);
 
 #endif
