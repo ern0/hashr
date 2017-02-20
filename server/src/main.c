@@ -1,6 +1,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <getopt.h>
 #include "Utils.h"
 #include "Logger.h"
 #include "Server.h"

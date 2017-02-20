@@ -20,13 +20,30 @@
 
 
 	void HashItem_ctor(HashItem* self) {
-		// NOP
+		
+		self->next = NULL;
+
+		self->keyData = NULL;
+		self->keyLength = 0;
+		self->valueData = NULL;
+		self->valueLength = 0;
+
+		self->method = -1;
+
 	} // ctor
 
 
 	void HashItem_dtor(HashItem* self) {
-		// NOP
+
+		if (self->keyData != NULL) free(self->keyData);
+		if (self->valueData != NULL) free(self->valueData);
+
 	} // dtor
+
+
+	void HashItem_setMethod(HashItem* self,int method) {
+		self->method = method;
+	} // setMethod()
 
 
 	void HashItem_dump(HashItem* self) {
@@ -39,13 +56,39 @@
 	} // dump()
 
 
-	void HashItem_setKey(HashItem* self,char* data,int length) {
-		self->keyData = data;
+	int HashItem_setKey(HashItem* self,char* data,int length) {
+
+		self->keyData = malloc(length);
+		if (self->keyData == NULL) return -1;
+
+		memcpy(self->keyData,data,length);
 		self->keyLength = length;
+
+		return 0;
 	} // setKey()
 
 
-	void HashItem_setValue(HashItem* self,char* data,int length) {
-		self->valueData = data;
+	int HashItem_setValue(HashItem* self,char* data,int length) {
+
+		self->valueData = malloc(length);
+		if (self->valueData == NULL) return -1;
+
+		memcpy(self->valueData,data,length);
 		self->valueLength = length;
+
+		return 0;
 	} // setValue()
+
+
+	int HashItem_replaceValue(HashItem* self,char* data,int length) {
+
+		if (self->valueLength != length) {
+			self->valueData = realloc(self->valueData,length);
+			if (self->valueData == NULL) return -1;
+		}
+
+		memcpy(self->valueData,data,length);
+		self->valueLength = length;
+
+		return 0;
+	} // replaceValue()

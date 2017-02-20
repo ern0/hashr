@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include "Hasher.h"
 
 // class HashItem
 
@@ -27,7 +29,9 @@
 	HashItem* new_HashItem();
 	void delete_HashItem(HashItem* self);
 	void HashItem_dump(HashItem* self);
-	void HashItem_setKey(HashItem* self,char* data,int length);
-	void HashItem_setValue(HashItem* self,char* buffer,int length);
+	void HashItem_setMethod(HashItem* self,int method);
+	int HashItem_setKey(HashItem* self,char* data,int length);
+	int HashItem_setValue(HashItem* self,char* buffer,int length);
+	int HashItem_replaceValue(HashItem* self,char* data,int length);
 
 #endif

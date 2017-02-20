@@ -13,9 +13,6 @@
 
 #define HashTable_CAPACITY_DEFAULT 8
 #define HashTable_CAPACITY_MAX 0x10000
-#define HashTable_METHOD_DEFAULT 1
-
-#define HashTable_METHOD_DEBUG 1
 
 
 // class HashTable
@@ -34,15 +31,19 @@
 	// protected
 	void HashTable_ctor(HashTable* self);
 	void HashTable_dtor(HashTable* self);
+	HashItem** HashTable_findItem(HashTable* self,int hash,char* data,int lenght);
 
 	// public
 	HashTable* new_HashTable();
 	void delete_HashTable(HashTable* self);
 	void HashTable_setLogger(HashTable* self,Logger* logger);
 	int HashTable_getMethod(HashTable* self);
+	int HashTable_setAndAdjustMethod(HashTable* self,int method);
 	int HashTable_getCapacity(HashTable* self);
 	int HashTable_getNumberOfElms(HashTable* self);
-	int HashTable_performSet(HashTable* self,char* keybuf,int keylen,char* valbuf,int vallen);
+	void HashTable_outOfMemory(HashTable* self,int code);	
 	void HashTable_dump(HashTable* self);	
+
+	int HashTable_performSet(HashTable* self,char* keybuf,int keylen,char* valbuf,int vallen);
 
 #endif
