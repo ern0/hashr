@@ -69,11 +69,14 @@ class Parser:
 				if multi:
 					desc += "[" + str(valc) + "]"
 
+			if len(chunkData) < 4: isInt = False
+
 			if chunkType == b"STAT": desc = "status"
 			if chunkType == b"NCON": desc = "connections"
 			if chunkType == b"METD": desc = "hash method"
 			if chunkType == b"CPTY": desc = "capacity"
 			if chunkType == b"NELM": desc = "elements"
+			if chunkType == b"AVAL": desc = "value"
 
 			print("  " + desc + ": ",end="")
 			for i in range(0,15 - len(desc)): print(" ",end="")
@@ -87,7 +90,7 @@ class Parser:
 
 			else:
 				self.renderAuto(chunkData)
-			
+
 			print("")
 
 

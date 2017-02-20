@@ -62,6 +62,7 @@
 	void Packet_appendEndmark(Packet* self);
 	void Packet_beginChunk(Packet* self,const char* id);
 	void Packet_endChunk(Packet* self);
+	void Packet_appendChunk(Packet* self,const char* id,const char* value,int length);	
 	void Packet_appendIntChunk(Packet* self,const char* id,int value);
 	void Packet_appendStrChunk(Packet* self,const char* id,const char* value);
 

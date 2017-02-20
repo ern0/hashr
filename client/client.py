@@ -31,12 +31,12 @@ Usage:
     If no command is specified, CLI client will be started.
 Available commands:
   help - voila
-  quit, exit - leave client
-  info - retrieve some info from server
-  set <key> <value> - add or update an item
+  quit, exit, q - leave client
+  info, i - retrieve some info from server
+  set, s <key> <value> - add or update an item
     use "@filename" as value to store a file
-  get <key> - show item
-  del <key> - delete item
+  get, g <key> - show item
+  del, d <key> - delete item
   zap - delete all items
   results - show max. number of search item results
   results <n> - set max. number of search item results
@@ -44,7 +44,13 @@ Available commands:
   vsearch <pattern> - search in values
   search <pattern> - search pattern in keys and values
   reorg <method> <capacity> - reorganize storage
-    capacity will be rounded up to power of 2"""
+    capacity will be rounded up to power of 2
+Debug commands:
+  i1 - invalid command: 'freebeer'
+  i2 - missing parameters: 'set x'
+  i3 - too many parameters: 'get x y'
+  dump, z - server dumps full hash table to stdout
+     does not work in daemon mode"""
 		)
 
 
@@ -263,6 +269,24 @@ Available commands:
 				self.parmNumCheck(words,2)
 				command.setReorgMethod(words[1])
 				command.setReorgCapacity( self.validNum(words[2],8) )
+
+			elif cmd == "dump" or cmd == 'z':
+				command.setCommand("dump")
+				self.parmNumCheck(words,0)
+
+			elif cmd == "i1":
+				command.setCommand("freebeer")
+				self.parmNumCheck(words,0)
+
+			elif cmd == "i2":
+				command.setCommand("set")
+				self.parmNumCheck(words,0)
+
+			elif cmd == "i3":
+				command.setCommand("get")
+				self.parmNumCheck(words,0)
+				command.setRequestKey("getkey")
+				command.setRequestValue("getvaluewtf")
 
 			else:
 				print("invalid command, type \"help\" for help")

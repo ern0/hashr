@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define RET
+
 #include "Utils.h"
 #include "Logger.h"
 #include "HashItem.h"
@@ -32,6 +34,7 @@
 	void HashTable_ctor(HashTable* self);
 	void HashTable_dtor(HashTable* self);
 	HashItem** HashTable_findItem(HashTable* self,int hash,char* data,int lenght);
+	int HashTable_getHash(HashTable* self,char* data,int len);
 
 	// public
 	HashTable* new_HashTable();
@@ -44,6 +47,7 @@
 	void HashTable_outOfMemory(HashTable* self,int code);	
 	void HashTable_dump(HashTable* self);	
 
-	int HashTable_performSet(HashTable* self,char* keybuf,int keylen,char* valbuf,int vallen);
+	int HashTable_performSet(HashTable* self,char* keydata,int keylen,char* valdata,int vallen);
+	int HashTable_performGet(HashTable* self,RET char** valdata,RET int* vallen,char* keydata,int keylen);
 
 #endif

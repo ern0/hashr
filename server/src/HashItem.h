@@ -6,6 +6,7 @@
 #include <string.h>
 #include "Hasher.h"
 
+
 // class HashItem
 
 	// private

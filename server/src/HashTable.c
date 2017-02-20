@@ -82,6 +82,17 @@
 	} // getNumberOfElms()
 
 
+	int HashTable_getHash(HashTable* self,
+
+		char* data,int len) {
+
+		int hash = Hasher_hash(self->method,data,len);
+		hash &= self->hashMask;
+
+		return hash;
+	} // getHashIndex()
+
+
 	void HashTable_dump(HashTable* self) {
 
 		for (int i = 0; i < self->capacity; i++) {
@@ -117,14 +128,13 @@
 	
 	int HashTable_performSet(HashTable* self,char* keydata,int keylen,char* valdata,int vallen) {
 
-		int hash = Hasher_hash(self->method,keydata,keylen);
-		hash &= self->hashMask;
+		int hash = HashTable_getHash(self,keydata,keylen);
 
 		// if there's an item with the same key, replace value only
 		HashItem** oldItemPtr = HashTable_findItem(self,hash,keydata,keylen);
 		if (oldItemPtr != NULL) {
 			HashItem_replaceValue(*oldItemPtr,valdata,vallen);
-			return 2;
+			return 1;
 		}
 
 		HashItem* item = new_HashItem();
@@ -142,6 +152,19 @@
 
 		self->numberOfElms++;
 
-		return 1;
+		return 2;
 	} // performSet()
 
+
+	int HashTable_performGet(HashTable* self,RET char** valdata,RET int* vallen,char* keydata,int keylen) {
+
+		int hash = HashTable_getHash(self,keydata,keylen);
+
+		HashItem** itemPtr = HashTable_findItem(self,hash,keydata,keylen);
+		if (itemPtr == NULL) return 2;
+
+		*valdata = HashItem_getValueData(*itemPtr);
+		*vallen = HashItem_getValueLength(*itemPtr);
+
+		return 1;
+	} // performGet()

@@ -35,12 +35,11 @@
 		if (setsid() == -1) exit(4);
 		if (chdir("/")) exit(4);
 		
-/*		
 		for (int i = 0; i < 12; i++) close(i);
 		if (-1 == open("/dev/null",O_RDWR)) exit(4);
 		dup(0);
 		dup(0);
-*/
+
 	} // daemonize()
 
 

@@ -205,6 +205,8 @@
 			Command_processSearch(self->command);
 		} else if (0 == strncmp("reorg",cmdBuffer,cmdLen)) {
 			Command_processReorg(self->command);
+		} else if (0 == strncmp("dump",cmdBuffer,cmdLen)) {
+			Command_processDump(self->command);
 		} else {
 			Command_processUnknown(self->command);
 		}
@@ -270,6 +272,15 @@
 		self->length = tmp;
 
 	} // endChunk()
+
+
+	void Packet_appendChunk(Packet* self,const char* id,const char* value,int length) {
+
+		Packet_beginChunk(self,id);
+		Packet_append(self,value,length);
+		Packet_endChunk(self);
+
+	} // appendChunk()
 
 
 	void Packet_appendIntChunk(Packet* self,const char* id,int value) {

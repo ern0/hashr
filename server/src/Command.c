@@ -129,6 +129,19 @@
 	} // processHeartbeat()
 
 
+	void Command_processDump(Command* self) {
+
+		Packet_prepareForReply(self->packet);
+		Packet_appendHeader(self->packet);
+		Packet_appendCounter(self->packet);
+
+		HashTable_dump(self->hashTable);
+		
+		Packet_appendEndmark(self->packet);
+
+	} // processDump()
+
+
 	void Command_processInfo(Command* self) {
 
 		Packet_prepareForReply(self->packet);
@@ -197,7 +210,42 @@
 
 	void Command_processGet(Command* self) {
 
-		HashTable_dump(self->hashTable);
+		if ( Command_loadChunk(self,"QKEY") == -1 ) return;
+		char* keyData = self->data;
+		int keyLength = self->length;
+
+		Packet_prepareForReply(self->packet);
+		Packet_appendHeader(self->packet);
+		Packet_appendCounter(self->packet);
+
+		char* valueData = NULL;
+		int valueLength = 0;
+		int result = HashTable_performGet(
+			self->hashTable
+			,RET &valueData,RET &valueLength
+			,keyData,keyLength
+		);
+
+		if (result == 1) {
+			Command_reportStatus(
+				self
+				,Command_ST_FOUND
+				,2212,"Data found"
+			);
+
+			Packet_appendChunk(self->packet,"AVAL",valueData,valueLength);
+
+		} // if found
+
+		else {
+			Command_reportStatus(
+				self
+				,Command_ST_NOT_FOUND
+				,2213,"No such key"
+			);
+		} // else not found
+
+		Packet_appendEndmark(self->packet);
 		
 	} // get()
 
@@ -230,5 +278,4 @@
 	void Command_processReorg(Command* self) {
 		printf("todo: reorg cmd \n");
 	}
-
 
