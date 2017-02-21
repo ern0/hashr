@@ -310,7 +310,10 @@ Debug commands:
 
 		if len(self.singleShotWords) == 0: return False
 
-		self.processCliCommand(self.singleShotWords)
+		response = self.processCliCommand(self.singleShotWords)
+		parser = Parser(response)
+		parser.render()
+
 		return True
 
 
