@@ -16,6 +16,7 @@
 	#define Logger_FATAL 4
 	#define Logger_MUTE 5  /* only for testing */
 	#define Logger_DISPLAY 0x80
+	#define Logger_LEVEL_MASK 0x0f
 
 	// private
 	struct Logger {

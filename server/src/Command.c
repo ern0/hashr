@@ -84,7 +84,7 @@
 	} // setCommand()
 
 
-	int Command_loadStrChunk(Command* self,char* id) {
+	int Command_findParamChunk(Command* self,char* id) {
 
 		int chunkIndex = Packet_findChunk(self->packet,id);
 		if (chunkIndex == -1) {
@@ -102,6 +102,15 @@
 			return -1;
 		} // if not found
 
+		return chunkIndex;
+	} // findParamChunk()
+
+
+	int Command_loadStrChunk(Command* self,char* id) {
+
+		int chunkIndex = Command_findParamChunk(self,id);
+		if (chunkIndex == -1) return -1;
+
 		unsigned char* buffer = Packet_getBuffer(self->packet);
 		self->data = (char*)&buffer[chunkIndex];
 		self->length = Utils_getBufInt(&buffer[chunkIndex - 4]);
@@ -112,8 +121,13 @@
 
 	int Command_loadIntChunk(Command* self,char* id) {
 
-		// TODO
-		return 0;
+		int chunkIndex = Command_findParamChunk(self,id);
+		if (chunkIndex == -1) return -1;
+
+		unsigned char* buffer = Packet_getBuffer(self->packet);
+		int result = Utils_getBufInt(&buffer[chunkIndex - 4]);
+
+		return result;
 	} // loadIntChunk()
 
 
@@ -370,7 +384,7 @@
 
 		Command_beginReply(self);
 
-		HashItem* resultPtr;
+		HashItem *resultPtr;
 		int num = HashTable_search(self->hashTable,RET &resultPtr,maxResult,keySearch,valueSearch);
 
 		if (num == 0) {

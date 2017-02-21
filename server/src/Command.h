@@ -77,6 +77,7 @@ typedef struct Packet Packet;
 	void Command_dtor(Command* self);
 	void Command_fail(Command* self,int id,const char* message);
 	void Command_reportStatus(Command* self,int st,int id,const char* message);
+	int Command_findParamChunk(Command* self,char* id);
 	int Command_loadStrChunk(Command* self,char* id);
 	int Command_loadIntChunk(Command* self,char* id);
 	void Command_beginReply(Command* self);

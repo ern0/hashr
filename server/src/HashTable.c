@@ -61,6 +61,24 @@
 	} // getMethod()
 
 
+	void HashTable_setMethod(HashTable* self,int method) {
+
+		if ((self->numberOfElms != 0) && (self->method != method)) {
+
+			Logger_log(
+				self->logger
+				,Logger_FATAL
+				,2809,"Internal error: setting hash method is not allowed"
+			);
+			exit(2);
+
+		} // if not empty
+
+		self->method = method;
+
+	} // setMethod()
+
+
 	int HashItem_setAndAdjustMethod(HashTable* self,int method) {
 
 		if (method < 1) return self->method;
@@ -82,9 +100,7 @@
 	} // getNumberOfElms()
 
 
-	int HashTable_getHash(HashTable* self,
-
-		char* data,int len) {
+	int HashTable_getHash(HashTable* self,char* data,int len) {
 
 		int hash = Hasher_hash(self->method,data,len);
 		hash &= self->hashMask;

@@ -121,6 +121,7 @@ test: \
 	${BIN}/test-Utils \
 	${BIN}/test-Packet_scan \
 	${BIN}/test-Packet_build \
+	${BIN}/test-HashTable \
 
 ${BIN}/test-Utils: \
 		Makefile ${OBJ} ${BIN} \
@@ -166,6 +167,20 @@ ${BIN}/test-Packet_build: \
 		${OBJ}/Hasher.o \
 		${OBJ}/Command.o \
 		-o ${BIN}/test-Packet_build
+
+${BIN}/test-HashTable: \
+		Makefile ${OBJ} ${BIN} \
+		${TST}/test-HashTable.cpp \
+		${OBJ}/HashTable.o \
+		${OBJ}/Utils.o
+	${TC} \
+		${TST}/test-HashTable.cpp \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
+		${OBJ}/HashTable.o \
+		${OBJ}/HashItem.o \
+		${OBJ}/Hasher.o \
+		-o ${BIN}/test-HashTable
 
 ########################################################
 

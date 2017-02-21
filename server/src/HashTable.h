@@ -40,6 +40,7 @@
 	HashTable* new_HashTable();
 	void delete_HashTable(HashTable* self);
 	void HashTable_setLogger(HashTable* self,Logger* logger);
+	void HashTable_setMethod(HashTable* self,int method);
 	int HashTable_getMethod(HashTable* self);
 	int HashTable_setAndAdjustMethod(HashTable* self,int method);
 	int HashTable_getCapacity(HashTable* self);
