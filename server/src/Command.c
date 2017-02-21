@@ -49,7 +49,7 @@
 	void Command_reportStatus(Command* self,int st,int id,const char* message) {
 
 		int logLevel;
-		if (st < 20) {
+		if (st < Command_ST_ERROR_LEVEL) {
 			logLevel = Logger_NOTICE | Logger_DISPLAY;
 		} else {
 			logLevel = Logger_ERROR | Logger_DISPLAY;
@@ -84,7 +84,7 @@
 	} // setCommand()
 
 
-	int Command_loadChunk(Command* self,char* id) {
+	int Command_loadStrChunk(Command* self,char* id) {
 
 		int chunkIndex = Packet_findChunk(self->packet,id);
 		if (chunkIndex == -1) {
@@ -107,7 +107,14 @@
 		self->length = Utils_getBufInt(&buffer[chunkIndex - 4]);
 
 		return 0;
-	} // loadCunk()
+	} // loadStrCunk()
+
+
+	int Command_loadIntChunk(Command* self,char* id) {
+
+		// TODO
+		return 0;
+	} // loadIntChunk()
 
 
 	void Command_beginReply(Command* self) {
@@ -163,7 +170,7 @@
 
 		Command_beginReply(self);
 
-		Command_reportStatus(self,Command_ST_OK,2202,"Info provided");
+		Command_reportStatus(self,Command_ST_INFO_PROVIDED,2202,"Info provided");
 	
 		int noOfConns = Server_getNumberOfConnections(self->server);
 		Packet_appendIntChunk(self->packet,"NCON",noOfConns);
@@ -184,11 +191,11 @@
 
 	void Command_processSet(Command* self) {
 
-		if ( Command_loadChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
 		char* keyData = self->data;
 		int keyLength = self->length;
 
-		if ( Command_loadChunk(self,"QVAL") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QVAL") == -1 ) return;
 		char* valueData = self->data;
 		int valueLength = self->length;
 
@@ -225,7 +232,7 @@
 
 	void Command_processGet(Command* self) {
 
-		if ( Command_loadChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
 
 		Command_beginReply(self);
 
@@ -266,7 +273,7 @@
 	
 	void Command_processDel(Command* self) {
 
-		if ( Command_loadChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
 		char* keyData = self->data;
 		int keyLength = self->length;
 
@@ -309,7 +316,7 @@
 		if (HashTable_performZap(self->hashTable) == 1) {
 			Command_reportStatus(
 				self
-				,Command_ST_DELETED
+				,Command_ST_EMPTY
 				,2216,"Already empty"
 			);
 		} // if already empty
@@ -317,7 +324,7 @@
 		else {
 			Command_reportStatus(
 				self
-				,Command_ST_NOT_EXISTS
+				,Command_ST_ZAPPED
 				,2217,"All items deleted"
 			);
 		} // else zapped
@@ -329,25 +336,69 @@
 	} // processZap()
 	
 
+	void Command_processKcount(Command* self) {
+		Command_universalSearch(self,1,1,0);
+	} // processKcount()
+
+
+	void Command_processVcount(Command* self) {
+		Command_universalSearch(self,1,0,1);
+	} // processVcount()
+
+
+	void Command_processCount(Command* self) {
+		Command_universalSearch(self,1,1,1);
+	} // processCount()
+
+
 	void Command_processKsearch(Command* self) {
-		Command_beginReply(self);
-		printf("todo: ksearch cmd \n");
-		Command_endReply(self);
-	}
+		Command_universalSearch(self,1,1,0);
+	} // processKsearch()
 
 
 	void Command_processVsearch(Command* self) {
-		Command_beginReply(self);
-		printf("todo: vsearch cmd \n");
-		Command_endReply(self);
-	}
+		Command_universalSearch(self,1,0,1);
+	} // processVsearch()
 
 
 	void Command_processSearch(Command* self) {
+		Command_universalSearch(self,1,1,1);
+	} // processSearch()
+
+
+	void Command_universalSearch(Command* self,int maxResult,int keySearch,int valueSearch) {
+
 		Command_beginReply(self);
-		printf("todo: search cmd \n");
+
+		HashItem* resultPtr;
+		int num = HashTable_search(self->hashTable,RET &resultPtr,maxResult,keySearch,valueSearch);
+
+		if (num == 0) {
+			Command_reportStatus(
+				self
+				,Command_ST_NO_MATCH
+				,2218,"No match"
+			);
+		} // if empty
+
+		else {
+			Command_reportStatus(
+				self
+				,Command_ST_MATCH_FOUND
+				,2219,"Search result provided"
+			);
+		} // if any hits
+
+		Packet_appendIntChunk(self->packet,"SRES",num);
+
+		if ((maxResult > 0) && (num > 0)) {
+			// todo: provide result
+			Packet_appendIntChunk(self->packet,"SRES",9999);
+		}
+
 		Command_endReply(self);
-	}
+		
+	} // universalSearch()
 
 
 	void Command_processReorg(Command* self) {

@@ -197,6 +197,12 @@
 			Command_processInfo(self->command);
 		} else if (0 == strncmp("zap",cmdBuffer,cmdLen)) {
 			Command_processZap(self->command);
+		} else if (0 == strncmp("kcount",cmdBuffer,cmdLen)) {
+			Command_processKcount(self->command);
+		} else if (0 == strncmp("vcount",cmdBuffer,cmdLen)) {
+			Command_processVcount(self->command);
+		} else if (0 == strncmp("count",cmdBuffer,cmdLen)) {
+			Command_processCount(self->command);
 		} else if (0 == strncmp("ksearch",cmdBuffer,cmdLen)) {
 			Command_processKsearch(self->command);
 		} else if (0 == strncmp("vsearch",cmdBuffer,cmdLen)) {

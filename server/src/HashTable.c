@@ -241,3 +241,17 @@
 
 		return 2;
 	} // performZap()
+
+
+	int HashTable_search(
+		HashTable* self
+		,RET HashItem** result
+		,int maxResult
+		,int keySearch
+		,int valueSearch) 
+	{
+
+		// TODO
+		return 0;
+
+	} // search()

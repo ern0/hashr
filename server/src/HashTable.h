@@ -51,6 +51,7 @@
 	int HashTable_performGet(HashTable* self,RET char** valdata,RET int* vallen,char* keydata,int keylen);
 	int HashTable_performDel(HashTable* self,char* keydata,int keylen);
 	int HashTable_performZap(HashTable* self);
-	
+	int HashTable_search(HashTable* self,RET HashItem** resultPtr,int maxResult,int keySearch,int valueSearch);
+
 
 #endif

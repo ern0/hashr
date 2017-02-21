@@ -70,13 +70,21 @@ response:
  - hash table capacity
  - actual item count
 
-search, ksearch, vsearch
-------------------------
+count, kcount, vcount
+---------------------
 request:
- - max. result items
  - pattern
 response:
  - status: provided 
+ - number of results
+ 
+search, ksearch, vsearch
+------------------------
+request:
+ - pattern
+response:
+ - status: provided 
+ - number of results
  - payload: array of values
 
 reorganize
