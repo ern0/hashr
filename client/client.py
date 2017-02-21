@@ -285,7 +285,6 @@ Debug commands:
 			elif cmd == "i3":
 				command.setCommand("get")
 				self.parmNumCheck(words,0)
-				command.setRequestKey("getkey")
 				command.setRequestValue("getvaluewtf")
 
 			else:

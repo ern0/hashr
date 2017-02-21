@@ -48,6 +48,10 @@
 
 	void Command_reportStatus(Command* self,int st,int id,const char* message) {
 
+		Packet_prepareForReply(self->packet);
+		Packet_appendHeader(self->packet);
+		Packet_appendCounter(self->packet);
+
 		int logLevel;
 		if (st < 20) {
 			logLevel = Logger_NOTICE | Logger_DISPLAY;
@@ -70,6 +74,8 @@
 		Packet_appendInt(self->packet,st);
 		Packet_appendStr(self->packet,message);
 		Packet_endChunk(self->packet);
+
+		Packet_appendEndmark(self->packet);
 
 	} // reportStatus()
 
