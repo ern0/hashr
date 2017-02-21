@@ -48,10 +48,6 @@
 
 	void Command_reportStatus(Command* self,int st,int id,const char* message) {
 
-		Packet_prepareForReply(self->packet);
-		Packet_appendHeader(self->packet);
-		Packet_appendCounter(self->packet);
-
 		int logLevel;
 		if (st < 20) {
 			logLevel = Logger_NOTICE | Logger_DISPLAY;
@@ -63,7 +59,7 @@
 		snprintf(
 			extendedMessage
 			,200
-			,"Command '%s' result: %d - %s"
+			,"Command \"%s\" result: %d - %s"
 			,self->cmd
 			,st
 			,message
@@ -74,8 +70,6 @@
 		Packet_appendInt(self->packet,st);
 		Packet_appendStr(self->packet,message);
 		Packet_endChunk(self->packet);
-
-		Packet_appendEndmark(self->packet);
 
 	} // reportStatus()
 
@@ -94,11 +88,17 @@
 
 		int chunkIndex = Packet_findChunk(self->packet,id);
 		if (chunkIndex == -1) {
+
+			Command_beginReply(self);
+
 			Command_reportStatus(
 				self
 				,Command_ST_MISSING_PARAM
 				,2203,"Missing parameter"
 			);
+
+			Command_endReply(self);
+
 			return -1;
 		} // if not found
 
@@ -110,49 +110,56 @@
 	} // loadCunk()
 
 
-	void Command_processUnknown(Command* self) {
+	void Command_beginReply(Command* self) {
 
 		Packet_prepareForReply(self->packet);
 		Packet_appendHeader(self->packet);
 		Packet_appendCounter(self->packet);
+
+	} // beginReply()
+
+
+	void Command_endReply(Command* self) {
+
+		Packet_appendEndmark(self->packet);
+
+	} // endReply()
+
+
+	void Command_processUnknown(Command* self) {
+
+		Command_beginReply(self);
+
 		Command_reportStatus(
 			self
 			,Command_ST_INVALID_COMMAND
 			,2201,"Invalid command"
 		);
-		Packet_appendEndmark(self->packet);
+
+		Command_endReply(self);
 
 	} // processUnknownCommand()
 
 
 	void Command_processHeartbeat(Command* self) {
 
-		Packet_prepareForReply(self->packet);
-		Packet_appendHeader(self->packet);
-		Packet_appendCounter(self->packet);
-		Packet_appendEndmark(self->packet);
+		Command_beginReply(self);
+		Packet_appendStrChunk(self->packet,"beat","heartbeat");
+		Command_endReply(self);
 
 	} // processHeartbeat()
 
 
 	void Command_processDump(Command* self) {
 
-		Packet_prepareForReply(self->packet);
-		Packet_appendHeader(self->packet);
-		Packet_appendCounter(self->packet);
-
 		HashTable_dump(self->hashTable);
 		
-		Packet_appendEndmark(self->packet);
-
 	} // processDump()
 
 
 	void Command_processInfo(Command* self) {
 
-		Packet_prepareForReply(self->packet);
-		Packet_appendHeader(self->packet);
-		Packet_appendCounter(self->packet);
+		Command_beginReply(self);
 
 		Command_reportStatus(self,Command_ST_OK,2202,"Info provided");
 	
@@ -168,7 +175,7 @@
 		int noOfElms = HashTable_getNumberOfElms(self->hashTable);
 		Packet_appendIntChunk(self->packet,"NELM",noOfElms);
 
-		Packet_appendEndmark(self->packet);
+		Command_endReply(self);
 
 	} // processInfo()
 
@@ -183,15 +190,15 @@
 		char* valueData = self->data;
 		int valueLength = self->length;
 
+		Command_beginReply(self);
+
 		int result = HashTable_performSet(
 			self->hashTable
 			,keyData,keyLength
 			,valueData,valueLength
 		);
 
-		Packet_prepareForReply(self->packet);
-		Packet_appendHeader(self->packet);
-		Packet_appendCounter(self->packet);
+		Command_beginReply(self);
 
 		if (result == 1) {
 			Command_reportStatus(
@@ -209,7 +216,7 @@
 			);
 		} // else updated
 
-		Packet_appendEndmark(self->packet);
+		Command_endReply(self);
 
 	} // processSet()
 
@@ -217,12 +224,11 @@
 	void Command_processGet(Command* self) {
 
 		if ( Command_loadChunk(self,"QKEY") == -1 ) return;
+
+		Command_beginReply(self);
+
 		char* keyData = self->data;
 		int keyLength = self->length;
-
-		Packet_prepareForReply(self->packet);
-		Packet_appendHeader(self->packet);
-		Packet_appendCounter(self->packet);
 
 		char* valueData = NULL;
 		int valueLength = 0;
@@ -251,8 +257,8 @@
 			);
 		} // else not found
 
-		Packet_appendEndmark(self->packet);
-		
+		Command_endReply(self);
+
 	} // get()
 
 	
@@ -262,9 +268,7 @@
 		char* keyData = self->data;
 		int keyLength = self->length;
 
-		Packet_prepareForReply(self->packet);
-		Packet_appendHeader(self->packet);
-		Packet_appendCounter(self->packet);
+		Command_beginReply(self);
 
 		char* valueData = NULL;
 		int valueLength = 0;
@@ -289,32 +293,42 @@
 			);
 		} // else not found
 
-		Packet_appendEndmark(self->packet);
+		Command_endReply(self);
 
 	} // processDel()
 
 	
 	void Command_processZap(Command* self) {
+		Command_beginReply(self);
 		printf("todo: zap cmd \n");
+		Command_endReply(self);
 	}
 	
 
 	void Command_processKsearch(Command* self) {
+		Command_beginReply(self);
 		printf("todo: ksearch cmd \n");
+		Command_endReply(self);
 	}
 
 
 	void Command_processVsearch(Command* self) {
+		Command_beginReply(self);
 		printf("todo: vsearch cmd \n");
+		Command_endReply(self);
 	}
 
 
 	void Command_processSearch(Command* self) {
+		Command_beginReply(self);
 		printf("todo: search cmd \n");
+		Command_endReply(self);
 	}
 
 
 	void Command_processReorg(Command* self) {
+		Command_beginReply(self);
 		printf("todo: reorg cmd \n");
+		Command_endReply(self);
 	}
 

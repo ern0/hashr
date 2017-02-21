@@ -276,17 +276,17 @@ Debug commands:
 				self.parmNumCheck(words,0)
 
 			elif cmd == "i1":
-				print("issuing command: 'freebeer'")
+				print("issuing command: \"freebeer\"")
 				command.setCommand("freebeer")
 				self.parmNumCheck(words,0)
 
 			elif cmd == "i2":
-				print("sending a 'set' command request without parameters")
+				print("sending a \"set\" command request without parameters")
 				command.setCommand("set")
 				self.parmNumCheck(words,0)
 
 			elif cmd == "i3":
-				print("sending a 'set' command request with 'value' parameter")
+				print("sending a \"get\" command request with wrong (\"value\") parameter")
 				command.setCommand("get")
 				self.parmNumCheck(words,0)
 				command.setRequestValue("getvaluewtf")
