@@ -39,29 +39,37 @@ TEST_CASE("HashTable") {
 	}
 
 
-	SECTION("set then del") {
-
-		HashTable_performSet(ht,(char*)"dakej",5,(char*)"davalue",7);
-		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
-
-		HashTable_performDel(ht,(char*)"dakej",5);
-		REQUIRE(HashTable_getNumberOfElms(ht) == 0);
-
-	}
-
-	SECTION("set then set same key") {
+	SECTION("set and get, then del and get") {
 
 		int result = HashTable_performSet(ht,(char*)"dakej",5,(char*)"davalue",7);
+		REQUIRE(result == HashTable_SET_INSERTED);
 		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
-		REQUIRE(result == 2);
 
-		result = HashTable_performSet(ht,(char*)"dakej",5,(char*)"voila",6);
-		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
-		REQUIRE(result == 1);
+		result = HashTable_performDel(ht,(char*)"dakej",5);
+		REQUIRE(result == HashTable_DEL_DELETED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 0);
 
 		char* val;
 		int len;
-		HashTable_performGet(ht,&val,&len,(char*)"dakej",5);
+		result = HashTable_performGet(ht,&val,&len,(char*)"dakej",5);
+		REQUIRE(result == HashTable_GET_NOT_FOUND);
+
+	}
+
+	SECTION("set, then set same key") {
+
+		int result = HashTable_performSet(ht,(char*)"dakej",5,(char*)"davalue",7);
+		REQUIRE(result == HashTable_SET_INSERTED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
+
+		result = HashTable_performSet(ht,(char*)"dakej",5,(char*)"voila",6);
+		REQUIRE(result == HashTable_SET_UPDATED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
+
+		char* val;
+		int len;
+		result = HashTable_performGet(ht,&val,&len,(char*)"dakej",5);
+		REQUIRE(result == HashTable_GET_PROVIDED);
 		REQUIRE(0 == strcmp(val,"voila"));
 
 	}
@@ -69,23 +77,22 @@ TEST_CASE("HashTable") {
 	SECTION("add items to the same slot") {
 
 		int result = HashTable_performSet(ht,(char*)"a1",2,(char*)"a1-value",9);
+		REQUIRE(result == HashTable_SET_INSERTED);
 		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
-		REQUIRE(result == 2);
 
 		result = HashTable_performSet(ht,(char*)"a2",2,(char*)"a2-value",9);
+		REQUIRE(result == HashTable_SET_INSERTED);
 		REQUIRE(HashTable_getNumberOfElms(ht) == 2);
-		REQUIRE(result == 2);
 
 		char* val;
 		int len;
-
-		HashTable_performGet(ht,&val,&len,(char*)"a1",2);
+		result = HashTable_performGet(ht,&val,&len,(char*)"a1",2);
+		REQUIRE(result == HashTable_GET_PROVIDED);
 		REQUIRE(0 == strcmp(val,"a1-value"));
-		REQUIRE(result == 2);
 
-		HashTable_performGet(ht,&val,&len,(char*)"a2",2);
+		result = HashTable_performGet(ht,&val,&len,(char*)"a2",2);
+		REQUIRE(result == HashTable_GET_PROVIDED);
 		REQUIRE(0 == strcmp(val,"a2-value"));
-		REQUIRE(result == 2);
 
 	}
 

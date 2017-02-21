@@ -150,7 +150,7 @@
 		HashItem** oldItemPtr = HashTable_findItem(self,hash,keydata,keylen);
 		if (oldItemPtr != NULL) {
 			HashItem_replaceValue(*oldItemPtr,valdata,vallen);
-			return 1;
+			return HashTable_SET_UPDATED;
 		}
 
 		HashItem* item = new_HashItem();
@@ -168,7 +168,7 @@
 
 		self->numberOfElms++;
 
-		return 2;
+		return HashTable_SET_INSERTED;
 	} // performSet()
 
 
@@ -177,12 +177,12 @@
 		int hash = HashTable_getHash(self,keydata,keylen);
 
 		HashItem** itemPtr = HashTable_findItem(self,hash,keydata,keylen);
-		if (itemPtr == NULL) return 2;
+		if (itemPtr == NULL) return HashTable_GET_NOT_FOUND;
 
 		*valdata = HashItem_getValueData(*itemPtr);
 		*vallen = HashItem_getValueLength(*itemPtr);
 
-		return 1;
+		return HashTable_GET_PROVIDED;
 	} // performGet()
 
 
@@ -191,7 +191,7 @@
 		int hash = HashTable_getHash(self,keydata,keylen);
 
 		HashItem** itemPtr = HashTable_findItem(self,hash,keydata,keylen);
-		if (itemPtr == NULL) return 2;
+		if (itemPtr == NULL) return HashTable_DEL_ALREADY;
 
 		HashItem* item = *itemPtr;
 		HashItem* saved = HashItem_getNext(item);
@@ -217,13 +217,13 @@
 		delete_HashItem(item);
 		--self->numberOfElms;
 
-		return 1;
+		return HashTable_DEL_DELETED;
 	} // performDel()
 
 
 	int HashTable_performZap(HashTable* self) {
 
-		if (self->numberOfElms == 0) return 1;
+		if (self->numberOfElms == 0) return HashTable_ZAP_EMPTY;
 
 		for (int i = 0; i < self->capacity; i++) {
 
@@ -255,7 +255,7 @@
 
 		} // foreach items
 
-		return 2;
+		return HashTable_ZAP_ZAPPED;
 	} // performZap()
 
 

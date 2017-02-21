@@ -16,6 +16,16 @@
 #define HashTable_CAPACITY_DEFAULT 8
 #define HashTable_CAPACITY_MAX 0x10000
 
+#define HashTable_SET_INSERTED 1
+#define HashTable_SET_UPDATED 2
+#define HashTable_GET_PROVIDED 3
+#define HashTable_GET_NOT_FOUND 4
+#define HashTable_DEL_DELETED 5
+#define HashTable_DEL_ALREADY 6
+#define HashTable_ZAP_ZAPPED 7
+#define HashTable_ZAP_EMPTY 8
+
+
 
 // class HashTable
 

@@ -223,7 +223,7 @@
 
 		Command_beginReply(self);
 
-		if (result == 1) {
+		if (result == HashTable_SET_UPDATED) {
 			Command_reportStatus(
 				self
 				,Command_ST_UPDATED
@@ -261,7 +261,7 @@
 			,keyData,keyLength
 		);
 
-		if (result == 1) {
+		if (result == HashTable_GET_PROVIDED) {
 			Command_reportStatus(
 				self
 				,Command_ST_FOUND
@@ -300,7 +300,7 @@
 			,keyData,keyLength
 		);
 
-		if (result == 1) {
+		if (result == HashTable_DEL_DELETED) {
 			Command_reportStatus(
 				self
 				,Command_ST_DELETED
@@ -327,7 +327,7 @@
 
 		int zapped = HashTable_getNumberOfElms(self->hashTable);
 
-		if (HashTable_performZap(self->hashTable) == 1) {
+		if (HashTable_performZap(self->hashTable) == HashTable_ZAP_EMPTY) {
 			Command_reportStatus(
 				self
 				,Command_ST_EMPTY
