@@ -152,7 +152,9 @@
 
 	void Command_processDump(Command* self) {
 
+		Command_beginReply(self);
 		HashTable_dump(self->hashTable);
+		Command_endReply(self);
 		
 	} // processDump()
 
@@ -299,10 +301,28 @@
 
 	
 	void Command_processZap(Command* self) {
+
 		Command_beginReply(self);
-		printf("todo: zap cmd \n");
+
+		if (HashTable_performZap(self->hashTable) == 1) {
+			Command_reportStatus(
+				self
+				,Command_ST_DELETED
+				,2216,"Already empty"
+			);
+		} // if already empty
+
+		else {
+			Command_reportStatus(
+				self
+				,Command_ST_NOT_EXISTS
+				,2217,"All items deleted"
+			);
+		} // else zapped
+
 		Command_endReply(self);
-	}
+
+	} // processZap()
 	
 
 	void Command_processKsearch(Command* self) {

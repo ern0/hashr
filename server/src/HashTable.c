@@ -203,3 +203,41 @@
 
 		return 1;
 	} // performDel()
+
+
+	int HashTable_performZap(HashTable* self) {
+
+		if (self->numberOfElms == 0) return 1;
+
+		for (int i = 0; i < self->capacity; i++) {
+
+			HashItem* item = self->items[i];
+			if (item == NULL) continue;
+
+			// delete head
+
+			HashItem* next = HashItem_getNext(item);
+			delete_HashItem(item);
+			self->items[i] = NULL;
+
+			--self->numberOfElms;
+			if (self->numberOfElms == 0) break;
+
+			// delete linked list
+
+			while (1) {
+				if (next == NULL) break;
+				HashItem* current = next;
+
+				next = HashItem_getNext(current);
+				delete_HashItem(current);
+
+				--self->numberOfElms;
+			} // while scan linked list
+
+			if (self->numberOfElms == 0) break;
+
+		} // foreach items
+
+		return 2;
+	} // performZap()
