@@ -3,15 +3,25 @@ class Parser:
 
 	def __init__(self,data):
 		self.data = data
+		self.counter = None
+
+
+	def getCounter(self):
+		return self.counter
 
 
 	def render(self):
+		self.parse(True)
+
+
+	def parse(self,render = False):
 		
 		if self.data[0:4] != b"HSHr":
-			print("invalid header: ",end="")
+			if render: print("invalid header: ",end="")
 			self.renderAuto(self.data[0:4])
 			return
 
+		self.counter = None
 		ptr = 4
 		multi = False
 		keyc = 0
@@ -54,8 +64,12 @@ class Parser:
 			chunkData = self.data[ptr:ptr + chunkLength]
 			ptr += chunkLength
 
-			if chunkType == b"cntr": continue
+			if chunkType == b"cntr": 
+				self.counter = self.getInt(chunkData)
+				continue
 
+			if not render: continue
+			
 			isInt = True
 			desc = chunkType.decode("utf-8")			
 

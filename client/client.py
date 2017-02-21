@@ -159,15 +159,20 @@ Debug commands:
 			return None
 
 
-	def waitResponse(self,counter):
+	def waitResponse(self,requestCounter):
 
-		ready = select([self.sock],[],[],self.responseTimeout)
-		if ready[0]: result = self.sock.recv(9999)
-		else: result = None
+		while True:
+			ready = select([self.sock],[],[],self.responseTimeout)
+			if ready[0]: response = self.sock.recv(9999)
+			else: return None
 
-		# todo: check counter
+			self.parser = Parser(response)
+			self.parser.parse()
+			responseCounter = self.parser.getCounter()
 
-		return result
+			if requestCounter < responseCounter: return None
+			if requestCounter > responseCounter: continue
+			return response
 
 
 	def parseLine(self,line):
@@ -320,8 +325,7 @@ Debug commands:
 		if len(self.singleShotWords) == 0: return False
 
 		response = self.processCliCommand(self.singleShotWords)
-		parser = Parser(response)
-		parser.render()
+		self.parser.render()
 
 		return True
 
@@ -351,8 +355,7 @@ Debug commands:
 
 			if response == None: continue
 
-			parser = Parser(response)
-			parser.render()
+			self.parser.render()
 
 
 	def main(self):
