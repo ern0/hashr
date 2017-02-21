@@ -56,6 +56,38 @@ TEST_CASE("HashTable") {
 
 	}
 
+	SECTION("del non-existent") {
+
+		int result = HashTable_performSet(ht,(char*)"yyyy",5,(char*)"davalue",7);
+		REQUIRE(result == HashTable_SET_INSERTED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
+
+		result = HashTable_performDel(ht,(char*)"zzzz",5);
+		REQUIRE(result == HashTable_DEL_ALREADY);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
+
+		result = HashTable_performDel(ht,(char*)"wwww",5);
+		REQUIRE(result == HashTable_DEL_ALREADY);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
+
+	}
+
+	SECTION("set and get, then del, then del again") {
+
+		int result = HashTable_performSet(ht,(char*)"dakej",5,(char*)"davalue",7);
+		REQUIRE(result == HashTable_SET_INSERTED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
+
+		result = HashTable_performDel(ht,(char*)"dakej",5);
+		REQUIRE(result == HashTable_DEL_DELETED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 0);
+
+		result = HashTable_performDel(ht,(char*)"dakej",5);
+		REQUIRE(result == HashTable_DEL_ALREADY);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 0);
+
+	}
+
 	SECTION("set, then set same key") {
 
 		int result = HashTable_performSet(ht,(char*)"dakej",5,(char*)"davalue",7);
@@ -93,6 +125,68 @@ TEST_CASE("HashTable") {
 		result = HashTable_performGet(ht,&val,&len,(char*)"a2",2);
 		REQUIRE(result == HashTable_GET_PROVIDED);
 		REQUIRE(0 == strcmp(val,"a2-value"));
+
+	}
+
+	SECTION("chain tests") {
+
+		int result = HashTable_performSet(ht,(char*)"xh",2,(char*)"x1-value",9);
+		REQUIRE(result == HashTable_SET_INSERTED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
+
+		result = HashTable_performSet(ht,(char*)"x2",2,(char*)"x2-value",9);
+		REQUIRE(result == HashTable_SET_INSERTED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 2);
+
+		result = HashTable_performSet(ht,(char*)"x3",2,(char*)"x3-value",9);
+		REQUIRE(result == HashTable_SET_INSERTED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 3);
+
+		result = HashTable_performSet(ht,(char*)"xt",2,(char*)"x4-value",9);
+		REQUIRE(result == HashTable_SET_INSERTED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 4);
+
+		SECTION("del chain head") {
+
+			int result = HashTable_performDel(ht,(char*)"xh",2);
+			REQUIRE(result == HashTable_DEL_DELETED);
+			REQUIRE(HashTable_getNumberOfElms(ht) == 3);
+
+			result = HashTable_performDel(ht,(char*)"xh",2);
+			REQUIRE(result == HashTable_DEL_ALREADY);
+			REQUIRE(HashTable_getNumberOfElms(ht) == 3);
+
+		}
+
+		SECTION("del chain tail") {
+
+			int result = HashTable_performDel(ht,(char*)"xt",2);
+			REQUIRE(result == HashTable_DEL_DELETED);
+			REQUIRE(HashTable_getNumberOfElms(ht) == 3);
+
+			result = HashTable_performDel(ht,(char*)"xt",2);
+			REQUIRE(result == HashTable_DEL_ALREADY);
+			REQUIRE(HashTable_getNumberOfElms(ht) == 3);
+
+		}
+
+		SECTION("del chain 2nd") {
+
+			int result = HashTable_performDel(ht,(char*)"x2",2);
+			REQUIRE(result == HashTable_DEL_DELETED);
+			REQUIRE(HashTable_getNumberOfElms(ht) == 3);
+
+			result = HashTable_performDel(ht,(char*)"x2",2);
+			REQUIRE(result == HashTable_DEL_ALREADY);
+			REQUIRE(HashTable_getNumberOfElms(ht) == 3);
+
+		}
+
+		char* val;
+		int len;
+		result = HashTable_performGet(ht,&val,&len,(char*)"x3",2);
+		REQUIRE(result == HashTable_GET_PROVIDED);
+		REQUIRE(0 == strcmp(val,"x3-value"));
 
 	}
 
