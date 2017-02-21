@@ -77,6 +77,7 @@ class Parser:
 			if chunkType == b"CPTY": desc = "capacity"
 			if chunkType == b"NELM": desc = "elements"
 			if chunkType == b"AVAL": desc = "value"
+			if chunkType == b"ZAPD": desc = "zapped"
 
 			print("  " + desc + ": ",end="")
 			for i in range(0,15 - len(desc)): print(" ",end="")

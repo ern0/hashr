@@ -304,6 +304,8 @@
 
 		Command_beginReply(self);
 
+		int zapped = HashTable_getNumberOfElms(self->hashTable);
+
 		if (HashTable_performZap(self->hashTable) == 1) {
 			Command_reportStatus(
 				self
@@ -319,6 +321,8 @@
 				,2217,"All items deleted"
 			);
 		} // else zapped
+
+		Packet_appendIntChunk(self->packet,"ZAPD",zapped);
 
 		Command_endReply(self);
 

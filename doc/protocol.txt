@@ -48,6 +48,7 @@ Response block types:
   "STAT" - status
   "AKEY" - response key
   "AVAL" - response value (payload)
+  "ZAPD" - zap result number of items
   "SRES" - search result number of items
 
 Push block types:
