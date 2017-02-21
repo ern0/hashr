@@ -271,18 +271,22 @@ Debug commands:
 				command.setReorgCapacity( self.validNum(words[2],8) )
 
 			elif cmd == "dump" or cmd == 'z':
+				print("check server console for result")
 				command.setCommand("dump")
 				self.parmNumCheck(words,0)
 
 			elif cmd == "i1":
+				print("issuing command: 'freebeer'")
 				command.setCommand("freebeer")
 				self.parmNumCheck(words,0)
 
 			elif cmd == "i2":
+				print("sending a 'set' command request without parameters")
 				command.setCommand("set")
 				self.parmNumCheck(words,0)
 
 			elif cmd == "i3":
+				print("sending a 'set' command request with 'value' parameter")
 				command.setCommand("get")
 				self.parmNumCheck(words,0)
 				command.setRequestValue("getvaluewtf")
