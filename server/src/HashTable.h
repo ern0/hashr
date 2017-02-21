@@ -26,7 +26,6 @@
 #define HashTable_ZAP_EMPTY 8
 
 
-
 // class HashTable
 
 	// private

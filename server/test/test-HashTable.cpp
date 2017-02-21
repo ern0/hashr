@@ -34,10 +34,11 @@ TEST_CASE("HashTable") {
 
 
 	SECTION("check empty state") {
+
 		int elms = HashTable_getNumberOfElms(ht);
 		REQUIRE(elms == 0);
-	}
 
+	}
 
 	SECTION("set and get, then del and get") {
 
@@ -88,13 +89,13 @@ TEST_CASE("HashTable") {
 
 	}
 
-	SECTION("set, then set same key") {
+	SECTION("set, then update with shorter") {
 
 		int result = HashTable_performSet(ht,(char*)"dakej",5,(char*)"davalue",7);
 		REQUIRE(result == HashTable_SET_INSERTED);
 		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
 
-		result = HashTable_performSet(ht,(char*)"dakej",5,(char*)"voila",6);
+		result = HashTable_performSet(ht,(char*)"dakej",5,(char*)"yo",3);
 		REQUIRE(result == HashTable_SET_UPDATED);
 		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
 
@@ -102,7 +103,7 @@ TEST_CASE("HashTable") {
 		int len;
 		result = HashTable_performGet(ht,&val,&len,(char*)"dakej",5);
 		REQUIRE(result == HashTable_GET_PROVIDED);
-		REQUIRE(0 == strcmp(val,"voila"));
+		REQUIRE(0 == strcmp(val,"yo"));
 
 	}
 
@@ -187,6 +188,50 @@ TEST_CASE("HashTable") {
 		result = HashTable_performGet(ht,&val,&len,(char*)"x3",2);
 		REQUIRE(result == HashTable_GET_PROVIDED);
 		REQUIRE(0 == strcmp(val,"x3-value"));
+
+	}
+
+	SECTION("zap on empty table") {
+
+		int result = HashTable_performZap(ht);
+		REQUIRE(result == HashTable_ZAP_EMPTY);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 0);
+
+	}
+
+	SECTION("zap a bunch of items") {
+
+		int result = HashTable_performSet(ht,(char*)"x1",2,(char*)"x1-value",9);
+		REQUIRE(result == HashTable_SET_INSERTED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 1);
+
+		result = HashTable_performSet(ht,(char*)"x2",2,(char*)"x2-value",9);
+		REQUIRE(result == HashTable_SET_INSERTED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 2);
+
+		result = HashTable_performSet(ht,(char*)"x3",2,(char*)"x3-value",9);
+		REQUIRE(result == HashTable_SET_INSERTED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 3);
+
+		result = HashTable_performSet(ht,(char*)"yy",2,(char*)"yy-value",9);
+		REQUIRE(result == HashTable_SET_INSERTED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 4);
+
+		result = HashTable_performSet(ht,(char*)"yy",2,(char*)"updated",8);
+		REQUIRE(result == HashTable_SET_UPDATED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 4);
+
+		result = HashTable_performZap(ht);
+		REQUIRE(result == HashTable_ZAP_ZAPPED);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 0);
+
+		result = HashTable_performDel(ht,(char*)"x2",2);
+		REQUIRE(result == HashTable_DEL_ALREADY);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 0);
+
+		result = HashTable_performZap(ht);
+		REQUIRE(result == HashTable_ZAP_EMPTY);
+		REQUIRE(HashTable_getNumberOfElms(ht) == 0);
 
 	}
 
