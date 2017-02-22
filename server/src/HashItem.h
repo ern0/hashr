@@ -41,5 +41,7 @@
 	HashItem* HashItem_getNext(HashItem* self);
 	void HashItem_setNext(HashItem* self,HashItem* next);
 	int HashItem_replaceValue(HashItem* self,char* data,int length);
+	int HashItem_searchKey(HashItem* self,char* data,int length);
+	int HashItem_searchValue(HashItem* self,char* data,int length);
 
 #endif

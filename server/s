@@ -4,8 +4,17 @@ rm -f /tmp/hashr.log
 #bin/`uname -s`-`uname -p`/hashr-server ; exit
 
 bin/`uname -s`-`uname -p`/hashr-server -f /tmp/hashr.pid -l /tmp/hashr.log &
+
+../client/client.py -c set pix mix
+../client/client.py -c set pici mixi
+../client/client.py -c set pixi mici
+../client/client.py -c set loyfas moyfas
+
 ../client/client.py -c info
+../client/client.py -c search x
+
 ../client/client.py
+
 sleep .2
 kill `cat /tmp/hashr.pid`
 #tail /tmp/hashr.log

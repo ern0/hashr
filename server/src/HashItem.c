@@ -143,3 +143,13 @@
 
 		return 0;
 	} // replaceValue()
+
+
+	int HashItem_searchKey(HashItem* self,char* data,int length) {
+		return (NULL != memmem(self->keyData,self->keyLength,data,length));
+	} // searchKey()
+
+
+	int HashItem_searchValue(HashItem* self,char* data,int length) {
+		return (NULL != memmem(self->valueData,self->valueLength,data,length));
+	} // searchValue()

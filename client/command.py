@@ -11,7 +11,6 @@ class Command:
 		self.requestKey = None
 		self.requestValue = None
 		
-		self.searchFilter = None
 		self.searchPattern = None
 		self.searchMaxResults = None
 
@@ -39,10 +38,6 @@ class Command:
 		self.requestValue = value
 		return self
 
-
-	def setSearchFilter(self,filter):
-		self.searchFilter = filter
-		return self
 
 	def setSearchPattern(self,pattern):
 		self.searchPattern = pattern
@@ -77,9 +72,6 @@ class Command:
 
 		if self.requestValue is not None:
 			packet.addTextBlock("QVAL",self.requestValue)
-
-		if self.searchFilter is not None:
-			packet.addTextBlock("SFIL",self.searchFilter)
 
 		if self.searchPattern is not None:
 			packet.addTextBlock("SPAT",self.searchPattern)

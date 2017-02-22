@@ -23,8 +23,8 @@
 		self->patternLength = -1;
 		self->maxResults = -1;
 		self->mode = -1;
-		self->keySearch = 0;
-		self->valueSearch = 0;
+		self->keyMatch = 0;
+		self->valueMatch = 0;
 		self->numberOfResults = 0;
 
 	} // ctor
@@ -39,34 +39,67 @@
 		self->patternData = patternData;
 		self->patternLength = patternLength;
 	} // setPattern()
-	
 
-	void SearchOptions_setCountMode(SearchOptions* self,char keySearch,char valueSearch) {
+
+	char* SearchOptions_getPatternData(SearchOptions* self) {
+		return self->patternData;
+	} // getPatternData()
+
+
+	int SearchOptions_getPatternLength(SearchOptions* self) {
+		return self->patternLength;
+	} // getPatternLength()
+
+
+	void SearchOptions_setCountMode(SearchOptions* self,int keyMatch,int valueMatch) {
+
 		self->mode = SEARCHOPT_COUNT;
+
+		self->keyMatch = keyMatch;
+		self->valueMatch = valueMatch;
+
 	} // setCountMode()
 
 
-	void SearchOptions_setSearchMode(SearchOptions* self,char keySearch,char valueSearch) {
+	void SearchOptions_setSearchMode(SearchOptions* self,int keyMatch,int valueMatch) {
+
 		self->mode = SEARCHOPT_SEARCH;
+
+		self->keyMatch = keyMatch;
+		self->valueMatch = valueMatch;
+
 	} // setSearchMode()
 
 
-	char SearchOptions_isCountMode(SearchOptions* self) {
+	int SearchOptions_isKeyMatchMode(SearchOptions* self) {
+		return self->keyMatch;
+	} // isKeyMatchMode()
+
+
+	int SearchOptions_isValueMatchMode(SearchOptions* self) {
+		return self->valueMatch;
+	} // isValueMatchhMode()
+
+
+	int SearchOptions_isCountMode(SearchOptions* self) {
 		return ( self->mode == SEARCHOPT_COUNT );
 	} // isCountMode()
 
 
-	char SearchOptions_isSearchMode(SearchOptions* self) {
+	int SearchOptions_isSearchMode(SearchOptions* self) {
 		return ( self->mode == SEARCHOPT_SEARCH );
 	} // isSearchMode()
 
 
 	void SearchOptions_setMaxResults(SearchOptions* self,int max) {
-
 		if (max == -1) max = SEARCHOPT_MAXRESULTS_DEFAULT;
 		self->maxResults = max;
-
 	} // setSearchMax()
+
+
+	void SearchOptions_resetNumberOfResults(SearchOptions* self) {
+		self->numberOfResults = 0;
+	} // resetNumberOfResults()	
 
 
 	int SearchOptions_getNumberOfResults(SearchOptions* self) {

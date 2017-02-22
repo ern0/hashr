@@ -21,8 +21,8 @@
 		int patternLength;
 		int maxResults;
 		char mode;
-		char keySearch;
-		char valueSearch;
+		int keyMatch;
+		int valueMatch;
 		
 		// response
 		int numberOfResults;
@@ -36,12 +36,17 @@
 	SearchOptions* new_SearchOptions();
 	void delete_SearchOptions(SearchOptions* self);
 	void SearchOptions_setPattern(SearchOptions* self,char* patternData,int patternLength);
-	void SearchOptions_setCountMode(SearchOptions* self,char keySearch,char valueSearch);
-	void SearchOptions_setSearchMode(SearchOptions* self,char keySearch,char valueSearch);
-	char SearchOptions_isCountMode(SearchOptions* self);
-	char SearchOptions_isSearchMode(SearchOptions* self);
+	char* SearchOptions_getPatternData(SearchOptions* self);
+	int SearchOptions_getPatternLength(SearchOptions* self);
+	void SearchOptions_setCountMode(SearchOptions* self,int keyMatch,int valueMatch);
+	void SearchOptions_setSearchMode(SearchOptions* self,int keyMatch,int valueMatch);
+	int SearchOptions_isCountMode(SearchOptions* self);
+	int SearchOptions_isSearchMode(SearchOptions* self);
+	int SearchOptions_isKeyMatchMode(SearchOptions* self);
+	int SearchOptions_isValueMatchMode(SearchOptions* self);
 	void SearchOptions_setMaxResults(SearchOptions* self,int max);
 	int SearchOptions_getNumberOfResults(SearchOptions* self);
+	void SearchOptions_resetNumberOfResults(SearchOptions* self);
 
 	// protected
 	void SearchOptions_ctor(SearchOptions* self);

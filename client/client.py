@@ -257,21 +257,18 @@ Debug commands:
 
 			elif cmd == "ksearch" or cmd == "kcount":
 				self.parmNumCheck(words,1)
-				command.setSearchFilter("key")
 				command.setSearchPattern(words[1])
 				if cmd == "ksearch": 
 					command.setSearchMaxResults(self.searchMaxResults)
 
 			elif cmd == "vsearch" or cmd == "vcount":
 				self.parmNumCheck(words,1)
-				command.setSearchFilter("value")
 				command.setSearchPattern(words[1])
 				if cmd == "vsearch": 
 					command.setSearchMaxResults(self.searchMaxResults)
 
 			elif cmd == "search" or cmd == "count":
 				self.parmNumCheck(words,1)
-				command.setSearchFilter("all")
 				command.setSearchPattern(words[1])
 				if cmd == "search": 
 					command.setSearchMaxResults(self.searchMaxResults)

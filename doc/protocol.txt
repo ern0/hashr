@@ -1,0 +1,54 @@
+Packet metaformat
+=================
+
+Gross packet lenght must be shorter than receive buffer size.
+
+Specific packets have strict rules for the number and order
+of blocks.
+
+Packet
+------
+- 4 byte prefix: "HSHr"
+- followed by blocks (see below)
+- last block is only a special header without data
+
+Block
+-----
+- 4 byte identifier (e.g. "CMND" for command)
+- 4 byte length
+- payload
+
+The first block ID is also determines the type of the packet.
+
+When the block ID is "ENDm", it marks the end of the series
+of blocks. Possible further bytes in the packet are ignored.
+
+Byte order
+----------
+Hi-first, like ARM or MC68000 native.
+
+
+Block types
+===========
+
+Notice: not a final version!
+
+Request block types:
+  "CMND" - specifies command, e.g. "set", "del" etc.
+  "QKEY" - request key 
+  "QVAL" - request value (payload)
+  "SPAT" - search pattern
+  "SMAX" - search max. number of results
+  "RMET" - reorg method
+  "RCAP" - reorg capacity
+
+Response block types:
+  "INFO" - info response
+  "STAT" - status
+  "AKEY" - response key
+  "AVAL" - response value (payload)
+  "ZAPD" - zap result number of items
+  "SRES" - search result number of items
+
+Push block types:
+  "DOWN" - system down notification

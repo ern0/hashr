@@ -355,7 +355,7 @@
 		SearchOptions* opts = new_SearchOptions();
 		if (opts == NULL) return;
 
-		SearchOptions_setSearchMode(opts,1,0);
+		SearchOptions_setCountMode(opts,1,0);
 		int seo = Command_prepareSearchOptions(self,opts);
 		if (seo != -1) Command_universalSearch(self,opts);
 
@@ -369,7 +369,7 @@
 		SearchOptions* opts = new_SearchOptions();
 		if (opts == NULL) return;
 
-		SearchOptions_setSearchMode(opts,0,1);
+		SearchOptions_setCountMode(opts,0,1);
 		int seo = Command_prepareSearchOptions(self,opts);
 		if (seo != -1) Command_universalSearch(self,opts);
 
@@ -379,11 +379,11 @@
 
 
 	void Command_processCount(Command* self) {
-		
+
 		SearchOptions* opts = new_SearchOptions();
 		if (opts == NULL) return;
 
-		SearchOptions_setSearchMode(opts,1,1);
+		SearchOptions_setCountMode(opts,1,1);
 		int seo = Command_prepareSearchOptions(self,opts);
 		if (seo != -1) Command_universalSearch(self,opts);
 
@@ -436,14 +436,20 @@
 
 	int Command_prepareSearchOptions(Command* self,SearchOptions* opts) {
 
-		SearchOptions_setMaxResults(opts, Command_loadIntChunk(self,"SMAX") );
+		if (SearchOptions_isSearchMode(opts)) {
+			SearchOptions_setMaxResults(opts, Command_loadIntChunk(self,"SMAX") );
+		}
 
 		if ( Command_loadStrChunk(self,"SPAT") == -1 ) {
+
+			Command_beginReply(self);			
 			Command_reportStatus(
 				self
 				,Command_ST_MISSING_PARAM
 				,2218,"Missing search pattern"
 			);
+			Command_endReply(self);
+
 			return -1;
 		} // if missing pattern
 
@@ -477,9 +483,9 @@
 
 		Packet_appendIntChunk(self->packet,"SRES",opts->numberOfResults);
 
-		char provideResult = 1;
+		int provideResult = 1;
 		if (SearchOptions_isCountMode(opts)) provideResult = 0;
-		if (SearchOptions_getNumberOfResults(opts)) provideResult = 0;
+		if (SearchOptions_getNumberOfResults(opts) == 0) provideResult = 0;
 		if (provideResult) {
 
 			// TODO: render result
