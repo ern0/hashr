@@ -351,43 +351,90 @@
 	
 
 	void Command_processKcount(Command* self) {
-		Command_universalSearch(self,1,1,0);
+		
+		SearchOptions* opts = new_SearchOptions();
+		if (opts == NULL) return;
+
+		SearchOptions_setSearchMode(opts,1,0);
+		Command_universalSearch(self,opts);
+
+		delete_SearchOptions(opts);
+
 	} // processKcount()
 
 
 	void Command_processVcount(Command* self) {
-		Command_universalSearch(self,1,0,1);
+		
+		SearchOptions* opts = new_SearchOptions();
+		if (opts == NULL) return;
+
+		SearchOptions_setSearchMode(opts,0,1);
+		Command_universalSearch(self,opts);
+
+		delete_SearchOptions(opts);
+
 	} // processVcount()
 
 
 	void Command_processCount(Command* self) {
-		Command_universalSearch(self,1,1,1);
+		
+		SearchOptions* opts = new_SearchOptions();
+		if (opts == NULL) return;
+
+		SearchOptions_setSearchMode(opts,1,1);
+		Command_universalSearch(self,opts);
+
+		delete_SearchOptions(opts);
+
 	} // processCount()
 
 
 	void Command_processKsearch(Command* self) {
-		Command_universalSearch(self,1,1,0);
+		
+		SearchOptions* opts = new_SearchOptions();
+		if (opts == NULL) return;
+
+		SearchOptions_setSearchMode(opts,1,0);
+		Command_universalSearch(self,opts);
+
+		delete_SearchOptions(opts);
+
 	} // processKsearch()
 
 
 	void Command_processVsearch(Command* self) {
-		Command_universalSearch(self,1,0,1);
+		
+		SearchOptions* opts = new_SearchOptions();
+		if (opts == NULL) return;
+
+		SearchOptions_setSearchMode(opts,0,1);
+		Command_universalSearch(self,opts);
+
+		delete_SearchOptions(opts);
+
 	} // processVsearch()
 
 
 	void Command_processSearch(Command* self) {
-		Command_universalSearch(self,1,1,1);
+		
+		SearchOptions* opts = new_SearchOptions();
+		if (opts == NULL) return;
+
+		SearchOptions_setSearchMode(opts,1,1);
+		Command_universalSearch(self,opts);
+
+		delete_SearchOptions(opts);
+
 	} // processSearch()
 
 
-	void Command_universalSearch(Command* self,int maxResult,int keySearch,int valueSearch) {
+	void Command_universalSearch(Command* self,SearchOptions* opts) {
 
 		Command_beginReply(self);
 
-		HashItem *resultPtr;
-		int num = HashTable_search(self->hashTable,RET &resultPtr,maxResult,keySearch,valueSearch);
+		int result = HashTable_search(self->hashTable,opts);
 
-		if (num == 0) {
+		if (result == HashTable_SEARCH_NOT_FOUND) {
 			Command_reportStatus(
 				self
 				,Command_ST_NO_MATCH
@@ -403,12 +450,17 @@
 			);
 		} // if any hits
 
-		Packet_appendIntChunk(self->packet,"SRES",num);
+		Packet_appendIntChunk(self->packet,"SRES",opts->numberOfResults);
 
-		if ((maxResult > 0) && (num > 0)) {
-			// todo: provide result
+		char provideResult = 1;
+		if (SearchOptions_isCountMode(opts)) provideResult = 0;
+		if (SearchOptions_getNumberOfResults(opts)) provideResult = 0;
+		if (provideResult) {
+
+			// TODO: render result
 			Packet_appendIntChunk(self->packet,"SRES",9999);
-		}
+
+		} // if search
 
 		Command_endReply(self);
 		

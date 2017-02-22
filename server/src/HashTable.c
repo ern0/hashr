@@ -259,15 +259,23 @@
 	} // performZap()
 
 
-	int HashTable_search(
-		HashTable* self
-		,RET HashItem** result
-		,int maxResult
-		,int keySearch
-		,int valueSearch) 
-	{
+	int HashTable_search(HashTable* self,SearchOptions* opts) {
 
-		// TODO
-		return 0;
+		opts->numberOfResults = 0;
+		if (self->numberOfElms == 0) return HashTable_SEARCH_NOT_FOUND;
 
+		for (int i = 0; i < self->capacity; i++) {
+
+			HashItem* item = self->items[i];
+			if (item == NULL) continue;
+
+			// TODO: implement search
+			//int result = HashTable_searchItem(self,item,opts);
+
+		} // foreach slot
+
+		return HashTable_SEARCH_NOT_FOUND;
 	} // search()
+
+
+	//int HashTable_searchItem(self,)

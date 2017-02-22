@@ -25,6 +25,7 @@ ${BIN}/hashr-server: \
 		${OBJ}/Connection.o \
 		${OBJ}/Packet.o \
 		${OBJ}/Command.o \
+		${OBJ}/SearchOptions.o \
 		-o ${BIN}/hashr-server
 
 ${OBJ}/Utils.o: \
@@ -66,9 +67,19 @@ ${OBJ}/HashTable.o: \
 		${SRC}/HashTable.c \
 		-o ${OBJ}/HashTable.o
 
+${OBJ}/SearchOptions.o: \
+		Makefile ${OBJ} \
+		${OBJ}/Utils.o \
+		${SRC}/SearchOptions.h \
+		${SRC}/SearchOptions.c
+	${CC} -c \
+		${SRC}/SearchOptions\.c \
+		-o ${OBJ}/SearchOptions.o
+
 ${OBJ}/HashItem.o: \
 		Makefile ${OBJ} \
 		${OBJ}/Hasher.o \
+		${OBJ}/SearchOptions.o \
 		${SRC}/HashItem.h \
 		${SRC}/HashItem.c
 	${CC} -c \
@@ -109,6 +120,7 @@ ${OBJ}/Command.o: \
 		Makefile ${OBJ} \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
+		${OBJ}/SearchOptions.o \
 		${SRC}/Command.h \
 		${SRC}/Command.c
 	${CC} -c \
@@ -148,6 +160,7 @@ ${BIN}/test-Packet_scan: \
 		${OBJ}/HashItem.o \
 		${OBJ}/Hasher.o \
 		${OBJ}/Command.o \
+		${OBJ}/SearchOptions.o \		
 		-o ${BIN}/test-Packet_scan
 
 ${BIN}/test-Packet_build: \
@@ -166,6 +179,7 @@ ${BIN}/test-Packet_build: \
 		${OBJ}/HashItem.o \
 		${OBJ}/Hasher.o \
 		${OBJ}/Command.o \
+		${OBJ}/SearchOptions.o \		
 		-o ${BIN}/test-Packet_build
 
 ${BIN}/test-HashTable: \
@@ -180,6 +194,7 @@ ${BIN}/test-HashTable: \
 		${OBJ}/HashTable.o \
 		${OBJ}/HashItem.o \
 		${OBJ}/Hasher.o \
+		${OBJ}/SearchOptions.o \		
 		-o ${BIN}/test-HashTable
 
 ########################################################

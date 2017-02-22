@@ -12,19 +12,21 @@
 #include "Logger.h"
 #include "HashItem.h"
 #include "Hasher.h"
+#include "SearchOptions.h"
 
 #define HashTable_CAPACITY_DEFAULT 8
 #define HashTable_CAPACITY_MAX 0x10000
 
-#define HashTable_SET_INSERTED 1
-#define HashTable_SET_UPDATED 2
-#define HashTable_GET_PROVIDED 3
-#define HashTable_GET_NOT_FOUND 4
-#define HashTable_DEL_DELETED 5
-#define HashTable_DEL_ALREADY 6
-#define HashTable_ZAP_ZAPPED 7
-#define HashTable_ZAP_EMPTY 8
-
+#define HashTable_SET_INSERTED 11
+#define HashTable_SET_UPDATED 12
+#define HashTable_GET_PROVIDED 23
+#define HashTable_GET_NOT_FOUND 20
+#define HashTable_DEL_DELETED 35
+#define HashTable_DEL_ALREADY 36
+#define HashTable_ZAP_ZAPPED 45
+#define HashTable_ZAP_EMPTY 46
+#define HashTable_SEARCH_PROVIDED 53
+#define HashTable_SEARCH_NOT_FOUND 50
 
 // class HashTable
 
@@ -61,7 +63,7 @@
 	int HashTable_performGet(HashTable* self,RET char** valdata,RET int* vallen,char* keydata,int keylen);
 	int HashTable_performDel(HashTable* self,char* keydata,int keylen);
 	int HashTable_performZap(HashTable* self);
-	int HashTable_search(HashTable* self,RET HashItem** resultPtr,int maxResult,int keySearch,int valueSearch);
+	int HashTable_search(HashTable* self,SearchOptions* opts);
 
 
 #endif

@@ -12,6 +12,7 @@
 #include "Logger.h"
 #include "Server.h"
 #include "HashTable.h"
+#include "SearchOptions.h"
 
 // class Packet;
 struct Packet;
@@ -82,7 +83,7 @@ typedef struct Packet Packet;
 	int Command_loadIntChunk(Command* self,char* id);
 	void Command_beginReply(Command* self);
 	void Command_endReply(Command* self);
-	void Command_universalSearch(Command* self,int maxResult,int keySearch,int ValueSearch);
+	void Command_universalSearch(Command* self,SearchOptions* opts);
 
 
 #endif
