@@ -37,7 +37,7 @@
 
 	void Command_setPacket(Command* self,Packet* packet) {
 		self->packet = packet;
-		strcpy(self->cmd,"n.a.");
+		self->token = -1;
 	} // setPacket()
 
 
@@ -60,7 +60,7 @@
 			extendedMessage
 			,200
 			,"Command \"%s\" result: %d - %s"
-			,self->cmd
+			,Command_getName(self,self->token)
 			,st
 			,message
 		);
@@ -74,14 +74,45 @@
 	} // reportStatus()
 
 
-	void Command_setCommand(Command* self,char* cmd,int len) {
-
-		if (len > 19) len = 19;
-		strncpy(self->cmd,(char*)cmd,len);
-
-		self->cmd[len] = 0;
-
+	void Command_setCommand(Command* self,int token) {
+		self->token = token;
 	} // setCommand()
+
+
+	char* Command_getName(Command* self,int token) {
+
+		switch (token) {
+			case TOKEN_INFO:
+				return (char*)"info"; 
+			case TOKEN_GET:
+				return (char*)"get";
+			case TOKEN_SET:
+				return (char*)"set";
+			case TOKEN_DEL:
+				return (char*)"del";
+			case TOKEN_ZAP:
+				return (char*)"zap"; 
+			case TOKEN_KSEARCH:
+				return (char*)"ksearch";
+			case TOKEN_KCOUNT:
+				return (char*)"kcount";
+			case TOKEN_VSEARCH:
+				return (char*)"vsearch";
+			case TOKEN_VCOUNT:
+				return (char*)"vcount";
+			case TOKEN_SEARCH:
+				return (char*)"search";
+			case TOKEN_COUNT:
+				return (char*)"count";
+			case TOKEN_REORG:
+				return (char*)"reorg";
+			case TOKEN_DUMP:
+				return (char*)"dump";
+		} // switch
+
+		sprintf(self->unknown,"unknown-%d",token);
+		return self->unknown;
+	} // getName()
 
 
 	int Command_findParamChunk(Command* self,char* id) {

@@ -61,8 +61,9 @@ class Command:
 
 		packet = Packet()
 
-		if self.cmd is not None: 
-			packet.addTextBlock("CMND",self.cmd)
+		if self.cmd is not None:
+			token = self.getCommandToken()
+			packet.addIntBlock("CMND",token)
 
 		if self.counter is not None:
 			packet.addIntBlock("cntr",self.counter)
@@ -86,3 +87,22 @@ class Command:
 			packet.addIntBlock("RCAP",self.reorgCapacity)
 
 		return packet.render()
+
+
+	def getCommandToken(self):
+		
+		if self.cmd == "beat": return 0
+		if self.cmd == "info": return 1
+		if self.cmd == "get": return 2
+		if self.cmd == "set": return 4
+		if self.cmd == "del": return 5
+		if self.cmd == "zap": return 6
+		if self.cmd == "ksearch": return 11
+		if self.cmd == "kcount": return 12
+		if self.cmd == "vsearch": return 13
+		if self.cmd == "vcount": return 14
+		if self.cmd == "search": return 15
+		if self.cmd == "count": return 16
+		if self.cmd == "reorg": return 21
+		if self.cmd == "dump": return 22
+		if self.cmd == "freebeer": return 99

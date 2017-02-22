@@ -11,6 +11,20 @@
 #include "Command.h"
 #include "Server.h"
 
+#define TOKEN_BEAT 0
+#define TOKEN_INFO 1
+#define TOKEN_GET 2
+#define TOKEN_SET 4
+#define TOKEN_DEL 5
+#define TOKEN_ZAP 6
+#define TOKEN_KSEARCH 11
+#define TOKEN_KCOUNT 12
+#define TOKEN_VSEARCH 13
+#define TOKEN_VCOUNT 14
+#define TOKEN_SEARCH 15
+#define TOKEN_COUNT 16
+#define TOKEN_REORG 21
+#define TOKEN_DUMP 22
 
 // class Packet
 
