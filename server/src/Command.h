@@ -83,6 +83,7 @@ typedef struct Packet Packet;
 	int Command_loadIntChunk(Command* self,char* id);
 	void Command_beginReply(Command* self);
 	void Command_endReply(Command* self);
+	int Command_prepareSearchOptions(Command* self,SearchOptions* opts);
 	void Command_universalSearch(Command* self,SearchOptions* opts);
 
 

@@ -269,7 +269,7 @@
 			HashItem* item = self->items[i];
 			if (item == NULL) continue;
 
-			// TODO: implement search
+			
 			//int result = HashTable_searchItem(self,item,opts);
 
 		} // foreach slot

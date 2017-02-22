@@ -19,9 +19,9 @@
 
 	void SearchOptions_ctor(SearchOptions* self) {
 
-		self->patternData = NULL
-		self->patternLenght = -1;
-		self->maxResult = -1;
+		self->patternData = NULL;
+		self->patternLength = -1;
+		self->maxResults = -1;
 		self->mode = -1;
 		self->keySearch = 0;
 		self->valueSearch = 0;
@@ -35,6 +35,11 @@
 	} // dtor
 
 
+	void SearchOptions_setPattern(SearchOptions* self,char* patternData,int patternLength) {
+		self->patternData = patternData;
+		self->patternLength = patternLength;
+	} // setPattern()
+	
 
 	void SearchOptions_setCountMode(SearchOptions* self,char keySearch,char valueSearch) {
 		self->mode = SEARCHOPT_COUNT;
@@ -54,6 +59,14 @@
 	char SearchOptions_isSearchMode(SearchOptions* self) {
 		return ( self->mode == SEARCHOPT_SEARCH );
 	} // isSearchMode()
+
+
+	void SearchOptions_setMaxResults(SearchOptions* self,int max) {
+
+		if (max == -1) max = SEARCHOPT_MAXRESULTS_DEFAULT;
+		self->maxResults = max;
+
+	} // setSearchMax()
 
 
 	int SearchOptions_getNumberOfResults(SearchOptions* self) {

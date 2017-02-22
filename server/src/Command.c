@@ -356,7 +356,8 @@
 		if (opts == NULL) return;
 
 		SearchOptions_setSearchMode(opts,1,0);
-		Command_universalSearch(self,opts);
+		int seo = Command_prepareSearchOptions(self,opts);
+		if (seo != -1) Command_universalSearch(self,opts);
 
 		delete_SearchOptions(opts);
 
@@ -369,7 +370,8 @@
 		if (opts == NULL) return;
 
 		SearchOptions_setSearchMode(opts,0,1);
-		Command_universalSearch(self,opts);
+		int seo = Command_prepareSearchOptions(self,opts);
+		if (seo != -1) Command_universalSearch(self,opts);
 
 		delete_SearchOptions(opts);
 
@@ -382,7 +384,8 @@
 		if (opts == NULL) return;
 
 		SearchOptions_setSearchMode(opts,1,1);
-		Command_universalSearch(self,opts);
+		int seo = Command_prepareSearchOptions(self,opts);
+		if (seo != -1) Command_universalSearch(self,opts);
 
 		delete_SearchOptions(opts);
 
@@ -395,7 +398,8 @@
 		if (opts == NULL) return;
 
 		SearchOptions_setSearchMode(opts,1,0);
-		Command_universalSearch(self,opts);
+		int seo = Command_prepareSearchOptions(self,opts);
+		if (seo != -1) Command_universalSearch(self,opts);
 
 		delete_SearchOptions(opts);
 
@@ -408,7 +412,8 @@
 		if (opts == NULL) return;
 
 		SearchOptions_setSearchMode(opts,0,1);
-		Command_universalSearch(self,opts);
+		int seo = Command_prepareSearchOptions(self,opts);
+		if (seo != -1) Command_universalSearch(self,opts);
 
 		delete_SearchOptions(opts);
 
@@ -421,11 +426,31 @@
 		if (opts == NULL) return;
 
 		SearchOptions_setSearchMode(opts,1,1);
-		Command_universalSearch(self,opts);
+		int seo = Command_prepareSearchOptions(self,opts);
+		if (seo != -1) Command_universalSearch(self,opts);
 
 		delete_SearchOptions(opts);
 
 	} // processSearch()
+
+
+	int Command_prepareSearchOptions(Command* self,SearchOptions* opts) {
+
+		SearchOptions_setMaxResults(opts, Command_loadIntChunk(self,"SMAX") );
+
+		if ( Command_loadStrChunk(self,"SPAT") == -1 ) {
+			Command_reportStatus(
+				self
+				,Command_ST_MISSING_PARAM
+				,2218,"Missing search pattern"
+			);
+			return -1;
+		} // if missing pattern
+
+		SearchOptions_setPattern(opts,self->data,self->length);
+
+		return 0;
+	} // prepareSearchOptions()
 
 
 	void Command_universalSearch(Command* self,SearchOptions* opts) {
