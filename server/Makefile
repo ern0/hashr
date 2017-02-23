@@ -200,6 +200,10 @@ ${BIN}/test-HashTable: \
 ${BIN}/test-Search: \
 		Makefile ${OBJ} ${BIN} \
 		${TST}/test-Search.cpp \
+		${OBJ}/Logger.o \
+		${OBJ}/HashTable.o \
+		${OBJ}/HashItem.o \
+		${OBJ}/Hasher.o \
 		${OBJ}/Search.o \
 		${OBJ}/Utils.o
 	${TC} \

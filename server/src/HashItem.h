@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+
 #include "Hasher.h"
 
 
@@ -43,5 +45,7 @@
 	int HashItem_replaceValue(HashItem* self,char* data,int length);
 	int HashItem_searchKey(HashItem* self,char* data,int length);
 	int HashItem_searchValue(HashItem* self,char* data,int length);
+	int HashItem_matchKey(HashItem* self,char* data,int length);
+	int HashItem_matchValue(HashItem* self,char* data,int lenght);
 
 #endif

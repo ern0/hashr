@@ -155,3 +155,15 @@ return;
 	int HashItem_searchValue(HashItem* self,char* data,int length) {
 		return (NULL != memmem(self->valueData,self->valueLength,data,length));
 	} // searchValue()
+
+
+	int HashItem_matchKey(HashItem* self,char* data,int length) {
+		if (length != self->keyLength) return 0;
+		return (0 == memcmp(self->keyData,data,length));
+	} // matchKey()
+
+
+	int HashItem_matchValue(HashItem* self,char* data,int length) {
+		if (length != self->valueLength) return 0;
+		return (0 == memcmp(self->valueData,data,length));
+	} // matchValue()

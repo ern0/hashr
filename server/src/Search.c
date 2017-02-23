@@ -22,8 +22,7 @@
 		self->patternData = NULL;
 		self->patternLength = -1;
 		self->mode = -1;
-		self->keyMatch = 0;
-		self->valueMatch = 0;
+		self->match = 0;
 		self->limitStart = 0;
 		self->limitItems = -1;
 		self->numberOfResults = 0;
@@ -34,13 +33,18 @@
 
 
 	void Search_dtor(Search* self) {
+		Search_dropResults(self);
+	} // dtor
 
+
+	void Search_dropResults(Search* self) {
+		
 		if (self->results == NULL) return;
 
 		free(self->results);
 		self->results = NULL;
 
-	} // dtor
+	} // dropResults()
 
 
 	void Search_setPattern(Search* self,char* patternData,int patternLength) {
@@ -49,22 +53,18 @@
 	} // setPattern()
 
 
-	void Search_setCountMode(Search* self,int keyMatch,int valueMatch) {
+	void Search_setCountMode(Search* self,int match) {
 
 		self->mode = SEARCH_MODE_COUNT;
-
-		self->keyMatch = keyMatch;
-		self->valueMatch = valueMatch;
+		self->match = match;
 
 	} // setCountMode()
 
 
-	void Search_setSearchMode(Search* self,int keyMatch,int valueMatch) {
+	void Search_setSearchMode(Search* self,int match) {
 
 		self->mode = SEARCH_MODE_SEARCH;
-
-		self->keyMatch = keyMatch;
-		self->valueMatch = valueMatch;
+		self->match = match;
 
 	} // setSearchMode()
 
@@ -107,7 +107,8 @@
 		self->numberOfChecked = 0;
 		self->numberOfMatching = 0;
 		self->numberOfResults = 0;
-		self->results = NULL;
+
+		Search_dropResults(self);
 
 	} // resetNumberOfResults()	
 
@@ -117,10 +118,10 @@
 		// checkpoint: process item
 
 		int found = 0;
-		if (self->keyMatch) {
+		if ((self->match & SEARCH_MATCH_KEY) != 0) {
 			found = HashItem_searchKey(item,self->patternData,self->patternLength);
 		}
-		if ( (!found) && (self->valueMatch)) {
+		if ( (!found) && ((self->match & SEARCH_MATCH_VALUE) != 0) ) {
 			found = HashItem_searchValue(item,self->patternData,self->patternLength);	
 		}
 

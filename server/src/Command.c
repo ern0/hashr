@@ -4,6 +4,7 @@
 #include "Server.h"
 #include "HashItem.h"
 
+
 	Command* new_Command() {
 
 		Command* self;
@@ -396,7 +397,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setCountMode(search,1,0);
+		Search_setCountMode(search,SEARCH_MATCH_KEY);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 
@@ -410,7 +411,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setCountMode(search,0,1);
+		Search_setCountMode(search,SEARCH_MATCH_VALUE);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 
@@ -424,7 +425,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setCountMode(search,1,1);
+		Search_setCountMode(search,SEARCH_MATCH_KEY | SEARCH_MATCH_VALUE);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 
@@ -438,7 +439,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setSearchMode(search,1,0);
+		Search_setSearchMode(search,SEARCH_MATCH_KEY);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 
@@ -452,7 +453,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setSearchMode(search,0,1);
+		Search_setSearchMode(search,SEARCH_MATCH_VALUE);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 
@@ -466,7 +467,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setSearchMode(search,1,1);
+		Search_setSearchMode(search,SEARCH_MATCH_KEY | SEARCH_MATCH_VALUE);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 

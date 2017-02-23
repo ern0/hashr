@@ -14,15 +14,16 @@
 
 	#define SEARCH_MODE_COUNT 111
 	#define SEARCH_MODE_SEARCH 99
+	#define SEARCH_MATCH_KEY 0x01
+	#define SEARCH_MATCH_VALUE 0x02
 
 	struct Search {
 
 		// request
 		char* patternData;
 		int patternLength;
-		char mode;
-		int keyMatch;
-		int valueMatch;
+		int mode;
+		int match;
 		int limitStart;
 		int limitItems;
 
@@ -42,8 +43,8 @@
 	Search* new_Search();
 	void delete_Search(Search* self);
 	void Search_setPattern(Search* self,char* patternData,int patternLength);
-	void Search_setCountMode(Search* self,int keyMatch,int valueMatch);
-	void Search_setSearchMode(Search* self,int keyMatch,int valueMatch);
+	void Search_setCountMode(Search* self,int match);
+	void Search_setSearchMode(Search* self,int match);
 	int Search_isCountMode(Search* self);
 	int Search_isSearchMode(Search* self);
 	void Search_setLimitStart(Search* self,int limitStart);
@@ -56,6 +57,7 @@
 	// protected
 	void Search_ctor(Search* self);
 	void Search_dtor(Search* self);
+	void Search_dropResults(Search* self);
 
 
 #endif
