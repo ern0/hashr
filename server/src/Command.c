@@ -565,7 +565,15 @@
 
 	void Command_processReorg(Command* self) {
 		Command_beginReply(self);
-		printf("todo: reorg cmd \n");
+
+		int method = Command_loadIntChunk(self,"RMET",1);
+		if ( method == -1 ) return;
+		int capacity = Command_loadIntChunk(self,"RCAP",1);
+		if ( capacity == -1 ) return;
+		capacity = Utils_roundUp2Power(capacity);
+
+		printf("TODO: reorg %s %d \n",Hasher_getName(method),capacity);
+
 		Command_endReply(self);
 	}
 

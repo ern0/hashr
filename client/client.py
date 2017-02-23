@@ -40,11 +40,12 @@ Available commands:
   zap - delete all items
   kcount, kc <pattern> - search in keys and show match count 
   vcount, vc <pattern> - search in values and show match count
-  count, c <pattern> - search pattern in keys and values and show match count
+  count, fc <pattern> - search pattern in keys and values and show match count
   ksearch, ks <pattern> <start> <limit> - search in keys within specified result window
   vsearch, vs <pattern> <start> <limit> - search in values within specified result window
-  search, s <pattern> <start> <limit> - search pattern in keys and values within specified result window
+  search, fs <pattern> <start> <limit> - search pattern in keys and values within specified result window
   reorg <method> <capacity> - reorganize storage
+    valid methods are 1 to 10 (1 is for debugging)
     capacity will be rounded up to power of 2
 Debug commands:
   i1 - invalid command: 'freebeer'
@@ -286,9 +287,19 @@ Debug commands:
 				command.setCommand("count")			
 				self.setSearchParms(command,words,False)
 
-			elif cmd == "reorg":
+			elif cmd == "reorg" or cmd == "r":
+				command.setCommand("reorg")			
 				self.parmNumCheck(words,2)
-				command.setReorgMethod(words[1])
+				try: met = int(words[1])
+				except: met = -1
+				if met < 1: met = 1
+				if met > 10: met = 1
+				command.setReorgMethod(met)
+				print("hash method: " + command.getMethodName())
+				try: num = int(words[2])
+				except: num = -1
+				if num < 8: num = 8
+				command.setReorgCapacity(num)
 
 			elif cmd == "dump" or cmd == 'z':
 				print("check server console for result")

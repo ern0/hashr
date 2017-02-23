@@ -87,7 +87,7 @@ class Command:
 			packet.addIntBlock("LIMI",self.searchLimitItems)
 
 		if self.reorgMethod is not None:
-			packet.addTextBlock("RMET",self.reorgMethod)
+			packet.addIntBlock("RMET",self.reorgMethod)
 
 		if self.reorgCapacity is not None:
 			packet.addIntBlock("RCAP",self.reorgCapacity)
@@ -112,3 +112,18 @@ class Command:
 		if self.cmd == "reorg": return 21
 		if self.cmd == "dump": return 22
 		if self.cmd == "freebeer": return 99
+
+
+	def getMethodName(self):
+
+		if self.reorgMethod == 1: return "debug"
+		if self.reorgMethod == 2: return "additive"
+		if self.reorgMethod == 3: return "xor"
+		if self.reorgMethod == 4: return "rotating"
+		if self.reorgMethod == 5: return "Bernstein"
+		if self.reorgMethod == 6: return "modified bernstein"
+		if self.reorgMethod == 7: return "shift-add-xor"
+		if self.reorgMethod == 8: return "Fowler-Noll-Vo"
+		if self.reorgMethod == 9: return "one-at-a-time"
+		if self.reorgMethod == 10: return "elf"
+
