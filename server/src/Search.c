@@ -21,10 +21,11 @@
 
 		self->patternData = NULL;
 		self->patternLength = -1;
-		self->maxResults = -1;
 		self->mode = -1;
 		self->keyMatch = 0;
 		self->valueMatch = 0;
+		self->limitStart = 0;
+		self->limitItems = -1;
 		self->numberOfResults = 0;
 		self->results = NULL;
 
@@ -92,10 +93,24 @@
 	} // isSearchMode()
 
 
-	void Search_setMaxResults(Search* self,int max) {
-		if (max == -1) max = SEARCH_MAXRESULTS_DEFAULT;
-		self->maxResults = max;
-	} // setSearchMax()
+	void Search_setLimitStart(Search* self,int limitStart) {
+		self->limitStart = limitStart;
+	} // setLimitStart()
+
+
+	int Search_getLimitStart(Search* self) {
+		return self->limitStart;
+	}	// getLimitStart()
+
+
+	void Search_setLimitItems(Search* self,int limitItems) {
+		self->limitItems = limitItems;
+	} // setLimitItems()
+
+
+	int Search_getLimitItems(Search* self) {
+		return self->limitItems;
+	} // getLimitItems()
 
 
 	void Search_resetResults(Search* self) {

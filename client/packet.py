@@ -42,7 +42,6 @@ class Packet:
 
 
 	def addIntBlock(self,type,value):
-
 		block = Block()
 		block.setType(bytearray(type,"UTF-8"))
 		block.setInt(value)

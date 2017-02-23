@@ -47,6 +47,11 @@
 
 
 	void Command_reportStatus(Command* self,int st,int id,const char* message) {
+		Command_reportStatusExtra(self,st,id,message,"");
+	} // reportStatus()
+
+
+	void Command_reportStatusExtra(Command* self,int st,int id,const char* message,const char* extra) {
 
 		int logLevel;
 		if (st < Command_ST_ERROR_LEVEL) {
@@ -55,14 +60,16 @@
 			logLevel = Logger_ERROR | Logger_DISPLAY;
 		}
 
+
 		char extendedMessage[200];
 		snprintf(
 			extendedMessage
 			,200
-			,"Command \"%s\" result: %d - %s"
+			,"Command \"%s\" result: %d - %s: %s"
 			,Command_getName(self,self->token)
 			,st
 			,message
+			,extra
 		);
 		Packet_log(self->packet,logLevel,id,extendedMessage);
 
@@ -71,7 +78,7 @@
 		Packet_appendStr(self->packet,message);
 		Packet_endChunk(self->packet);
 
-	} // reportStatus()
+	} // reportStatusExtra()
 
 
 	void Command_setCommand(Command* self,int token) {
@@ -115,17 +122,20 @@
 	} // getName()
 
 
-	int Command_findParamChunk(Command* self,char* id) {
+	int Command_findParamChunk(Command* self,char* id,int mandatory) {
 
 		int chunkIndex = Packet_findChunk(self->packet,id);
+		if (!mandatory) return chunkIndex;
+
 		if (chunkIndex == -1) {
 
 			Command_beginReply(self);
 
-			Command_reportStatus(
+			Command_reportStatusExtra(
 				self
 				,Command_ST_MISSING_PARAM
 				,2203,"Missing parameter"
+				,id
 			);
 
 			Command_endReply(self);
@@ -137,9 +147,9 @@
 	} // findParamChunk()
 
 
-	int Command_loadStrChunk(Command* self,char* id) {
+	int Command_loadStrChunk(Command* self,char* id,int mandatory) {
 
-		int chunkIndex = Command_findParamChunk(self,id);
+		int chunkIndex = Command_findParamChunk(self,id,mandatory);
 		if (chunkIndex == -1) return -1;
 
 		unsigned char* buffer = Packet_getBuffer(self->packet);
@@ -150,9 +160,9 @@
 	} // loadStrCunk()
 
 
-	int Command_loadIntChunk(Command* self,char* id) {
+	int Command_loadIntChunk(Command* self,char* id,int mandatory) {
 
-		int chunkIndex = Command_findParamChunk(self,id);
+		int chunkIndex = Command_findParamChunk(self,id,mandatory);
 		if (chunkIndex == -1) return -1;
 
 		unsigned char* buffer = Packet_getBuffer(self->packet);
@@ -236,11 +246,11 @@
 
 	void Command_processSet(Command* self) {
 
-		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY",1) == -1 ) return;
 		char* keyData = self->data;
 		int keyLength = self->length;
 
-		if ( Command_loadStrChunk(self,"QVAL") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QVAL",1) == -1 ) return;
 		char* valueData = self->data;
 		int valueLength = self->length;
 
@@ -277,7 +287,7 @@
 
 	void Command_processGet(Command* self) {
 
-		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY",1) == -1 ) return;
 
 		Command_beginReply(self);
 
@@ -318,7 +328,7 @@
 	
 	void Command_processDel(Command* self) {
 
-		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY",1) == -1 ) return;
 		char* keyData = self->data;
 		int keyLength = self->length;
 
@@ -468,10 +478,16 @@
 	int Command_prepareSearch(Command* self,Search* search) {
 
 		if (Search_isSearchMode(search)) {
-			Search_setMaxResults(search, Command_loadIntChunk(self,"SMAX") );
-		}
 
-		if ( Command_loadStrChunk(self,"SPAT") == -1 ) {
+			int limitStart = Command_loadIntChunk(self,"LIMS",0);
+			if (limitStart == -1) limitStart = 0;
+			Search_setLimitStart(search,limitStart);
+
+			Search_setLimitItems(search, Command_loadIntChunk(self,"LIMI",0) );
+
+		} // if search mode
+
+		if ( Command_loadStrChunk(self,"SPAT",0) == -1 ) {
 
 			Command_beginReply(self);			
 			Command_reportStatus(

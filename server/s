@@ -5,16 +5,23 @@ rm -f /tmp/hashr.log
 
 bin/`uname -s`-`uname -p`/hashr-server -f /tmp/hashr.pid -l /tmp/hashr.log &
 
-../client/client.py -c set pix mix
-../client/client.py -c set pici mixi
-../client/client.py -c set pixi mici
-../client/client.py -c set loyfas moyfas
+../client/client.py -c set axy 1egy
+../client/client.py -c set bxw 2ket
+../client/client.py -c set cxy 3
+../client/client.py -c set dxw 4
+../client/client.py -c set exy 5
+../client/client.py -c set fxy 6
+../client/client.py -c set fxy 7
+../client/client.py -c set fxw 8
+../client/client.py -c set fxy 9
+../client/client.py -c set fxy 10
+../client/client.py -c set fxw 11
 
 ../client/client.py
 
 ../client/client.py -c info
-../client/client.py -c search x
+../client/client.py -c search x 0 5
 
 sleep .2
 kill `cat /tmp/hashr.pid`
-#tail /tmp/hashr.log
+tail /tmp/hashr.log

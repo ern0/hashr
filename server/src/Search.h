@@ -20,10 +20,11 @@
 		// request
 		char* patternData;
 		int patternLength;
-		int maxResults;
 		char mode;
 		int keyMatch;
 		int valueMatch;
+		int limitStart;
+		int limitItems;
 		
 		// response
 		int numberOfResults;
@@ -44,8 +45,11 @@
 	int Search_isSearchMode(Search* self);
 	int Search_isKeyMatchMode(Search* self);
 	int Search_isValueMatchMode(Search* self);
-	void Search_setMaxResults(Search* self,int max);
 	int Search_getNumberOfResults(Search* self);
+	void Search_setLimitStart(Search* self,int limitStart);
+	int Search_getLimitStart(Search* self);
+	void Search_setLimitItems(Search* self,int limitItems);
+	int Search_getLimitItems(Search* self);
 	void Search_resetResults(Search* self);
 	void Search_incNumberOfResults(Search* self);
 	void Search_addResult(Search* self,HashItem* item,int remaining);

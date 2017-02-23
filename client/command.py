@@ -12,7 +12,8 @@ class Command:
 		self.requestValue = None
 		
 		self.searchPattern = None
-		self.searchMaxResults = None
+		self.searchLimitStart = None
+		self.searchLimitItems = None
 
 		self.reorgMethod = None
 		self.reorgCapacity = None
@@ -43,9 +44,11 @@ class Command:
 		self.searchPattern = pattern
 		return self
 
-	def setSearchMaxResults(self,maxres):
-		self.searchMaxResults = maxres
-		return self
+	def setSearchLimit(self,start,items):
+		if start < 0: start = 0
+		if items < 0: items = -1
+		self.searchLimitStart = start
+		self.searchLimitItems = items
 
 
 	def setReorgMethod(self,method):
@@ -77,8 +80,11 @@ class Command:
 		if self.searchPattern is not None:
 			packet.addTextBlock("SPAT",self.searchPattern)
 
-		if self.searchMaxResults is not None:
-			packet.addIntBlock("SMAX",self.searchMaxResults)
+		if self.searchLimitStart is not None:
+			packet.addIntBlock("LIMS",self.searchLimitStart)
+
+		if self.searchLimitItems is not None:
+			packet.addIntBlock("LIMI",self.searchLimitItems)
 
 		if self.reorgMethod is not None:
 			packet.addTextBlock("RMET",self.reorgMethod)
