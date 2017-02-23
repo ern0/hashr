@@ -121,9 +121,11 @@
 		if ((self->match & SEARCH_MATCH_KEY) != 0) {
 			found = HashItem_searchKey(item,self->patternData,self->patternLength);
 		}
-		if ( (!found) && ((self->match & SEARCH_MATCH_VALUE) != 0) ) {
-			found = HashItem_searchValue(item,self->patternData,self->patternLength);	
-		}
+		if (!found) {
+			if ((self->match & SEARCH_MATCH_VALUE) != 0) {
+				found = HashItem_searchValue(item,self->patternData,self->patternLength);				
+			}
+		} // if not found
 
 		self->numberOfChecked++;
 		if (!found) return 0;
@@ -149,7 +151,7 @@
 		if (self->numberOfResults == 0) {
 
 			int remaining = self->numberOfElms - self->numberOfChecked;
-			if ((self->limitItems != -1) && (self->limitItems < remaining)) {
+			if ((self->limitItems > 0) && (self->limitItems < remaining)) {
 				remaining = self->limitItems;
 			}
 			self->results = (HashItem**)malloc(sizeof(HashItem*) * remaining);

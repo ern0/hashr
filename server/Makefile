@@ -1,7 +1,7 @@
 #### Makefile for hashr ################################
 
 PLATFORM=$(shell uname -s)-$(shell uname -p)
-CC=gcc -std=c11
+CC=gcc -std=c11 -O3
 TC=g++
 SRC=src
 TST=test

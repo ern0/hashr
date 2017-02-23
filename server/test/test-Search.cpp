@@ -156,15 +156,18 @@ TEST_CASE("Search") {
 
 			item = Search_getResult(search,0);
 			REQUIRE(item != NULL);
-			REQUIRE( HashItem_matchValue(item,ARR("September")) );
+			result = HashItem_matchValue(item,ARR("September"));
+			REQUIRE(result);
 
 			item = Search_getResult(search,1);
 			REQUIRE(item != NULL);
-			REQUIRE( HashItem_matchValue(item,ARR("November")) );
+			result = HashItem_matchValue(item,ARR("November"));
+			REQUIRE(result);
 
 			item = Search_getResult(search,2);
 			REQUIRE(item != NULL);
-			REQUIRE( HashItem_matchValue(item,ARR("December")) );
+			result = HashItem_matchValue(item,ARR("December"));
+			REQUIRE(result);
 
 		}
 
