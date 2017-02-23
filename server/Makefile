@@ -197,6 +197,21 @@ ${BIN}/test-HashTable: \
 		${OBJ}/Search.o \		
 		-o ${BIN}/test-HashTable
 
+${BIN}/test-Search: \
+		Makefile ${OBJ} ${BIN} \
+		${TST}/test-Search.cpp \
+		${OBJ}/Search.o \
+		${OBJ}/Utils.o
+	${TC} \
+		${TST}/test-Search.cpp \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
+		${OBJ}/HashTable.o \
+		${OBJ}/HashItem.o \
+		${OBJ}/Hasher.o \
+		${OBJ}/Search.o \
+		-o ${BIN}/test-Search
+
 ########################################################
 
 ${BIN}:

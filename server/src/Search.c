@@ -27,13 +27,19 @@
 		self->limitStart = 0;
 		self->limitItems = -1;
 		self->numberOfResults = 0;
+		self->numberOfMatching = 0;
 		self->results = NULL;
 
 	} // ctor
 
 
 	void Search_dtor(Search* self) {
-		if (self->results != NULL) free(self->results);
+
+		if (self->results == NULL) return;
+
+		free(self->results);
+		self->results = NULL;
+
 	} // dtor
 
 
@@ -41,16 +47,6 @@
 		self->patternData = patternData;
 		self->patternLength = patternLength;
 	} // setPattern()
-
-
-	char* Search_getPatternData(Search* self) {
-		return self->patternData;
-	} // getPatternData()
-
-
-	int Search_getPatternLength(Search* self) {
-		return self->patternLength;
-	} // getPatternLength()
 
 
 	void Search_setCountMode(Search* self,int keyMatch,int valueMatch) {
@@ -73,16 +69,6 @@
 	} // setSearchMode()
 
 
-	int Search_isKeyMatchMode(Search* self) {
-		return self->keyMatch;
-	} // isKeyMatchMode()
-
-
-	int Search_isValueMatchMode(Search* self) {
-		return self->valueMatch;
-	} // isValueMatchhMode()
-
-
 	int Search_isCountMode(Search* self) {
 		return ( self->mode == SEARCH_MODE_COUNT );
 	} // isCountMode()
@@ -98,25 +84,9 @@
 	} // setLimitStart()
 
 
-	int Search_getLimitStart(Search* self) {
-		return self->limitStart;
-	}	// getLimitStart()
-
-
 	void Search_setLimitItems(Search* self,int limitItems) {
 		self->limitItems = limitItems;
 	} // setLimitItems()
-
-
-	int Search_getLimitItems(Search* self) {
-		return self->limitItems;
-	} // getLimitItems()
-
-
-	void Search_resetResults(Search* self) {
-		self->numberOfResults = 0;
-		self->results = NULL;
-	} // resetNumberOfResults()	
 
 
 	int Search_getNumberOfResults(Search* self) {
@@ -124,23 +94,74 @@
 	} // getNumberOfResults()	
 
 
-	void Search_incNumberOfResults(Search* self) {
-		self->numberOfResults++;
-	} // incNumberOfResults()
-
-
-	void Search_addResult(Search* self,HashItem* item,int remaining) {
-
-		if (self->numberOfResults == 0) {
-			self->results = (HashItem**)malloc(sizeof(HashItem*) * remaining);
-		}
-
-		self->results[self->numberOfResults++] = item;
-
-	} // addResult()
-
-
 	HashItem* Search_getResult(Search* self,int index) {
 		if (self->results == NULL) return NULL;
 		return self->results[index];
 	} // getResult()
+
+
+	void Search_resetResults(Search* self,int numberOfElms) {
+
+		self->numberOfElms = numberOfElms;
+
+		self->numberOfChecked = 0;
+		self->numberOfMatching = 0;
+		self->numberOfResults = 0;
+		self->results = NULL;
+
+	} // resetNumberOfResults()	
+
+
+	int Search_process(Search* self,HashItem* item) {
+
+		// checkpoint: process item
+
+		int found = 0;
+		if (self->keyMatch) {
+			found = HashItem_searchKey(item,self->patternData,self->patternLength);
+		}
+		if ( (!found) && (self->valueMatch)) {
+			found = HashItem_searchValue(item,self->patternData,self->patternLength);	
+		}
+
+		self->numberOfChecked++;
+		if (!found) return 0;
+
+		// checkpoint: found
+
+		if (self->mode == SEARCH_MODE_COUNT) {
+			self->numberOfResults++;
+			return 0;
+		}
+
+		// checkpoint: search mode
+
+		self->numberOfMatching++;
+		if (self->numberOfMatching <= self->limitStart) return 0;
+
+		// checkpoint: store
+
+		if (self->numberOfResults == 0) {
+
+			int remaining = self->numberOfElms - self->numberOfChecked;
+			if ((self->limitItems != -1) && (self->limitItems < remaining)) {
+				remaining = self->limitItems;
+			}
+			self->results = (HashItem**)malloc(sizeof(HashItem*) * remaining);
+		} // if first item to store (lazy allocation)
+
+		// checkpoint: memory allocated for results
+
+		self->results[self->numberOfResults] = item;
+		self->numberOfResults++;
+
+		// checkpoint: item stored
+
+		if (self->limitItems > 0) {
+			if (self->numberOfResults >= self->limitItems) return 1;
+		}
+
+		// checkpoint: ready to process next item
+
+		return 0;
+	} // process()

@@ -166,7 +166,7 @@
 		if (chunkIndex == -1) return -1;
 
 		unsigned char* buffer = Packet_getBuffer(self->packet);
-		int result = Utils_getBufInt(&buffer[chunkIndex - 4]);
+		int result = Utils_getBufInt(&buffer[chunkIndex]);
 
 		return result;
 	} // loadIntChunk()

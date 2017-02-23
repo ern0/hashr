@@ -1,10 +1,11 @@
 clear
 PLATFORM=`uname -s`-`uname -p`
 
-make -j4 bin/$PLATFORM/test-HashTable
+make -j4 bin/$PLATFORM/test-Search
 #make -j4
 
 #bin/$PLATFORM/test-Utils
 #bin/$PLATFORM/test-Packet_scan
 #bin/$PLATFORM/test-Packet_build
-bin/$PLATFORM/test-HashTable
+#bin/$PLATFORM/test-HashTable
+bin/$PLATFORM/test-Search

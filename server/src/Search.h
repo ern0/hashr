@@ -25,8 +25,13 @@
 		int valueMatch;
 		int limitStart;
 		int limitItems;
-		
+
+		// aux
+		int numberOfElms;
+
 		// response
+		int numberOfChecked;
+		int numberOfMatching;
 		int numberOfResults;
 		HashItem** results;
 
@@ -37,22 +42,15 @@
 	Search* new_Search();
 	void delete_Search(Search* self);
 	void Search_setPattern(Search* self,char* patternData,int patternLength);
-	char* Search_getPatternData(Search* self);
-	int Search_getPatternLength(Search* self);
 	void Search_setCountMode(Search* self,int keyMatch,int valueMatch);
 	void Search_setSearchMode(Search* self,int keyMatch,int valueMatch);
 	int Search_isCountMode(Search* self);
 	int Search_isSearchMode(Search* self);
-	int Search_isKeyMatchMode(Search* self);
-	int Search_isValueMatchMode(Search* self);
-	int Search_getNumberOfResults(Search* self);
 	void Search_setLimitStart(Search* self,int limitStart);
-	int Search_getLimitStart(Search* self);
 	void Search_setLimitItems(Search* self,int limitItems);
-	int Search_getLimitItems(Search* self);
-	void Search_resetResults(Search* self);
-	void Search_incNumberOfResults(Search* self);
-	void Search_addResult(Search* self,HashItem* item,int remaining);
+	void Search_resetResults(Search* self,int numberOfElms);
+	int Search_process(Search* self,HashItem* item);
+	int Search_getNumberOfResults(Search* self);
 	HashItem* Search_getResult(Search* self,int index);
 
 	// protected

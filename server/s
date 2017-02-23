@@ -17,11 +17,13 @@ bin/`uname -s`-`uname -p`/hashr-server -f /tmp/hashr.pid -l /tmp/hashr.log &
 ../client/client.py -c set fxy 10
 ../client/client.py -c set fxw 11
 
-../client/client.py
+echo ------------------------------
+../client/client.py -c dump
+../client/client.py -c search x 1 2
+echo ------------------------------
 
-../client/client.py -c info
-../client/client.py -c search x 0 5
+../client/client.py
 
 sleep .2
 kill `cat /tmp/hashr.pid`
-tail /tmp/hashr.log
+#tail /tmp/hashr.log

@@ -261,42 +261,19 @@
 
 	int HashTable_search(HashTable* self,Search* search) {
 
-		Search_resetResults(search);
 		if (self->numberOfElms == 0) return HashTable_SEARCH_NOT_FOUND;
 
-		char* data = Search_getPatternData(search);
-		int length = Search_getPatternLength(search);
-
-		int keyMode = Search_isKeyMatchMode(search);
-		int valueMode = Search_isValueMatchMode(search);
-		int searchMode = Search_isSearchMode(search);
-
-		int remaining = self->numberOfElms;
+		Search_resetResults(search,self->numberOfElms);
 		for (int i = 0; i < self->capacity; i++) {
 
 			HashItem* item = self->items[i];
-
 			while (item != NULL) {
-
-				int hit = 0;
-				if (keyMode) hit = HashItem_searchKey(item,data,length);
-				if ( (!hit) && valueMode) hit = HashItem_searchValue(item,data,length);
-				if (hit) {
-
-					if (searchMode) {
-						Search_addResult(search,item,remaining);
-					} else {
-						Search_incNumberOfResults(search);
-					} // if register
-
-				} // if hit
-
+				if ( Search_process(search,item) ) goto finished; // break 2
 				item = HashItem_getNext(item);
-				--remaining;
-
 			} // loop()
-		} // foreach slot
 
+		} finished: // foreach slot
+		
 		if (Search_getNumberOfResults(search) == 0) return HashTable_SEARCH_NOT_FOUND;
 		return HashTable_SEARCH_PROVIDED;
 	} // search()

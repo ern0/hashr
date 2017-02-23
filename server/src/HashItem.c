@@ -64,8 +64,10 @@
 			printf("%c",self->valueData[i]);
 		}
 
+		printf(" ");
+
+return;
 		if (self->next != NULL) {
-			printf(" ");
 			HashItem_dump(self->next);
 		}
 
