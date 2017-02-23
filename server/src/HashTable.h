@@ -12,7 +12,7 @@
 #include "Logger.h"
 #include "HashItem.h"
 #include "Hasher.h"
-#include "SearchOptions.h"
+#include "Search.h"
 
 #define HashTable_CAPACITY_DEFAULT 8
 #define HashTable_CAPACITY_MAX 0x10000
@@ -63,7 +63,7 @@
 	int HashTable_performGet(HashTable* self,RET char** valdata,RET int* vallen,char* keydata,int keylen);
 	int HashTable_performDel(HashTable* self,char* keydata,int keylen);
 	int HashTable_performZap(HashTable* self);
-	int HashTable_search(HashTable* self,SearchOptions* opts);
+	int HashTable_search(HashTable* self,Search* search);
 
 
 #endif

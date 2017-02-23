@@ -40,12 +40,12 @@ Available commands:
   zap - delete all items
   results - show max. number of search item results
   results <n> - set max. number of search item results
-  kcount <pattern> - search in keys and show match count 
-  vcount <pattern> - search in values and show match count
-  count <pattern> - search pattern in keys and values and show match count
-  ksearch <pattern> - search in keys and provide result
-  vsearch <pattern> - search in values and provide result
-  search <pattern> - search pattern in keys and values and provide result
+  kcount, kc <pattern> - search in keys and show match count 
+  vcount, vc <pattern> - search in values and show match count
+  count, c <pattern> - search pattern in keys and values and show match count
+  ksearch, ks <pattern> - search in keys and provide result
+  vsearch, vs <pattern> - search in values and provide result
+  search, s <pattern> - search pattern in keys and values and provide result
   reorg <method> <capacity> - reorganize storage
     capacity will be rounded up to power of 2
 Debug commands:

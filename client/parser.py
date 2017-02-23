@@ -38,16 +38,12 @@ class Parser:
 			chunkData = self.data[ptr:ptr + chunkLength]
 			ptr += chunkLength
 
-			if chunkType == b"RKEY":
-				if kfound: 
-					multi = True
-					break
+			if chunkType == b"AKEY":
+				if kfound: multi = True
 				kfound = True
 			
-			if chunkType == b"VKEY":
-				if vfound: 
-					multi = True
-					break
+			if chunkType == b"AVAL":
+				if vfound: multi = True
 				vfound = True
 
 		ptr = 4
@@ -73,15 +69,18 @@ class Parser:
 			isInt = True
 			desc = chunkType.decode("utf-8")			
 
-			if chunkType == b"RKEY":
+			if chunkType == b"AKEY":
+				isInt = False
 				desc = "key"
 				if multi: 
 					desc += "[" + str(keyc) + "]"
 					keyc += 1
-			if chunkType == b"RVAL": 
+			if chunkType == b"AVAL": 
+				isInt = False
 				desc = "value"
 				if multi:
 					desc += "[" + str(valc) + "]"
+					valc += 1
 
 			if len(chunkData) < 4: isInt = False
 
@@ -90,7 +89,6 @@ class Parser:
 			if chunkType == b"METD": desc = "hash method"
 			if chunkType == b"CPTY": desc = "capacity"
 			if chunkType == b"NELM": desc = "elements"
-			if chunkType == b"AVAL": desc = "value"
 			if chunkType == b"ZAPD": desc = "zapped"
 			if chunkType == b"SRES": desc = "match count"
 

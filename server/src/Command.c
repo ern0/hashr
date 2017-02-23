@@ -2,7 +2,7 @@
 #include "Packet.h"
 #include "Logger.h"
 #include "Server.h"
-
+#include "HashItem.h"
 
 	Command* new_Command() {
 
@@ -383,92 +383,92 @@
 
 	void Command_processKcount(Command* self) {
 		
-		SearchOptions* opts = new_SearchOptions();
-		if (opts == NULL) return;
+		Search* search = new_Search();
+		if (search == NULL) return;
 
-		SearchOptions_setCountMode(opts,1,0);
-		int seo = Command_prepareSearchOptions(self,opts);
-		if (seo != -1) Command_universalSearch(self,opts);
+		Search_setCountMode(search,1,0);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
 
-		delete_SearchOptions(opts);
+		delete_Search(search);
 
 	} // processKcount()
 
 
 	void Command_processVcount(Command* self) {
 		
-		SearchOptions* opts = new_SearchOptions();
-		if (opts == NULL) return;
+		Search* search = new_Search();
+		if (search == NULL) return;
 
-		SearchOptions_setCountMode(opts,0,1);
-		int seo = Command_prepareSearchOptions(self,opts);
-		if (seo != -1) Command_universalSearch(self,opts);
+		Search_setCountMode(search,0,1);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
 
-		delete_SearchOptions(opts);
+		delete_Search(search);
 
 	} // processVcount()
 
 
 	void Command_processCount(Command* self) {
 
-		SearchOptions* opts = new_SearchOptions();
-		if (opts == NULL) return;
+		Search* search = new_Search();
+		if (search == NULL) return;
 
-		SearchOptions_setCountMode(opts,1,1);
-		int seo = Command_prepareSearchOptions(self,opts);
-		if (seo != -1) Command_universalSearch(self,opts);
+		Search_setCountMode(search,1,1);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
 
-		delete_SearchOptions(opts);
+		delete_Search(search);
 
 	} // processCount()
 
 
 	void Command_processKsearch(Command* self) {
 		
-		SearchOptions* opts = new_SearchOptions();
-		if (opts == NULL) return;
+		Search* search = new_Search();
+		if (search == NULL) return;
 
-		SearchOptions_setSearchMode(opts,1,0);
-		int seo = Command_prepareSearchOptions(self,opts);
-		if (seo != -1) Command_universalSearch(self,opts);
+		Search_setSearchMode(search,1,0);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
 
-		delete_SearchOptions(opts);
+		delete_Search(search);
 
 	} // processKsearch()
 
 
 	void Command_processVsearch(Command* self) {
 		
-		SearchOptions* opts = new_SearchOptions();
-		if (opts == NULL) return;
+		Search* search = new_Search();
+		if (search == NULL) return;
 
-		SearchOptions_setSearchMode(opts,0,1);
-		int seo = Command_prepareSearchOptions(self,opts);
-		if (seo != -1) Command_universalSearch(self,opts);
+		Search_setSearchMode(search,0,1);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
 
-		delete_SearchOptions(opts);
+		delete_Search(search);
 
 	} // processVsearch()
 
 
 	void Command_processSearch(Command* self) {
 		
-		SearchOptions* opts = new_SearchOptions();
-		if (opts == NULL) return;
+		Search* search = new_Search();
+		if (search == NULL) return;
 
-		SearchOptions_setSearchMode(opts,1,1);
-		int seo = Command_prepareSearchOptions(self,opts);
-		if (seo != -1) Command_universalSearch(self,opts);
+		Search_setSearchMode(search,1,1);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
 
-		delete_SearchOptions(opts);
+		delete_Search(search);
 
 	} // processSearch()
 
 
-	int Command_prepareSearchOptions(Command* self,SearchOptions* opts) {
+	int Command_prepareSearch(Command* self,Search* search) {
 
-		if (SearchOptions_isSearchMode(opts)) {
-			SearchOptions_setMaxResults(opts, Command_loadIntChunk(self,"SMAX") );
+		if (Search_isSearchMode(search)) {
+			Search_setMaxResults(search, Command_loadIntChunk(self,"SMAX") );
 		}
 
 		if ( Command_loadStrChunk(self,"SPAT") == -1 ) {
@@ -484,17 +484,17 @@
 			return -1;
 		} // if missing pattern
 
-		SearchOptions_setPattern(opts,self->data,self->length);
+		Search_setPattern(search,self->data,self->length);
 
 		return 0;
-	} // prepareSearchOptions()
+	} // prepareSearch()
 
 
-	void Command_universalSearch(Command* self,SearchOptions* opts) {
+	void Command_universalSearch(Command* self,Search* search) {
 
 		Command_beginReply(self);
 
-		int result = HashTable_search(self->hashTable,opts);
+		int result = HashTable_search(self->hashTable,search);
 
 		if (result == HashTable_SEARCH_NOT_FOUND) {
 			Command_reportStatus(
@@ -512,15 +512,27 @@
 			);
 		} // if any hits
 
-		Packet_appendIntChunk(self->packet,"SRES",opts->numberOfResults);
+		Packet_appendIntChunk(self->packet,"SRES",search->numberOfResults);
 
 		int provideResult = 1;
-		if (SearchOptions_isCountMode(opts)) provideResult = 0;
-		if (SearchOptions_getNumberOfResults(opts) == 0) provideResult = 0;
+		if (Search_isCountMode(search)) provideResult = 0;
+		if (Search_getNumberOfResults(search) == 0) provideResult = 0;
 		if (provideResult) {
 
-			// TODO: render result
-			Packet_appendIntChunk(self->packet,"SRES",9999);
+			int num = Search_getNumberOfResults(search);
+			for (int i = 0; i < num; i++) {
+
+				HashItem* item = Search_getResult(search,i);
+
+				char* data = HashItem_getKeyData(item);
+				int length = HashItem_getKeyLength(item);
+				Packet_appendChunk(self->packet,"AKEY",data,length);
+
+				data = HashItem_getValueData(item);
+				length = HashItem_getValueLength(item);
+				Packet_appendChunk(self->packet,"AVAL",data,length);
+
+			} // foreach results
 
 		} // if search
 

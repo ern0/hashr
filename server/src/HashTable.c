@@ -259,20 +259,23 @@
 	} // performZap()
 
 
-	int HashTable_search(HashTable* self,SearchOptions* opts) {
+	int HashTable_search(HashTable* self,Search* search) {
 
-		SearchOptions_resetNumberOfResults(opts);
+		Search_resetResults(search);
 		if (self->numberOfElms == 0) return HashTable_SEARCH_NOT_FOUND;
 
-		char* data = SearchOptions_getPatternData(opts);
-		int length = SearchOptions_getPatternLength(opts);
+		char* data = Search_getPatternData(search);
+		int length = Search_getPatternLength(search);
 
-		int keyMode = SearchOptions_isKeyMatchMode(opts);
-		int valueMode = SearchOptions_isValueMatchMode(opts);
-		int searchMode = SearchOptions_isSearchMode(opts);
+		int keyMode = Search_isKeyMatchMode(search);
+		int valueMode = Search_isValueMatchMode(search);
+		int searchMode = Search_isSearchMode(search);
 
+		int remaining = self->numberOfElms;
 		for (int i = 0; i < self->capacity; i++) {
+
 			HashItem* item = self->items[i];
+
 			while (item != NULL) {
 
 				int hit = 0;
@@ -281,17 +284,20 @@
 				if (hit) {
 
 					if (searchMode) {
-						// TODO: collect result
-					}
+						Search_addResult(search,item,remaining);
+					} else {
+						Search_incNumberOfResults(search);
+					} // if register
 
-					opts->numberOfResults++;					
 				} // if hit
 
 				item = HashItem_getNext(item);
+				--remaining;
+
 			} // loop()
 		} // foreach slot
 
-		if (SearchOptions_getNumberOfResults(opts) == 0) return HashTable_SEARCH_NOT_FOUND;
+		if (Search_getNumberOfResults(search) == 0) return HashTable_SEARCH_NOT_FOUND;
 		return HashTable_SEARCH_PROVIDED;
 	} // search()
 
