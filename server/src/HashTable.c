@@ -61,6 +61,24 @@
 	} // getMethod()
 
 
+	void HashTable_setMethod(HashTable* self,int method) {
+
+		if ((self->numberOfElms != 0) && (self->method != method)) {
+
+			Logger_log(
+				self->logger
+				,Logger_FATAL
+				,2809,"Internal error: setting hash method is not allowed"
+			);
+			exit(2);
+
+		} // if not empty
+
+		self->method = method;
+
+	} // setMethod()
+
+
 	int HashItem_setAndAdjustMethod(HashTable* self,int method) {
 
 		if (method < 1) return self->method;
@@ -82,9 +100,7 @@
 	} // getNumberOfElms()
 
 
-	int HashTable_getHash(HashTable* self,
-
-		char* data,int len) {
+	int HashTable_getHash(HashTable* self,char* data,int len) {
 
 		int hash = Hasher_hash(self->method,data,len);
 		hash &= self->hashMask;
@@ -134,7 +150,7 @@
 		HashItem** oldItemPtr = HashTable_findItem(self,hash,keydata,keylen);
 		if (oldItemPtr != NULL) {
 			HashItem_replaceValue(*oldItemPtr,valdata,vallen);
-			return 1;
+			return HashTable_SET_UPDATED;
 		}
 
 		HashItem* item = new_HashItem();
@@ -152,7 +168,7 @@
 
 		self->numberOfElms++;
 
-		return 2;
+		return HashTable_SET_INSERTED;
 	} // performSet()
 
 
@@ -161,12 +177,12 @@
 		int hash = HashTable_getHash(self,keydata,keylen);
 
 		HashItem** itemPtr = HashTable_findItem(self,hash,keydata,keylen);
-		if (itemPtr == NULL) return 2;
+		if (itemPtr == NULL) return HashTable_GET_NOT_FOUND;
 
 		*valdata = HashItem_getValueData(*itemPtr);
 		*vallen = HashItem_getValueLength(*itemPtr);
 
-		return 1;
+		return HashTable_GET_PROVIDED;
 	} // performGet()
 
 
@@ -175,7 +191,7 @@
 		int hash = HashTable_getHash(self,keydata,keylen);
 
 		HashItem** itemPtr = HashTable_findItem(self,hash,keydata,keylen);
-		if (itemPtr == NULL) return 2;
+		if (itemPtr == NULL) return HashTable_DEL_ALREADY;
 
 		HashItem* item = *itemPtr;
 		HashItem* saved = HashItem_getNext(item);
@@ -201,13 +217,13 @@
 		delete_HashItem(item);
 		--self->numberOfElms;
 
-		return 1;
+		return HashTable_DEL_DELETED;
 	} // performDel()
 
 
 	int HashTable_performZap(HashTable* self) {
 
-		if (self->numberOfElms == 0) return 1;
+		if (self->numberOfElms == 0) return HashTable_ZAP_EMPTY;
 
 		for (int i = 0; i < self->capacity; i++) {
 
@@ -239,5 +255,51 @@
 
 		} // foreach items
 
-		return 2;
+		return HashTable_ZAP_ZAPPED;
 	} // performZap()
+
+
+	int HashTable_search(HashTable* self,Search* search) {
+
+		Search_resetResults(search);
+		if (self->numberOfElms == 0) return HashTable_SEARCH_NOT_FOUND;
+
+		char* data = Search_getPatternData(search);
+		int length = Search_getPatternLength(search);
+
+		int keyMode = Search_isKeyMatchMode(search);
+		int valueMode = Search_isValueMatchMode(search);
+		int searchMode = Search_isSearchMode(search);
+
+		int remaining = self->numberOfElms;
+		for (int i = 0; i < self->capacity; i++) {
+
+			HashItem* item = self->items[i];
+
+			while (item != NULL) {
+
+				int hit = 0;
+				if (keyMode) hit = HashItem_searchKey(item,data,length);
+				if ( (!hit) && valueMode) hit = HashItem_searchValue(item,data,length);
+				if (hit) {
+
+					if (searchMode) {
+						Search_addResult(search,item,remaining);
+					} else {
+						Search_incNumberOfResults(search);
+					} // if register
+
+				} // if hit
+
+				item = HashItem_getNext(item);
+				--remaining;
+
+			} // loop()
+		} // foreach slot
+
+		if (Search_getNumberOfResults(search) == 0) return HashTable_SEARCH_NOT_FOUND;
+		return HashTable_SEARCH_PROVIDED;
+	} // search()
+
+
+	//int HashTable_searchItem(self,)

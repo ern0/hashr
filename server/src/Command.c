@@ -2,7 +2,7 @@
 #include "Packet.h"
 #include "Logger.h"
 #include "Server.h"
-
+#include "HashItem.h"
 
 	Command* new_Command() {
 
@@ -37,7 +37,7 @@
 
 	void Command_setPacket(Command* self,Packet* packet) {
 		self->packet = packet;
-		strcpy(self->cmd,"n.a.");
+		self->token = -1;
 	} // setPacket()
 
 
@@ -49,7 +49,7 @@
 	void Command_reportStatus(Command* self,int st,int id,const char* message) {
 
 		int logLevel;
-		if (st < 20) {
+		if (st < Command_ST_ERROR_LEVEL) {
 			logLevel = Logger_NOTICE | Logger_DISPLAY;
 		} else {
 			logLevel = Logger_ERROR | Logger_DISPLAY;
@@ -60,7 +60,7 @@
 			extendedMessage
 			,200
 			,"Command \"%s\" result: %d - %s"
-			,self->cmd
+			,Command_getName(self,self->token)
 			,st
 			,message
 		);
@@ -74,17 +74,48 @@
 	} // reportStatus()
 
 
-	void Command_setCommand(Command* self,char* cmd,int len) {
-
-		if (len > 19) len = 19;
-		strncpy(self->cmd,(char*)cmd,len);
-
-		self->cmd[len] = 0;
-
+	void Command_setCommand(Command* self,int token) {
+		self->token = token;
 	} // setCommand()
 
 
-	int Command_loadChunk(Command* self,char* id) {
+	char* Command_getName(Command* self,int token) {
+
+		switch (token) {
+			case TOKEN_INFO:
+				return (char*)"info"; 
+			case TOKEN_GET:
+				return (char*)"get";
+			case TOKEN_SET:
+				return (char*)"set";
+			case TOKEN_DEL:
+				return (char*)"del";
+			case TOKEN_ZAP:
+				return (char*)"zap"; 
+			case TOKEN_KSEARCH:
+				return (char*)"ksearch";
+			case TOKEN_KCOUNT:
+				return (char*)"kcount";
+			case TOKEN_VSEARCH:
+				return (char*)"vsearch";
+			case TOKEN_VCOUNT:
+				return (char*)"vcount";
+			case TOKEN_SEARCH:
+				return (char*)"search";
+			case TOKEN_COUNT:
+				return (char*)"count";
+			case TOKEN_REORG:
+				return (char*)"reorg";
+			case TOKEN_DUMP:
+				return (char*)"dump";
+		} // switch
+
+		sprintf(self->unknown,"unknown-%d",token);
+		return self->unknown;
+	} // getName()
+
+
+	int Command_findParamChunk(Command* self,char* id) {
 
 		int chunkIndex = Packet_findChunk(self->packet,id);
 		if (chunkIndex == -1) {
@@ -102,12 +133,33 @@
 			return -1;
 		} // if not found
 
+		return chunkIndex;
+	} // findParamChunk()
+
+
+	int Command_loadStrChunk(Command* self,char* id) {
+
+		int chunkIndex = Command_findParamChunk(self,id);
+		if (chunkIndex == -1) return -1;
+
 		unsigned char* buffer = Packet_getBuffer(self->packet);
 		self->data = (char*)&buffer[chunkIndex];
 		self->length = Utils_getBufInt(&buffer[chunkIndex - 4]);
 
 		return 0;
-	} // loadCunk()
+	} // loadStrCunk()
+
+
+	int Command_loadIntChunk(Command* self,char* id) {
+
+		int chunkIndex = Command_findParamChunk(self,id);
+		if (chunkIndex == -1) return -1;
+
+		unsigned char* buffer = Packet_getBuffer(self->packet);
+		int result = Utils_getBufInt(&buffer[chunkIndex - 4]);
+
+		return result;
+	} // loadIntChunk()
 
 
 	void Command_beginReply(Command* self) {
@@ -163,7 +215,7 @@
 
 		Command_beginReply(self);
 
-		Command_reportStatus(self,Command_ST_OK,2202,"Info provided");
+		Command_reportStatus(self,Command_ST_INFO_PROVIDED,2202,"Info provided");
 	
 		int noOfConns = Server_getNumberOfConnections(self->server);
 		Packet_appendIntChunk(self->packet,"NCON",noOfConns);
@@ -184,11 +236,11 @@
 
 	void Command_processSet(Command* self) {
 
-		if ( Command_loadChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
 		char* keyData = self->data;
 		int keyLength = self->length;
 
-		if ( Command_loadChunk(self,"QVAL") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QVAL") == -1 ) return;
 		char* valueData = self->data;
 		int valueLength = self->length;
 
@@ -202,7 +254,7 @@
 
 		Command_beginReply(self);
 
-		if (result == 1) {
+		if (result == HashTable_SET_UPDATED) {
 			Command_reportStatus(
 				self
 				,Command_ST_UPDATED
@@ -225,7 +277,7 @@
 
 	void Command_processGet(Command* self) {
 
-		if ( Command_loadChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
 
 		Command_beginReply(self);
 
@@ -240,7 +292,7 @@
 			,keyData,keyLength
 		);
 
-		if (result == 1) {
+		if (result == HashTable_GET_PROVIDED) {
 			Command_reportStatus(
 				self
 				,Command_ST_FOUND
@@ -266,7 +318,7 @@
 	
 	void Command_processDel(Command* self) {
 
-		if ( Command_loadChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
 		char* keyData = self->data;
 		int keyLength = self->length;
 
@@ -279,7 +331,7 @@
 			,keyData,keyLength
 		);
 
-		if (result == 1) {
+		if (result == HashTable_DEL_DELETED) {
 			Command_reportStatus(
 				self
 				,Command_ST_DELETED
@@ -306,10 +358,10 @@
 
 		int zapped = HashTable_getNumberOfElms(self->hashTable);
 
-		if (HashTable_performZap(self->hashTable) == 1) {
+		if (HashTable_performZap(self->hashTable) == HashTable_ZAP_EMPTY) {
 			Command_reportStatus(
 				self
-				,Command_ST_DELETED
+				,Command_ST_EMPTY
 				,2216,"Already empty"
 			);
 		} // if already empty
@@ -317,7 +369,7 @@
 		else {
 			Command_reportStatus(
 				self
-				,Command_ST_NOT_EXISTS
+				,Command_ST_ZAPPED
 				,2217,"All items deleted"
 			);
 		} // else zapped
@@ -329,25 +381,164 @@
 	} // processZap()
 	
 
+	void Command_processKcount(Command* self) {
+		
+		Search* search = new_Search();
+		if (search == NULL) return;
+
+		Search_setCountMode(search,1,0);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
+
+		delete_Search(search);
+
+	} // processKcount()
+
+
+	void Command_processVcount(Command* self) {
+		
+		Search* search = new_Search();
+		if (search == NULL) return;
+
+		Search_setCountMode(search,0,1);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
+
+		delete_Search(search);
+
+	} // processVcount()
+
+
+	void Command_processCount(Command* self) {
+
+		Search* search = new_Search();
+		if (search == NULL) return;
+
+		Search_setCountMode(search,1,1);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
+
+		delete_Search(search);
+
+	} // processCount()
+
+
 	void Command_processKsearch(Command* self) {
-		Command_beginReply(self);
-		printf("todo: ksearch cmd \n");
-		Command_endReply(self);
-	}
+		
+		Search* search = new_Search();
+		if (search == NULL) return;
+
+		Search_setSearchMode(search,1,0);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
+
+		delete_Search(search);
+
+	} // processKsearch()
 
 
 	void Command_processVsearch(Command* self) {
-		Command_beginReply(self);
-		printf("todo: vsearch cmd \n");
-		Command_endReply(self);
-	}
+		
+		Search* search = new_Search();
+		if (search == NULL) return;
+
+		Search_setSearchMode(search,0,1);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
+
+		delete_Search(search);
+
+	} // processVsearch()
 
 
 	void Command_processSearch(Command* self) {
+		
+		Search* search = new_Search();
+		if (search == NULL) return;
+
+		Search_setSearchMode(search,1,1);
+		int seo = Command_prepareSearch(self,search);
+		if (seo != -1) Command_universalSearch(self,search);
+
+		delete_Search(search);
+
+	} // processSearch()
+
+
+	int Command_prepareSearch(Command* self,Search* search) {
+
+		if (Search_isSearchMode(search)) {
+			Search_setMaxResults(search, Command_loadIntChunk(self,"SMAX") );
+		}
+
+		if ( Command_loadStrChunk(self,"SPAT") == -1 ) {
+
+			Command_beginReply(self);			
+			Command_reportStatus(
+				self
+				,Command_ST_MISSING_PARAM
+				,2218,"Missing search pattern"
+			);
+			Command_endReply(self);
+
+			return -1;
+		} // if missing pattern
+
+		Search_setPattern(search,self->data,self->length);
+
+		return 0;
+	} // prepareSearch()
+
+
+	void Command_universalSearch(Command* self,Search* search) {
+
 		Command_beginReply(self);
-		printf("todo: search cmd \n");
+
+		int result = HashTable_search(self->hashTable,search);
+
+		if (result == HashTable_SEARCH_NOT_FOUND) {
+			Command_reportStatus(
+				self
+				,Command_ST_NO_MATCH
+				,2218,"No match"
+			);
+		} // if empty
+
+		else {
+			Command_reportStatus(
+				self
+				,Command_ST_MATCH_FOUND
+				,2219,"Search result provided"
+			);
+		} // if any hits
+
+		Packet_appendIntChunk(self->packet,"SRES",search->numberOfResults);
+
+		int provideResult = 1;
+		if (Search_isCountMode(search)) provideResult = 0;
+		if (Search_getNumberOfResults(search) == 0) provideResult = 0;
+		if (provideResult) {
+
+			int num = Search_getNumberOfResults(search);
+			for (int i = 0; i < num; i++) {
+
+				HashItem* item = Search_getResult(search,i);
+
+				char* data = HashItem_getKeyData(item);
+				int length = HashItem_getKeyLength(item);
+				Packet_appendChunk(self->packet,"AKEY",data,length);
+
+				data = HashItem_getValueData(item);
+				length = HashItem_getValueLength(item);
+				Packet_appendChunk(self->packet,"AVAL",data,length);
+
+			} // foreach results
+
+		} // if search
+
 		Command_endReply(self);
-	}
+		
+	} // universalSearch()
 
 
 	void Command_processReorg(Command* self) {

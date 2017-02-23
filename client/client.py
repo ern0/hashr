@@ -40,9 +40,12 @@ Available commands:
   zap - delete all items
   results - show max. number of search item results
   results <n> - set max. number of search item results
-  ksearch <pattern> - search in keys 
-  vsearch <pattern> - search in values
-  search <pattern> - search pattern in keys and values
+  kcount, kc <pattern> - search in keys and show match count 
+  vcount, vc <pattern> - search in values and show match count
+  count, c <pattern> - search pattern in keys and values and show match count
+  ksearch, ks <pattern> - search in keys and provide result
+  vsearch, vs <pattern> - search in values and provide result
+  search, s <pattern> - search pattern in keys and values and provide result
   reorg <method> <capacity> - reorganize storage
     capacity will be rounded up to power of 2
 Debug commands:
@@ -156,15 +159,20 @@ Debug commands:
 			return None
 
 
-	def waitResponse(self,counter):
+	def waitResponse(self,requestCounter):
 
-		ready = select([self.sock],[],[],self.responseTimeout)
-		if ready[0]: result = self.sock.recv(9999)
-		else: result = None
+		while True:
+			ready = select([self.sock],[],[],self.responseTimeout)
+			if ready[0]: response = self.sock.recv(9999)
+			else: return None
 
-		# todo: check counter
+			self.parser = Parser(response)
+			self.parser.parse()
+			responseCounter = self.parser.getCounter()
 
-		return result
+			if requestCounter < responseCounter: return None
+			if requestCounter > responseCounter: continue
+			return response
 
 
 	def parseLine(self,line):
@@ -247,23 +255,23 @@ Debug commands:
 			elif cmd == "zap":
 				self.parmNumCheck(words,0)
 
-			elif cmd == "ksearch":
+			elif cmd == "ksearch" or cmd == "kcount":
 				self.parmNumCheck(words,1)
-				command.setSearchFilter("key")
 				command.setSearchPattern(words[1])
-				command.setSearchMaxResults(self.searchMaxResults)
+				if cmd == "ksearch": 
+					command.setSearchMaxResults(self.searchMaxResults)
 
-			elif cmd == "vsearch":
+			elif cmd == "vsearch" or cmd == "vcount":
 				self.parmNumCheck(words,1)
-				command.setSearchFilter("value")
 				command.setSearchPattern(words[1])
-				command.setSearchMaxResults(self.searchMaxResults)
+				if cmd == "vsearch": 
+					command.setSearchMaxResults(self.searchMaxResults)
 
-			elif cmd == "search":
+			elif cmd == "search" or cmd == "count":
 				self.parmNumCheck(words,1)
-				command.setSearchFilter("all")
 				command.setSearchPattern(words[1])
-				command.setSearchMaxResults(self.searchMaxResults)
+				if cmd == "search": 
+					command.setSearchMaxResults(self.searchMaxResults)
 
 			elif cmd == "reorg":
 				self.parmNumCheck(words,2)
@@ -314,8 +322,7 @@ Debug commands:
 		if len(self.singleShotWords) == 0: return False
 
 		response = self.processCliCommand(self.singleShotWords)
-		parser = Parser(response)
-		parser.render()
+		self.parser.render()
 
 		return True
 
@@ -345,8 +352,7 @@ Debug commands:
 
 			if response == None: continue
 
-			parser = Parser(response)
-			parser.render()
+			self.parser.render()
 
 
 	def main(self):

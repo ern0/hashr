@@ -3,15 +3,25 @@ class Parser:
 
 	def __init__(self,data):
 		self.data = data
+		self.counter = None
+
+
+	def getCounter(self):
+		return self.counter
 
 
 	def render(self):
+		self.parse(True)
+
+
+	def parse(self,render = False):
 		
 		if self.data[0:4] != b"HSHr":
-			print("invalid header: ",end="")
+			if render: print("invalid header: ",end="")
 			self.renderAuto(self.data[0:4])
 			return
 
+		self.counter = None
 		ptr = 4
 		multi = False
 		keyc = 0
@@ -28,16 +38,12 @@ class Parser:
 			chunkData = self.data[ptr:ptr + chunkLength]
 			ptr += chunkLength
 
-			if chunkType == b"RKEY":
-				if kfound: 
-					multi = True
-					break
+			if chunkType == b"AKEY":
+				if kfound: multi = True
 				kfound = True
 			
-			if chunkType == b"VKEY":
-				if vfound: 
-					multi = True
-					break
+			if chunkType == b"AVAL":
+				if vfound: multi = True
 				vfound = True
 
 		ptr = 4
@@ -54,20 +60,27 @@ class Parser:
 			chunkData = self.data[ptr:ptr + chunkLength]
 			ptr += chunkLength
 
-			if chunkType == b"cntr": continue
+			if chunkType == b"cntr": 
+				self.counter = self.getInt(chunkData)
+				continue
 
+			if not render: continue
+			
 			isInt = True
 			desc = chunkType.decode("utf-8")			
 
-			if chunkType == b"RKEY":
+			if chunkType == b"AKEY":
+				isInt = False
 				desc = "key"
 				if multi: 
 					desc += "[" + str(keyc) + "]"
 					keyc += 1
-			if chunkType == b"RVAL": 
+			if chunkType == b"AVAL": 
+				isInt = False
 				desc = "value"
 				if multi:
 					desc += "[" + str(valc) + "]"
+					valc += 1
 
 			if len(chunkData) < 4: isInt = False
 
@@ -76,8 +89,8 @@ class Parser:
 			if chunkType == b"METD": desc = "hash method"
 			if chunkType == b"CPTY": desc = "capacity"
 			if chunkType == b"NELM": desc = "elements"
-			if chunkType == b"AVAL": desc = "value"
 			if chunkType == b"ZAPD": desc = "zapped"
+			if chunkType == b"SRES": desc = "match count"
 
 			print("  " + desc + ": ",end="")
 			for i in range(0,15 - len(desc)): print(" ",end="")

@@ -21,11 +21,9 @@ TCP/IP actions:
 
 Protocol
 ========
-Protocol format should be binary or JSON. The server always
-reports a status code, other fields are command-specific or
+Protocol format is binary. The server always reports a 
+status code, other fields are command-specific or
 result-specific.
-
-TODO: decide bin/json
 
 
 set
@@ -70,13 +68,21 @@ response:
  - hash table capacity
  - actual item count
 
-search, ksearch, vsearch
-------------------------
+count, kcount, vcount
+---------------------
 request:
- - max. result items
  - pattern
 response:
  - status: provided 
+ - number of results
+ 
+search, ksearch, vsearch
+------------------------
+request:
+ - pattern
+response:
+ - status: provided 
+ - number of results
  - payload: array of values
 
 reorganize

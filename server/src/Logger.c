@@ -77,13 +77,20 @@
 
 		self->lastId = id;
 
-		if ((self->level & 0x0f) == Logger_MUTE) {
+		// if logger is muted, turn off display
+		if ((self->level & Logger_LEVEL_MASK) == Logger_MUTE) {
 			level &= (~Logger_DISPLAY);
 		}
+
+		// if current message is fatal, turn on display
+		if ((level & Logger_LEVEL_MASK) == Logger_FATAL) {
+			level |= (Logger_DISPLAY);
+		}
+
 		if (level & Logger_DISPLAY) {
 			fprintf(stderr,"\r%s \n",message);
 		}
-		if ((level &  0x0f) < self->level) return;
+		if ((level & Logger_LEVEL_MASK) < self->level) return;
 
 		FILE* file = fopen(self->filename,"a+");
 		if (file == NULL) return;

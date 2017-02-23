@@ -172,8 +172,7 @@
 			return -1;
 		} // if no command in packet
 
-		char* cmdBuffer = (char*)&self->buffer[cmdIndex];
-		int cmdLen = Utils_getBufInt(&self->buffer[cmdIndex - 4]);
+		int cmdToken = Utils_getBufInt(&self->buffer[cmdIndex]);
 
 		int counterIndex = Packet_findChunk(self,"cntr");
 		if (counterIndex != -1) {
@@ -183,34 +182,55 @@
 		}	
 
 		Command_setPacket(self->command,self);
-		Command_setCommand(self->command,cmdBuffer,cmdLen);
+		Command_setCommand(self->command,cmdToken);
 
-		if (0 == strncmp("beat",cmdBuffer,cmdLen)) {
-			Command_processHeartbeat(self->command);
-		} else if (0 == strncmp("get",cmdBuffer,cmdLen)) {
-			Command_processGet(self->command);
-		} else if (0 == strncmp("set",cmdBuffer,cmdLen)) {
-			Command_processSet(self->command);
-		} else if (0 == strncmp("del",cmdBuffer,cmdLen)) {
-			Command_processDel(self->command);
-		} else if (0 == strncmp("info",cmdBuffer,cmdLen)) {
-			Command_processInfo(self->command);
-		} else if (0 == strncmp("zap",cmdBuffer,cmdLen)) {
-			Command_processZap(self->command);
-		} else if (0 == strncmp("ksearch",cmdBuffer,cmdLen)) {
-			Command_processKsearch(self->command);
-		} else if (0 == strncmp("vsearch",cmdBuffer,cmdLen)) {
-			Command_processVsearch(self->command);
-		} else if (0 == strncmp("search",cmdBuffer,cmdLen)) {
-			Command_processSearch(self->command);
-		} else if (0 == strncmp("reorg",cmdBuffer,cmdLen)) {
-			Command_processReorg(self->command);
-		} else if (0 == strncmp("dump",cmdBuffer,cmdLen)) {
-			Command_processDump(self->command);
-		} else {
-			Command_processUnknown(self->command);
-		}
-	
+		switch (cmdToken) {
+			case TOKEN_BEAT:
+				Command_processHeartbeat(self->command);
+				break;
+			case TOKEN_GET:
+				Command_processGet(self->command);
+				break;
+			case TOKEN_SET:
+				Command_processSet(self->command);
+				break;
+			case TOKEN_DEL:
+				Command_processDel(self->command);
+				break;
+			case TOKEN_INFO:
+				Command_processInfo(self->command);
+				break;
+			case TOKEN_ZAP:
+				Command_processZap(self->command);
+				break;
+			case TOKEN_KCOUNT:
+				Command_processKcount(self->command);
+				break;
+			case TOKEN_VCOUNT:
+				Command_processVcount(self->command);
+				break;
+			case TOKEN_COUNT:
+				Command_processCount(self->command);
+				break;
+			case TOKEN_KSEARCH:
+				Command_processKsearch(self->command);
+				break;
+			case TOKEN_VSEARCH:
+ 				Command_processVsearch(self->command);
+ 				break;
+ 			case TOKEN_SEARCH:
+ 				Command_processSearch(self->command);
+ 				break;
+ 			case TOKEN_REORG:
+				Command_processReorg(self->command);
+				break;
+			case TOKEN_DUMP:
+				Command_processDump(self->command);
+				break;
+			default:
+				Command_processUnknown(self->command);
+		} // switch token
+
 		return 0;
 	} // process()
 
