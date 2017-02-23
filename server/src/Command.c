@@ -240,6 +240,9 @@
 		int noOfElms = HashTable_getNumberOfElms(self->hashTable);
 		Packet_appendIntChunk(self->packet,"NELM",noOfElms);
 
+		int collision = HashTable_getCollisionPercent(self->hashTable);
+		Packet_appendIntChunk(self->packet,"COLP",collision);
+
 		Command_endReply(self);
 
 	} // processInfo()

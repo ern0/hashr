@@ -89,6 +89,7 @@ class Parser:
 			if chunkType == b"METD": desc = "hash method"
 			if chunkType == b"CPTY": desc = "capacity"
 			if chunkType == b"NELM": desc = "elements"
+			if chunkType == b"COLP": desc = "collision%"
 			if chunkType == b"ZAPD": desc = "zapped"
 			if chunkType == b"SRES": desc = "match count"
 

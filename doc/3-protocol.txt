@@ -46,11 +46,13 @@ Request block types:
 
 Response block types:
   "INFO" - info response
+  "NCON" - no. of connections
+  "METD" - actual hash method
+  "CPTY" - hash table capacity (slots)
+  "NELM" - number of elements
+  "COLP" - collision percent
   "STAT" - status
   "AKEY" - response key
   "AVAL" - response value (payload)
   "ZAPD" - zap result number of items
   "SRES" - search result number of items (search: provided)
-
-Push block types:
-  "DOWN" - system down notification

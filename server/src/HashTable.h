@@ -56,6 +56,7 @@
 	int HashTable_setAndAdjustMethod(HashTable* self,int method);
 	int HashTable_getCapacity(HashTable* self);
 	int HashTable_getNumberOfElms(HashTable* self);
+	int HashTable_getCollisionPercent(HashTable* self);
 	void HashTable_outOfMemory(HashTable* self,int code);	
 	void HashTable_dump(HashTable* self);	
 

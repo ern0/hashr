@@ -66,11 +66,6 @@
 
 		printf(" ");
 
-return;
-		if (self->next != NULL) {
-			HashItem_dump(self->next);
-		}
-
 	} // dump()
 
 

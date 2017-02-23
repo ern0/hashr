@@ -100,6 +100,28 @@
 	} // getNumberOfElms()
 
 
+	int HashTable_getCollisionPercent(HashTable* self) {
+
+		if (self->numberOfElms == 0) return 0;
+
+		int collision = 0;
+
+		for (int i = 0; i < self->capacity; i++) {
+
+			HashItem* item = self->items[i];
+			while (item != NULL) {
+				if (HashItem_getNext(item) != NULL) collision++;
+				item = HashItem_getNext(item);
+			} // loop()
+
+		} 
+
+		int result = (collision * 100) / self->numberOfElms;
+
+		return result;
+	} // getCollisionPercent()
+
+
 	int HashTable_getHash(HashTable* self,char* data,int len) {
 
 		int hash = Hasher_hash(self->method,data,len);
@@ -116,7 +138,10 @@
 			if ( (self->capacity > 32) && (item == NULL)) continue;
 
 			printf("%04X: ",i);
-			if (item != NULL) HashItem_dump(item);
+			while (item != NULL) {
+				HashItem_dump(item);
+				item = HashItem_getNext(item);
+			}
 			printf("\n");
 		} // foreach items
 
