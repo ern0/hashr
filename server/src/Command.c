@@ -483,7 +483,9 @@
 			if (limitStart == -1) limitStart = 0;
 			Search_setLimitStart(search,limitStart);
 
-			Search_setLimitItems(search, Command_loadIntChunk(self,"LIMI",0) );
+			int limitItems = Command_loadIntChunk(self,"LIMI",0);
+			if (limitItems < 1) limitItems = -1;
+			Search_setLimitItems(search,limitItems);
 
 		} // if search mode
 

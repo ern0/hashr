@@ -215,6 +215,7 @@ Debug commands:
 			except: ls = 0
 			try: li = int(words[3])
 			except: li = -1
+			if li < 1: li = -1
 			command.setSearchLimit(ls,li)
 
 
