@@ -136,6 +136,10 @@
 
 		// checkpoint: search mode
 
+		if (self->limitItems > 0) {  // overprotection
+			if (self->numberOfResults >= self->limitItems) return 1;
+		}
+
 		self->numberOfMatching++;
 		if (self->numberOfMatching <= self->limitStart) return 0;
 
