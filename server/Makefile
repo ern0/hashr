@@ -31,66 +31,62 @@ ${OBJ}/Utils.o: \
 		${SRC}/Utils.c -o ${OBJ}/Utils.o
 
 ${OBJ}/Logger.o: \
-		Makefile ${OBJ} ${SRC}/Logger.h ${SRC}/Logger.c \
-		${SRC}/Utils.o
+		${SRC}/Utils.h \
+		Makefile ${OBJ} ${SRC}/Logger.h ${SRC}/Logger.c
 	${CC} -c \
 		${SRC}/Logger.c -o ${OBJ}/Logger.o
 
 ${OBJ}/Server.o: \
-		Makefile ${OBJ} ${SRC}/Server.h ${SRC}/Server.c \
-		${OBJ}/Logger.o \
-	  ${OBJ}/Utils.o \
-	  ${OBJ}/HashTable.o \
-	  ${OBJ}/Connection.o
+		${SRC}/Logger.h \
+	  ${SRC}/Utils.h \
+	  ${SRC}/Connection.h \
+		Makefile ${OBJ} ${SRC}/Server.h ${SRC}/Server.c
 	${CC} -c \
 		${SRC}/Server.c -o ${OBJ}/Server.o
 
 ${OBJ}/Connection.o: \
-		Makefile ${OBJ} ${SRC}/Connection.h ${SRC}/Connection.c \
-  	${OBJ}/Utils.o \
-  	${OBJ}/Logger.o
+  	${SRC}/Utils.h \
+  	${SRC}/Logger.h \
+		Makefile ${OBJ} ${SRC}/Connection.h ${SRC}/Connection.c
 	${CC} -c \
 		${SRC}/Connection.c -o ${OBJ}/Connection.o
 
 ${OBJ}/Packet.o: \
-		Makefile ${OBJ} ${SRC}/Packet.h ${SRC}/Packet.c \
-  	${OBJ}/Utils.o \
-  	${OBJ}/Logger.o \
-  	${OBJ}/Server.o \
-  	${OBJ}/Command.o
+  	${SRC}/Utils.h \
+  	${SRC}/Logger.h \
+  	${SRC}/Server.h \
+		Makefile ${OBJ} ${SRC}/Packet.h ${SRC}/Packet.c
 	${CC} -c \
 		${SRC}/Packet.c -o ${OBJ}/Packet.o
 
 ${OBJ}/Command.o: \
-		Makefile ${OBJ} ${SRC}/Command.h ${SRC}/Command.c \
-		${OBJ}/Utils.o \
-	  ${OBJ}/Logger.o \
-  	${OBJ}/Server.o \
-	  ${OBJ}/Search.o
+		${SRC}/Utils.h \
+	  ${SRC}/Logger.h \
+  	${SRC}/Server.h \
+		Makefile ${OBJ} ${SRC}/Command.h ${SRC}/Command.c
 	${CC} -c \
 		${SRC}/Command.c -o ${OBJ}/Command.o
 
 ${OBJ}/HashTable.o: \
-		Makefile ${OBJ} ${SRC}/HashTable.h ${SRC}/HashTable.c \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
-		${OBJ}/HashItem.o \
-		${OBJ}/Hasher.o \
-		${OBJ}/Search.o
+		${SRC}/Utils.h \
+		${SRC}/Logger.h \
+		${SRC}/HashItem.h \
+		${SRC}/Hasher.h \
+		Makefile ${OBJ} ${SRC}/HashTable.h ${SRC}/HashTable.c
 	${CC} -c \
 		${SRC}/HashTable.c -o ${OBJ}/HashTable.o
 
 ${OBJ}/Search.o: \
-		Makefile ${OBJ} ${SRC}/Search.h ${SRC}/Search.c \
-		${OBJ}/Utils.o \
-  	${OBJ}/HashItem.o
+		${SRC}/Utils.h \
+		${SRC}/HashTable.h \
+		Makefile ${OBJ} ${SRC}/Search.h ${SRC}/Search.c
 	${CC} -c \
 		${SRC}/Search\.c -o ${OBJ}/Search.o
 
 ${OBJ}/HashItem.o: \
-		Makefile ${OBJ} ${SRC}/HashItem.h ${SRC}/HashItem.c \
-		${OBJ}/Hasher.o
-	${CC} -c \
+		${SRC}/Hasher.h \
+		Makefile ${OBJ} ${SRC}/HashItem.h ${SRC}/HashItem.c
+	${CC} -c -D_GNU_SOURCE \
 		${SRC}/HashItem.c	-o ${OBJ}/HashItem.o
 
 ${OBJ}/Hasher.o: \
@@ -195,8 +191,8 @@ ${BIN}:
 ${OBJ}:
 	mkdir -p ${OBJ}
 
-clean: ${OBJ}
+clean: ${OBJ} ${BIN}
 	rm -rf ${OBJ}/*.o
-	rm -rf ${BIN}/*.o
+	rm -rf ${BIN}/*
 
 all: clean ${BIN}/hashr-server
