@@ -1,7 +1,7 @@
 #### Makefile for hashr ################################
 
 PLATFORM=$(shell uname -s)-$(shell uname -p)
-CC=gcc -std=c11 -O3
+CC=gcc -std=c11 -O3 -g
 TC=g++
 SRC=src
 TST=test
@@ -189,7 +189,7 @@ ${BIN}/test-Search: \
 ${BIN}:
 	mkdir -p ${BIN}
 
-${OBJ}:
+${OBJ}: 
 	mkdir -p ${OBJ}
 
 clean: ${OBJ} ${BIN}

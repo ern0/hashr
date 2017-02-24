@@ -61,7 +61,6 @@
 			logLevel = Logger_ERROR | Logger_DISPLAY;
 		}
 
-
 		char extendedMessage[200];
 		snprintf(
 			extendedMessage
@@ -266,8 +265,6 @@
 			,keyData,keyLength
 			,valueData,valueLength
 		);
-
-		Command_beginReply(self);
 
 		if (result == HashTable_SET_UPDATED) {
 			Command_reportStatus(

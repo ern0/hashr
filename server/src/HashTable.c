@@ -156,8 +156,8 @@
 
 		HashItem** itemPtr = &self->items[hash];
 		while (1) {
-			
-			if (*itemPtr == NULL) return NULL;
+
+			if ((*itemPtr) == NULL) return NULL;
 			
 			if ( HashItem_getKeyLength(*itemPtr) == length ) {
 				if (0 == memcmp(HashItem_getKeyData(*itemPtr),data,length)) return itemPtr;
@@ -181,11 +181,11 @@
 
 
 	int HashTable_performSet(HashTable* self,char* keydata,int keylen,char* valdata,int vallen) {
-
 		int hash = HashTable_getHash(self,keydata,keylen);
 
 		// if there's an item with the same key, replace value only
 		HashItem** oldItemPtr = HashTable_findItem(self,hash,keydata,keylen);
+
 		if (oldItemPtr != NULL) {
 			HashItem_replaceValue(*oldItemPtr,valdata,vallen);
 			return HashTable_SET_UPDATED;
@@ -323,9 +323,12 @@
 
 		self->reorgMark ^= 0xff;
 		self->method = method;
-		self->hashMask = Utils_calcHashMask(capacity);		
+		self->hashMask = Utils_calcHashMask(capacity);	
 
-		if (self->capacity < capacity) HashTable_resizeMemory(self,capacity);
+		if (self->capacity < capacity) {
+			HashTable_resizeMemory(self,capacity);
+			for (int i = self->capacity; i < capacity; i++) self->items[i] = NULL;
+		}
 		HashTable_moveItems(self);
 		if (self->capacity > capacity) HashTable_resizeMemory(self,capacity);
 
@@ -374,7 +377,7 @@
 				// new hash is different, move item
 				else {
 
-					// save pointer-to-actual, it should be point to next
+					// save pointer-to-actual, it should point to next
 					HashItem** prev = itemPtr;
 
 					// get next (it's familiar, see above, before "continue" statements)

@@ -6,7 +6,7 @@ pkill -KILL hashr
 
 bin/`uname -s`-`uname -p`/hashr-server -f /tmp/hashr.pid -l /tmp/hashr.log &
 
-../client/client.py -c reorg 0 8
+../client/client.py -c reorg 9 8
 
 ../client/client.py -c set aa 0-4
 ../client/client.py -c set bb 1-4
@@ -21,12 +21,12 @@ bin/`uname -s`-`uname -p`/hashr-server -f /tmp/hashr.pid -l /tmp/hashr.log &
 ../client/client.py -c set kk a-1
 ../client/client.py -c set ll b-1
 
-echo ------------------------------
 ../client/client.py -c dump
-../client/client.py -c reorg 1 16
-echo ------------------------------
+echo ------------------------------re
+../client/client.py -c reorg 0 16
+echo ------------------------------du
 ../client/client.py -c dump
-echo ------------------------------
+echo ------------------------------ok
 
 #../client/client.py
 
