@@ -7,125 +7,96 @@ SRC=src
 TST=test
 OBJ=/tmp/hashr/${PLATFORM}
 BIN=bin/${PLATFORM}
+OBJLIST= \
+	${OBJ}/Utils.o \
+	${OBJ}/Logger.o \
+	${OBJ}/Server.o \
+	${OBJ}/Connection.o \
+	${OBJ}/Packet.o \
+	${OBJ}/Command.o \
+	${OBJ}/HashTable.o \
+	${OBJ}/Search.o \
+	${OBJ}/HashItem.o \
+	${OBJ}/Hasher.o
 
 ########################################################
 
 ${BIN}/hashr-server: \
-		Makefile ${OBJ} ${BIN} \
-		${SRC}/main.c \
-		${OBJ}/Server.o 
-	${CC} \
-		${SRC}/main.c \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
-		${OBJ}/Server.o \
-		${OBJ}/HashTable.o \
-		${OBJ}/HashItem.o \
-		${OBJ}/Hasher.o \
-		${OBJ}/Connection.o \
-		${OBJ}/Packet.o \
-		${OBJ}/Command.o \
-		${OBJ}/Search.o \
-		-o ${BIN}/hashr-server
+		Makefile ${OBJ} ${BIN} ${OBJLIST} ${SRC}/main.c
+	${CC} ${OBJLIST} ${SRC}/main.c -o ${BIN}/hashr-server
 
 ${OBJ}/Utils.o: \
-		Makefile ${OBJ} \
-		${SRC}/Utils.h \
-		${SRC}/Utils.c
+		Makefile ${OBJ} ${SRC}/Utils.h ${SRC}/Utils.c
 	${CC} -c \
-		${SRC}/Utils.c \
-		-o ${OBJ}/Utils.o
+		${SRC}/Utils.c -o ${OBJ}/Utils.o
 
 ${OBJ}/Logger.o: \
-		Makefile ${OBJ} \
-		${SRC}/Logger.h \
-		${SRC}/Logger.c
+		Makefile ${OBJ} ${SRC}/Logger.h ${SRC}/Logger.c \
+		${SRC}/Utils.o
 	${CC} -c \
-		${SRC}/Logger.c \
-		-o ${OBJ}/Logger.o
+		${SRC}/Logger.c -o ${OBJ}/Logger.o
 
 ${OBJ}/Server.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Utils.o \
+		Makefile ${OBJ} ${SRC}/Server.h ${SRC}/Server.c \
 		${OBJ}/Logger.o \
-		${OBJ}/HashTable.o \
-		${OBJ}/Connection.o \
-		${SRC}/Server.h \
-		${SRC}/Server.c
+	  ${OBJ}/Utils.o \
+	  ${OBJ}/HashTable.o \
+	  ${OBJ}/Connection.o
 	${CC} -c \
-		${SRC}/Server.c \
-		-o ${OBJ}/Server.o
+		${SRC}/Server.c -o ${OBJ}/Server.o
+
+${OBJ}/Connection.o: \
+		Makefile ${OBJ} ${SRC}/Connection.h ${SRC}/Connection.c \
+  	${OBJ}/Utils.o \
+  	${OBJ}/Logger.o
+	${CC} -c \
+		${SRC}/Connection.c -o ${OBJ}/Connection.o
+
+${OBJ}/Packet.o: \
+		Makefile ${OBJ} ${SRC}/Packet.h ${SRC}/Packet.c \
+  	${OBJ}/Utils.o \
+  	${OBJ}/Logger.o \
+  	${OBJ}/Server.o \
+  	${OBJ}/Command.o
+	${CC} -c \
+		${SRC}/Packet.c -o ${OBJ}/Packet.o
+
+${OBJ}/Command.o: \
+		Makefile ${OBJ} ${SRC}/Command.h ${SRC}/Command.c \
+		${OBJ}/Utils.o \
+	  ${OBJ}/Logger.o \
+  	${OBJ}/Server.o \
+	  ${OBJ}/Search.o
+	${CC} -c \
+		${SRC}/Command.c -o ${OBJ}/Command.o
 
 ${OBJ}/HashTable.o: \
-		Makefile ${OBJ} \
+		Makefile ${OBJ} ${SRC}/HashTable.h ${SRC}/HashTable.c \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
 		${OBJ}/HashItem.o \
-		${SRC}/HashTable.h \
-		${SRC}/HashTable.c
+		${OBJ}/Hasher.o \
+		${OBJ}/Search.o
 	${CC} -c \
-		${SRC}/HashTable.c \
-		-o ${OBJ}/HashTable.o
+		${SRC}/HashTable.c -o ${OBJ}/HashTable.o
 
 ${OBJ}/Search.o: \
-		Makefile ${OBJ} \
+		Makefile ${OBJ} ${SRC}/Search.h ${SRC}/Search.c \
 		${OBJ}/Utils.o \
-		${SRC}/Search.h \
-		${SRC}/Search.c
+  	${OBJ}/HashItem.o
 	${CC} -c \
-		${SRC}/Search\.c \
-		-o ${OBJ}/Search.o
+		${SRC}/Search\.c -o ${OBJ}/Search.o
 
 ${OBJ}/HashItem.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Hasher.o \
-		${OBJ}/Search.o \
-		${SRC}/HashItem.h \
-		${SRC}/HashItem.c
+		Makefile ${OBJ} ${SRC}/HashItem.h ${SRC}/HashItem.c \
+		${OBJ}/Hasher.o
 	${CC} -c \
-		${SRC}/HashItem.c \
-		-o ${OBJ}/HashItem.o
+		${SRC}/HashItem.c	-o ${OBJ}/HashItem.o
 
 ${OBJ}/Hasher.o: \
-		Makefile ${OBJ} \
-		${SRC}/Hasher.h \
-		${SRC}/Hasher.c
+		Makefile ${OBJ} ${SRC}/Hasher.h ${SRC}/Hasher.c
 	${CC} -c \
-		${SRC}/Hasher.c \
-		-o ${OBJ}/Hasher.o
-
-${OBJ}/Connection.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
-		${OBJ}/Packet.o \
-		${SRC}/Connection.h \
-		${SRC}/Connection.c
-	${CC} -c \
-		${SRC}/Connection.c \
-		-o ${OBJ}/Connection.o
-
-${OBJ}/Packet.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
-		${OBJ}/Command.o \
-		${SRC}/Packet.h \
-		${SRC}/Packet.c
-	${CC} -c \
-		${SRC}/Packet.c \
-		-o ${OBJ}/Packet.o
-
-${OBJ}/Command.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
-		${OBJ}/Search.o \
-		${SRC}/Command.h \
-		${SRC}/Command.c
-	${CC} -c \
-		${SRC}/Command.c \
-		-o ${OBJ}/Command.o
+		${SRC}/Hasher.c -o ${OBJ}/Hasher.o
 
 ########################################################
 
@@ -194,7 +165,7 @@ ${BIN}/test-HashTable: \
 		${OBJ}/HashTable.o \
 		${OBJ}/HashItem.o \
 		${OBJ}/Hasher.o \
-		${OBJ}/Search.o \		
+		${OBJ}/Search.o \
 		-o ${BIN}/test-HashTable
 
 ${BIN}/test-Search: \
