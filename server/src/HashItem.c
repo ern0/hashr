@@ -28,7 +28,7 @@
 		self->valueData = NULL;
 		self->valueLength = 0;
 
-		self->method = -1;
+		self->reorgMark = 0;
 
 	} // ctor
 
@@ -41,9 +41,14 @@
 	} // dtor
 
 
-	void HashItem_setMethod(HashItem* self,int method) {
-		self->method = method;
-	} // setMethod()
+	void HashItem_setReorgMark(HashItem* self,char reorgMark) {
+		self->reorgMark = reorgMark;
+	} // setReorgMark()
+
+
+	char HashItem_getReorgMark(HashItem* self) {
+		return self->reorgMark;
+	} // getReorgMark()
 
 
 	void HashItem_dump(HashItem* self) {
@@ -53,7 +58,6 @@
 			return;
 		}
 
-		if (self->method != 1) printf("%d:",self->method);
 		for (int i = 0; i < self->keyLength; i++) {
 			printf("%c",self->keyData[i]);
 		}

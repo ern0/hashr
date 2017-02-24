@@ -7,7 +7,8 @@
 		unsigned char* p = (unsigned char*)key;
 
 		switch (method) {
-			case 1: return Hasher_debug(key,length);
+			case 0: return Hasher_debug(0,key,length);
+			case 1: return Hasher_debug(1,key,length);
 			case 2: return Hasher_additive(p,length);
 			case 3: return Hasher_xor(p,length);
 			case 4: return Hasher_rotating(p,length);
@@ -26,7 +27,8 @@
 	char* Hasher_getName(int token) {
 		
 		switch (token) {
-			case 1: return "debug";
+			case 0: return "debug0";
+			case 1: return "debug1";
 			case 2: return "additive";
 			case 3: return "xor";
 			case 4: return "rotating";
@@ -42,9 +44,11 @@
 	} // getName()
 
 
-	int Hasher_debug(char* key,int length) {
+	int Hasher_debug(int pos,char* key,int length) {
 
-		int result = key[0];
+		if (length <= pos) return 0;
+
+		int result = key[pos];
 		result |= key[0] << 8;
 		result |= key[0] << 16;
 		result |= key[0] << 24;

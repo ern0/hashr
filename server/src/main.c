@@ -37,8 +37,7 @@
 		
 		for (int i = 0; i < 12; i++) close(i);
 		if (-1 == open("/dev/null",O_RDWR)) exit(4);
-		dup(0);
-		dup(0);
+		int avoidWarning = dup(0) | dup(0);
 
 	} // daemonize()
 

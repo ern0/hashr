@@ -45,7 +45,7 @@ Available commands:
   vsearch, vs <pattern> <start> <limit> - search in values within specified result window
   search, fs <pattern> <start> <limit> - search pattern in keys and values within specified result window
   reorg <method> <capacity> - reorganize storage
-    valid methods are 1 to 10 (1 is for debugging)
+    valid methods are 1 to 11 (1 and 2 are for debugging)
     capacity will be rounded up to power of 2
 Debug commands:
   i1 - invalid command: 'freebeer'
@@ -292,8 +292,8 @@ Debug commands:
 				self.parmNumCheck(words,2)
 				try: met = int(words[1])
 				except: met = -1
-				if met < 1: met = 1
-				if met > 10: met = 1
+				if met < 0: met = 0
+				if met > 10: met = 10
 				command.setReorgMethod(met)
 				print("hash method: " + command.getMethodName())
 				try: num = int(words[2])

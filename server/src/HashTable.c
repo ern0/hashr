@@ -1,6 +1,9 @@
 #include "HashTable.h"
 
 
+	inline void HashTable_linkItem(HashTable* self,HashItem* item,int hash);
+
+
 	HashTable* new_HashTable() {
 
 		HashTable* self;
@@ -23,6 +26,7 @@
 		self->capacity = Utils_roundUp2Power(HashTable_CAPACITY_DEFAULT);
 		self->hashMask = Utils_calcHashMask(self->capacity);		
 		self->numberOfElms = 0;
+		self->reorgMark = 0;
 
 		self->items = (HashItem**)malloc(self->capacity * sizeof(HashItem*));
 		if (self->items == NULL) HashTable_outOfMemory(self,2801);
@@ -81,7 +85,7 @@
 
 	int HashItem_setAndAdjustMethod(HashTable* self,int method) {
 
-		if (method < 1) return self->method;
+		if (method < 0) return self->method;
 		if (method > Hasher_METHOD_MAX) return self->method;
 
 		self->method = method;
@@ -166,7 +170,16 @@
 		return NULL;
 	} // findItem()
 
-	
+
+	inline void HashTable_linkItem(HashTable* self,HashItem* item,int hash) {
+
+		HashItem_setNext(item,self->items[hash]);
+		self->items[hash] = item;
+
+		return;
+	} // linkItem()
+
+
 	int HashTable_performSet(HashTable* self,char* keydata,int keylen,char* valdata,int vallen) {
 
 		int hash = HashTable_getHash(self,keydata,keylen);
@@ -180,16 +193,12 @@
 
 		HashItem* item = new_HashItem();
 		if (item == NULL) HashTable_outOfMemory(self,2802);
-		HashItem_setMethod(item,self->method);
+		HashItem_setReorgMark(item,self->reorgMark);
 		if (-1 == HashItem_setKey(item,keydata,keylen)) HashTable_outOfMemory(self,2802);
 		if (-1 == HashItem_setValue(item,valdata,vallen)) HashTable_outOfMemory(self,2802);
 
-		// put new item into slot, to the end of the linked list
-		HashItem** newItemPtr = &self->items[hash];
-		while (*newItemPtr != NULL) {
-			newItemPtr = HashItem_getNextPtr(*newItemPtr);
-		}
-		*newItemPtr = item;		
+		// insert new item in slot (to the beginning of the linked list)
+		HashTable_linkItem(self,item,hash);
 
 		self->numberOfElms++;
 
@@ -284,7 +293,7 @@
 	} // performZap()
 
 
-	int HashTable_search(HashTable* self,Search* search) {
+	int HashTable_performSearch(HashTable* self,Search* search) {
 
 		if (self->numberOfElms == 0) return HashTable_SEARCH_NOT_FOUND;
 
@@ -293,15 +302,97 @@
 
 			HashItem* item = self->items[i];
 			while (item != NULL) {
-				if ( Search_process(search,item) ) goto finished; // break 2
+				if ( Search_process(search,item) ) goto search_finished; // break 2
 				item = HashItem_getNext(item);
 			} // loop()
 
-		} finished: // foreach slot
+		} search_finished: // foreach slot
 		
 		if (Search_getNumberOfResults(search) == 0) return HashTable_SEARCH_NOT_FOUND;
 		return HashTable_SEARCH_PROVIDED;
-	} // search()
+	} // performSearch()
 
 
-	//int HashTable_searchItem(self,)
+	int HashTable_performReorg(HashTable* self,int method,int capacity) {
+
+		capacity = Utils_roundUp2Power(capacity);
+
+		if ((method == self->method) && (capacity == self->capacity)) {
+			return HashTable_REORG_UNCHANGED;
+		} // if unchanged
+
+		self->reorgMark ^= 0xff;
+		self->method = method;
+		self->hashMask = Utils_calcHashMask(capacity);		
+
+		if (self->capacity < capacity) HashTable_resizeMemory(self,capacity);
+		HashTable_moveItems(self);
+		if (self->capacity > capacity) HashTable_resizeMemory(self,capacity);
+
+		self->capacity = capacity;
+
+		return HashTable_REORG_PERFORMED;
+	} // performReorg()
+
+
+	void HashTable_resizeMemory(HashTable* self,int capacity) {
+
+		self->items = (HashItem**)realloc(self->items,capacity * sizeof(HashItem*));
+		if (self->items == NULL) HashTable_outOfMemory(self,2803);
+
+	} // resizeMemory()
+
+
+	void HashTable_moveItems(HashTable* self) {
+
+		int processed = 0;
+		for (int i = 0; i < self->capacity; i++) {
+
+			HashItem** itemPtr = &self->items[i];
+			while (*itemPtr != NULL) {
+				HashItem* item = *itemPtr;
+
+				// already moved
+				if (HashItem_getReorgMark(item) == self->reorgMark) {
+					itemPtr = HashItem_getNextPtr(item);
+					continue;
+				}
+
+				// mark as moved
+				HashItem_setReorgMark(item,self->reorgMark);
+
+				// generate hash
+				char* keyData = HashItem_getKeyData(item);
+				int keyLength = HashItem_getKeyLength(item);
+				int hash = HashTable_getHash(self,keyData,keyLength);					
+
+				// new hash is same, don't move
+				if (i == hash) {
+					itemPtr = HashItem_getNextPtr(item);
+				}
+
+				// new hash is different, move item
+				else {
+
+					// save pointer-to-actual, it should be point to next
+					HashItem** prev = itemPtr;
+
+					// get next (it's familiar, see above, before "continue" statements)
+					itemPtr = HashItem_getNextPtr(item);
+
+					// pointer-to-actual now points to the next, so actual is finally "in the air"
+					*prev = *itemPtr;
+
+					// link actual to its new place
+					HashTable_linkItem(self,item,hash);
+
+				} // else
+
+				processed++;
+				if (processed >= self->numberOfElms) return;
+	
+			} // loop()
+		} // foreach slot
+
+	} // moveItems()
+

@@ -1,3 +1,4 @@
+from command import *
 
 class Parser:
 
@@ -102,6 +103,9 @@ class Parser:
 				if chunkType == b'STAT': 
 					print(" ",end="")
 					self.renderText(chunkData[4:])
+
+				if chunkType == b"METD":
+					print(" " + (Command()).getMethodName(self.getInt(chunkData[:4])),end="")
 
 			else:
 				self.renderAuto(chunkData)

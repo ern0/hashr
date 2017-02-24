@@ -3,14 +3,14 @@
 
 
 #define Hasher_METHOD_DEBUG 1
-#define Hasher_METHOD_MAX 1
-#define Hasher_METHOD_DEFAULT 1
+#define Hasher_METHOD_MAX 10
+#define Hasher_METHOD_DEFAULT 10
 
 
 // static
 	int Hasher_hash(int method,char* key,int length);
 	char* Hasher_getName(int token);
-	int Hasher_debug(char* key,int length);
+	int Hasher_debug(int pos,char* key,int length);
 	int Hasher_additive(unsigned char* p,int len);
 	int Hasher_xor(unsigned char* p,int len);
 	int Hasher_rotating(unsigned char* p,int len);

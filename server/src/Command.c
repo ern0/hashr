@@ -66,10 +66,11 @@
 		snprintf(
 			extendedMessage
 			,200
-			,"Command \"%s\" result: %d - %s: %s"
+			,"Command \"%s\" result: %d - %s%s%s"
 			,Command_getName(self,self->token)
 			,st
 			,message
+			,( extra[0] != 0 ? ": " : "")
 			,extra
 		);
 		Packet_log(self->packet,logLevel,id,extendedMessage);
@@ -516,7 +517,7 @@
 
 		Command_beginReply(self);
 
-		int result = HashTable_search(self->hashTable,search);
+		int result = HashTable_performSearch(self->hashTable,search);
 
 		if (result == HashTable_SEARCH_NOT_FOUND) {
 			Command_reportStatus(
@@ -564,16 +565,35 @@
 
 
 	void Command_processReorg(Command* self) {
+
 		Command_beginReply(self);
 
 		int method = Command_loadIntChunk(self,"RMET",1);
 		if ( method == -1 ) return;
 		int capacity = Command_loadIntChunk(self,"RCAP",1);
 		if ( capacity == -1 ) return;
-		capacity = Utils_roundUp2Power(capacity);
 
-		printf("TODO: reorg %s %d \n",Hasher_getName(method),capacity);
+		int result = HashTable_performReorg(self->hashTable,method,capacity);
+
+		if (result == HashTable_REORG_UNCHANGED) {
+			Command_reportStatus(
+				self
+				,Command_ST_UNCHANGED
+				,2221,"Unchanged parameters"
+			);
+		} // if unchanged
+
+		else {
+			Command_reportStatus(
+				self
+				,Command_ST_REORGANIZED
+				,2222,"Hashtable reorganized"
+			);
+		}
+
+		Packet_appendIntChunk(self->packet,"METD",HashTable_getMethod(self->hashTable));
+		Packet_appendIntChunk(self->packet,"CPTY",HashTable_getCapacity(self->hashTable));
 
 		Command_endReply(self);
-	}
 
+	} // processReorg()

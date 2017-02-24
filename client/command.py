@@ -114,16 +114,19 @@ class Command:
 		if self.cmd == "freebeer": return 99
 
 
-	def getMethodName(self):
+	def getMethodName(self,method = None):
 
-		if self.reorgMethod == 1: return "debug"
-		if self.reorgMethod == 2: return "additive"
-		if self.reorgMethod == 3: return "xor"
-		if self.reorgMethod == 4: return "rotating"
-		if self.reorgMethod == 5: return "Bernstein"
-		if self.reorgMethod == 6: return "modified bernstein"
-		if self.reorgMethod == 7: return "shift-add-xor"
-		if self.reorgMethod == 8: return "Fowler-Noll-Vo"
-		if self.reorgMethod == 9: return "one-at-a-time"
-		if self.reorgMethod == 10: return "elf"
+		if method is None: method = self.reorgMethod
+
+		if method == 0: return "debug0"
+		if method == 1: return "debug1"
+		if method == 2: return "additive"
+		if method == 3: return "xor"
+		if method == 4: return "rotating"
+		if method == 5: return "Bernstein"
+		if method == 6: return "modified bernstein"
+		if method == 7: return "shift-add-xor"
+		if method == 8: return "Fowler-Noll-Vo"
+		if method == 9: return "one-at-a-time"
+		if method == 10: return "elf"
 

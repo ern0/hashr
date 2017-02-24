@@ -27,6 +27,8 @@
 #define HashTable_ZAP_EMPTY 46
 #define HashTable_SEARCH_PROVIDED 53
 #define HashTable_SEARCH_NOT_FOUND 50
+#define HashTable_REORG_PERFORMED 65
+#define HashTable_REORG_UNCHANGED 66
 
 // class HashTable
 
@@ -38,6 +40,9 @@
 		int hashMask;
 		int numberOfElms;
 		HashItem** items;
+		int reorgMethod;
+		int reorgCapacity;
+		char reorgMark;
 	};
 	typedef struct HashTable HashTable;
 
@@ -46,6 +51,8 @@
 	void HashTable_dtor(HashTable* self);
 	HashItem** HashTable_findItem(HashTable* self,int hash,char* data,int lenght);
 	int HashTable_getHash(HashTable* self,char* data,int len);
+	void HashTable_resizeMemory(HashTable* self,int capacity);
+	void HashTable_moveItems(HashTable* self);
 
 	// public
 	HashTable* new_HashTable();
@@ -64,7 +71,8 @@
 	int HashTable_performGet(HashTable* self,RET char** valdata,RET int* vallen,char* keydata,int keylen);
 	int HashTable_performDel(HashTable* self,char* keydata,int keylen);
 	int HashTable_performZap(HashTable* self);
-	int HashTable_search(HashTable* self,Search* search);
+	int HashTable_performSearch(HashTable* self,Search* search);
+	int HashTable_performReorg(HashTable* self,int method,int capacity);
 
 
 #endif

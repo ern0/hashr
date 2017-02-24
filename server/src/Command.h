@@ -30,6 +30,8 @@ typedef struct Packet Packet;
 #define Command_ST_ZAPPED 9
 #define Command_ST_NO_MATCH 10
 #define Command_ST_MATCH_FOUND 11
+#define Command_ST_UNCHANGED 27
+#define Command_ST_REORGANIZED 28
 
 #define Command_ST_ERROR_LEVEL 30
 #define Command_ST_INVALID_COMMAND 31
