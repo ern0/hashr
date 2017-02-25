@@ -4,6 +4,7 @@
 #include "Server.h"
 #include "HashItem.h"
 
+
 	Command* new_Command() {
 
 		Command* self;
@@ -47,6 +48,11 @@
 
 
 	void Command_reportStatus(Command* self,int st,int id,const char* message) {
+		Command_reportStatusExtra(self,st,id,message,"");
+	} // reportStatus()
+
+
+	void Command_reportStatusExtra(Command* self,int st,int id,const char* message,const char* extra) {
 
 		int logLevel;
 		if (st < Command_ST_ERROR_LEVEL) {
@@ -59,10 +65,12 @@
 		snprintf(
 			extendedMessage
 			,200
-			,"Command \"%s\" result: %d - %s"
+			,"Command \"%s\" result: %d - %s%s%s"
 			,Command_getName(self,self->token)
 			,st
 			,message
+			,( extra[0] != 0 ? ": " : "")
+			,extra
 		);
 		Packet_log(self->packet,logLevel,id,extendedMessage);
 
@@ -71,7 +79,7 @@
 		Packet_appendStr(self->packet,message);
 		Packet_endChunk(self->packet);
 
-	} // reportStatus()
+	} // reportStatusExtra()
 
 
 	void Command_setCommand(Command* self,int token) {
@@ -115,17 +123,20 @@
 	} // getName()
 
 
-	int Command_findParamChunk(Command* self,char* id) {
+	int Command_findParamChunk(Command* self,char* id,int mandatory) {
 
 		int chunkIndex = Packet_findChunk(self->packet,id);
+		if (!mandatory) return chunkIndex;
+
 		if (chunkIndex == -1) {
 
 			Command_beginReply(self);
 
-			Command_reportStatus(
+			Command_reportStatusExtra(
 				self
 				,Command_ST_MISSING_PARAM
-				,2203,"Missing parameter"
+				,2203,"missing parameter"
+				,id
 			);
 
 			Command_endReply(self);
@@ -137,9 +148,9 @@
 	} // findParamChunk()
 
 
-	int Command_loadStrChunk(Command* self,char* id) {
+	int Command_loadStrChunk(Command* self,char* id,int mandatory) {
 
-		int chunkIndex = Command_findParamChunk(self,id);
+		int chunkIndex = Command_findParamChunk(self,id,mandatory);
 		if (chunkIndex == -1) return -1;
 
 		unsigned char* buffer = Packet_getBuffer(self->packet);
@@ -150,13 +161,15 @@
 	} // loadStrCunk()
 
 
-	int Command_loadIntChunk(Command* self,char* id) {
+	int Command_loadIntChunk(Command* self,char* id,int mandatory) {
 
-		int chunkIndex = Command_findParamChunk(self,id);
+		int chunkIndex = Command_findParamChunk(self,id,mandatory);
 		if (chunkIndex == -1) return -1;
 
 		unsigned char* buffer = Packet_getBuffer(self->packet);
-		int result = Utils_getBufInt(&buffer[chunkIndex - 4]);
+		int length = Utils_getBufInt(&buffer[chunkIndex - 4]);
+		if (length < 4) return -1;
+		int result = Utils_getBufInt(&buffer[chunkIndex]);
 
 		return result;
 	} // loadIntChunk()
@@ -185,7 +198,7 @@
 		Command_reportStatus(
 			self
 			,Command_ST_INVALID_COMMAND
-			,2201,"Invalid command"
+			,2201,"invalid command"
 		);
 
 		Command_endReply(self);
@@ -215,7 +228,7 @@
 
 		Command_beginReply(self);
 
-		Command_reportStatus(self,Command_ST_INFO_PROVIDED,2202,"Info provided");
+		Command_reportStatus(self,Command_ST_INFO_PROVIDED,2202,"info provided");
 	
 		int noOfConns = Server_getNumberOfConnections(self->server);
 		Packet_appendIntChunk(self->packet,"NCON",noOfConns);
@@ -223,11 +236,17 @@
 		int method = HashTable_getMethod(self->hashTable);
 		Packet_appendIntChunk(self->packet,"METD",method);
 
+		int minCapacity = HashTable_getMinCapacity(self->hashTable);
+		Packet_appendIntChunk(self->packet,"MCAP",minCapacity);
+
 		int capacity = HashTable_getCapacity(self->hashTable);
 		Packet_appendIntChunk(self->packet,"CPTY",capacity);
 		
 		int noOfElms = HashTable_getNumberOfElms(self->hashTable);
 		Packet_appendIntChunk(self->packet,"NELM",noOfElms);
+
+		int collision = HashTable_getCollisionPercent(self->hashTable);
+		Packet_appendIntChunk(self->packet,"COLP",collision);
 
 		Command_endReply(self);
 
@@ -236,15 +255,17 @@
 
 	void Command_processSet(Command* self) {
 
-		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY",1) == -1 ) return;
 		char* keyData = self->data;
 		int keyLength = self->length;
 
-		if ( Command_loadStrChunk(self,"QVAL") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QVAL",1) == -1 ) return;
 		char* valueData = self->data;
 		int valueLength = self->length;
 
 		Command_beginReply(self);
+
+		int oldCapacity = HashTable_getCapacity(self->hashTable);
 
 		int result = HashTable_performSet(
 			self->hashTable
@@ -252,13 +273,11 @@
 			,valueData,valueLength
 		);
 
-		Command_beginReply(self);
-
 		if (result == HashTable_SET_UPDATED) {
 			Command_reportStatus(
 				self
 				,Command_ST_UPDATED
-				,2210,"Data updated"
+				,2210,"data updated"
 			);
 		} // if inserted
 
@@ -266,9 +285,14 @@
 			Command_reportStatus(
 				self
 				,Command_ST_INSERTED
-				,2211,"Data inserted"
+				,2211,"data inserted"
 			);
 		} // else updated
+
+		int capacity = HashTable_getCapacity(self->hashTable);
+		if (oldCapacity != capacity) {
+			Packet_appendIntChunk(self->packet,"CPTY",capacity);
+		}
 
 		Command_endReply(self);
 
@@ -277,7 +301,7 @@
 
 	void Command_processGet(Command* self) {
 
-		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY",1) == -1 ) return;
 
 		Command_beginReply(self);
 
@@ -296,7 +320,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_FOUND
-				,2212,"Data found"
+				,2212,"data found"
 			);
 
 			Packet_appendChunk(self->packet,"AVAL",valueData,valueLength);
@@ -307,7 +331,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_NOT_FOUND
-				,2213,"No such key"
+				,2213,"no such key"
 			);
 		} // else not found
 
@@ -318,11 +342,13 @@
 	
 	void Command_processDel(Command* self) {
 
-		if ( Command_loadStrChunk(self,"QKEY") == -1 ) return;
+		if ( Command_loadStrChunk(self,"QKEY",1) == -1 ) return;
 		char* keyData = self->data;
 		int keyLength = self->length;
 
 		Command_beginReply(self);
+
+		int oldCapacity = HashTable_getCapacity(self->hashTable);
 
 		char* valueData = NULL;
 		int valueLength = 0;
@@ -335,7 +361,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_DELETED
-				,2214,"Data deleted"
+				,2214,"data deleted"
 			);
 		} // if found
 
@@ -347,6 +373,11 @@
 			);
 		} // else not found
 
+		int capacity = HashTable_getCapacity(self->hashTable);
+		if (oldCapacity != capacity) {
+			Packet_appendIntChunk(self->packet,"CPTY",capacity);
+		}
+
 		Command_endReply(self);
 
 	} // processDel()
@@ -357,12 +388,13 @@
 		Command_beginReply(self);
 
 		int zapped = HashTable_getNumberOfElms(self->hashTable);
+		int oldCapacity = HashTable_getCapacity(self->hashTable);
 
 		if (HashTable_performZap(self->hashTable) == HashTable_ZAP_EMPTY) {
 			Command_reportStatus(
 				self
 				,Command_ST_EMPTY
-				,2216,"Already empty"
+				,2216,"already empty"
 			);
 		} // if already empty
 
@@ -370,11 +402,16 @@
 			Command_reportStatus(
 				self
 				,Command_ST_ZAPPED
-				,2217,"All items deleted"
+				,2217,"all items deleted"
 			);
 		} // else zapped
 
 		Packet_appendIntChunk(self->packet,"ZAPD",zapped);
+
+		int capacity = HashTable_getCapacity(self->hashTable);
+		if (oldCapacity != capacity) {
+			Packet_appendIntChunk(self->packet,"CPTY",capacity);
+		}
 
 		Command_endReply(self);
 
@@ -386,7 +423,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setCountMode(search,1,0);
+		Search_setCountMode(search,SEARCH_MATCH_KEY);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 
@@ -400,7 +437,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setCountMode(search,0,1);
+		Search_setCountMode(search,SEARCH_MATCH_VALUE);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 
@@ -414,7 +451,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setCountMode(search,1,1);
+		Search_setCountMode(search,SEARCH_MATCH_KEY | SEARCH_MATCH_VALUE);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 
@@ -428,7 +465,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setSearchMode(search,1,0);
+		Search_setSearchMode(search,SEARCH_MATCH_KEY);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 
@@ -442,7 +479,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setSearchMode(search,0,1);
+		Search_setSearchMode(search,SEARCH_MATCH_VALUE);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 
@@ -456,7 +493,7 @@
 		Search* search = new_Search();
 		if (search == NULL) return;
 
-		Search_setSearchMode(search,1,1);
+		Search_setSearchMode(search,SEARCH_MATCH_KEY | SEARCH_MATCH_VALUE);
 		int seo = Command_prepareSearch(self,search);
 		if (seo != -1) Command_universalSearch(self,search);
 
@@ -468,16 +505,24 @@
 	int Command_prepareSearch(Command* self,Search* search) {
 
 		if (Search_isSearchMode(search)) {
-			Search_setMaxResults(search, Command_loadIntChunk(self,"SMAX") );
-		}
 
-		if ( Command_loadStrChunk(self,"SPAT") == -1 ) {
+			int limitStart = Command_loadIntChunk(self,"LIMS",0);
+			if (limitStart == -1) limitStart = 0;
+			Search_setLimitStart(search,limitStart);
+
+			int limitItems = Command_loadIntChunk(self,"LIMI",0);
+			if (limitItems < 1) limitItems = -1;
+			Search_setLimitItems(search,limitItems);
+
+		} // if search mode
+
+		if ( Command_loadStrChunk(self,"SPAT",0) == -1 ) {
 
 			Command_beginReply(self);			
 			Command_reportStatus(
 				self
 				,Command_ST_MISSING_PARAM
-				,2218,"Missing search pattern"
+				,2218,"missing search pattern"
 			);
 			Command_endReply(self);
 
@@ -494,13 +539,13 @@
 
 		Command_beginReply(self);
 
-		int result = HashTable_search(self->hashTable,search);
+		int result = HashTable_performSearch(self->hashTable,search);
 
 		if (result == HashTable_SEARCH_NOT_FOUND) {
 			Command_reportStatus(
 				self
 				,Command_ST_NO_MATCH
-				,2218,"No match"
+				,2219,"no match"
 			);
 		} // if empty
 
@@ -508,7 +553,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_MATCH_FOUND
-				,2219,"Search result provided"
+				,2220,"search result provided"
 			);
 		} // if any hits
 
@@ -542,8 +587,36 @@
 
 
 	void Command_processReorg(Command* self) {
-		Command_beginReply(self);
-		printf("todo: reorg cmd \n");
-		Command_endReply(self);
-	}
 
+		Command_beginReply(self);
+
+		int method = Command_loadIntChunk(self,"RMET",1);
+		if (method == -1) return;
+
+		int minCapacity = Command_loadIntChunk(self,"RCAP",0);
+		HashTable_calcMinCapacity(self->hashTable,minCapacity);
+
+		int result = HashTable_performReorg(self->hashTable,method);
+
+		if (result == HashTable_REORG_UNCHANGED) {
+			Command_reportStatus(
+				self
+				,Command_ST_UNCHANGED
+				,2221,"unchanged parameters"
+			);
+		} // if unchanged
+
+		else {
+			Command_reportStatus(
+				self
+				,Command_ST_REORGANIZED
+				,2222,"hashtable reorganized"
+			);
+		}
+
+		Packet_appendIntChunk(self->packet,"METD",HashTable_getMethod(self->hashTable));
+		Packet_appendIntChunk(self->packet,"CPTY",HashTable_getCapacity(self->hashTable));
+
+		Command_endReply(self);
+
+	} // processReorg()

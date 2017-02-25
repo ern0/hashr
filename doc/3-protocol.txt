@@ -39,17 +39,21 @@ Request block types:
   "QVAL" - request value (payload)
   "SFIL" - search filter ("key"/"value"/"all")
   "SPAT" - search pattern
-  "SMAX" - search max. number of results
+  "LIMS" - search limit start index
+  "LIMI" - search limit item number
   "RMET" - reorg method
-  "RCAP" - reorg capacity
+  "RCAP" - reorg suggested minumum capacity
 
 Response block types:
   "INFO" - info response
+  "NCON" - no. of connections
+  "METD" - actual hash method
+  "CPTY" - actual hash table capacity (slots)
+  "MCAP" - hash table minimum capacity
+  "NELM" - number of elements
+  "COLP" - collision percent
   "STAT" - status
   "AKEY" - response key
   "AVAL" - response value (payload)
   "ZAPD" - zap result number of items
-  "SRES" - search result number of items
-
-Push block types:
-  "DOWN" - system down notification
+  "SRES" - search result number of items (search: provided)

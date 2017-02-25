@@ -1,19 +1,35 @@
 clear
 rm -f /tmp/hashr.log
+pkill -KILL hashr
 
-#bin/`uname -s`-`uname -p`/hashr-server ; exit
+#bin/`uname -s`-`uname -p`/hashr-server
 
 bin/`uname -s`-`uname -p`/hashr-server -f /tmp/hashr.pid -l /tmp/hashr.log &
+../client/client.py ; sleep .2 ; kill `cat /tmp/hashr.pid` ; exit
 
-../client/client.py -c set pix mix
-../client/client.py -c set pici mixi
-../client/client.py -c set pixi mici
-../client/client.py -c set loyfas moyfas
+../client/client.py -c reorg 9 8
 
-../client/client.py
+../client/client.py -c set aa 0-4
+../client/client.py -c set bb 1-4
+../client/client.py -c set cc 2-4
+../client/client.py -c set dd 3-4
+../client/client.py -c set ee 4-4
+../client/client.py -c set ff 5-6
+../client/client.py -c set gg 6-7
+../client/client.py -c set hh 7-0
+../client/client.py -c set ii 8-1
+../client/client.py -c set jj 9-1
+../client/client.py -c set kk a-1
+../client/client.py -c set ll b-1
 
-../client/client.py -c info
-../client/client.py -c search x
+../client/client.py -c dump
+echo ------------------------------re
+../client/client.py -c reorg 0 16
+echo ------------------------------du
+../client/client.py -c dump
+echo ------------------------------ok
+
+#../client/client.py
 
 sleep .2
 kill `cat /tmp/hashr.pid`

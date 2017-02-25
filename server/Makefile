@@ -1,131 +1,99 @@
 #### Makefile for hashr ################################
 
 PLATFORM=$(shell uname -s)-$(shell uname -p)
-CC=gcc -std=c11
+CC=gcc -std=c11 -O3 -g
 TC=g++
 SRC=src
 TST=test
 OBJ=/tmp/hashr/${PLATFORM}
 BIN=bin/${PLATFORM}
+OBJLIST= \
+	${OBJ}/Utils.o \
+	${OBJ}/Logger.o \
+	${OBJ}/Server.o \
+	${OBJ}/Connection.o \
+	${OBJ}/Packet.o \
+	${OBJ}/Command.o \
+	${OBJ}/HashTable.o \
+	${OBJ}/Search.o \
+	${OBJ}/HashItem.o \
+	${OBJ}/Hasher.o
 
 ########################################################
 
 ${BIN}/hashr-server: \
-		Makefile ${OBJ} ${BIN} \
-		${SRC}/main.c \
-		${OBJ}/Server.o 
-	${CC} \
-		${SRC}/main.c \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
-		${OBJ}/Server.o \
-		${OBJ}/HashTable.o \
-		${OBJ}/HashItem.o \
-		${OBJ}/Hasher.o \
-		${OBJ}/Connection.o \
-		${OBJ}/Packet.o \
-		${OBJ}/Command.o \
-		${OBJ}/Search.o \
-		-o ${BIN}/hashr-server
+		Makefile ${OBJ} ${BIN} ${OBJLIST} ${SRC}/main.c
+	${CC} ${OBJLIST} \
+		${SRC}/main.c -o ${BIN}/hashr-server
 
 ${OBJ}/Utils.o: \
-		Makefile ${OBJ} \
-		${SRC}/Utils.h \
-		${SRC}/Utils.c
+		Makefile ${SRC}/Utils.h ${SRC}/Utils.c
 	${CC} -c \
-		${SRC}/Utils.c \
-		-o ${OBJ}/Utils.o
+		${SRC}/Utils.c -o ${OBJ}/Utils.o
 
 ${OBJ}/Logger.o: \
-		Makefile ${OBJ} \
-		${SRC}/Logger.h \
-		${SRC}/Logger.c
+		${SRC}/Utils.h \
+		Makefile ${SRC}/Logger.h ${SRC}/Logger.c
 	${CC} -c \
-		${SRC}/Logger.c \
-		-o ${OBJ}/Logger.o
+		${SRC}/Logger.c -o ${OBJ}/Logger.o
 
 ${OBJ}/Server.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
-		${OBJ}/HashTable.o \
-		${OBJ}/Connection.o \
-		${SRC}/Server.h \
-		${SRC}/Server.c
+		${SRC}/Logger.h \
+	  ${SRC}/Utils.h \
+	  ${SRC}/Connection.h \
+		Makefile ${SRC}/Server.h ${SRC}/Server.c
 	${CC} -c \
-		${SRC}/Server.c \
-		-o ${OBJ}/Server.o
-
-${OBJ}/HashTable.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
-		${OBJ}/HashItem.o \
-		${SRC}/HashTable.h \
-		${SRC}/HashTable.c
-	${CC} -c \
-		${SRC}/HashTable.c \
-		-o ${OBJ}/HashTable.o
-
-${OBJ}/Search.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Utils.o \
-		${SRC}/Search.h \
-		${SRC}/Search.c
-	${CC} -c \
-		${SRC}/Search\.c \
-		-o ${OBJ}/Search.o
-
-${OBJ}/HashItem.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Hasher.o \
-		${OBJ}/Search.o \
-		${SRC}/HashItem.h \
-		${SRC}/HashItem.c
-	${CC} -c \
-		${SRC}/HashItem.c \
-		-o ${OBJ}/HashItem.o
-
-${OBJ}/Hasher.o: \
-		Makefile ${OBJ} \
-		${SRC}/Hasher.h \
-		${SRC}/Hasher.c
-	${CC} -c \
-		${SRC}/Hasher.c \
-		-o ${OBJ}/Hasher.o
+		${SRC}/Server.c -o ${OBJ}/Server.o
 
 ${OBJ}/Connection.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
-		${OBJ}/Packet.o \
-		${SRC}/Connection.h \
-		${SRC}/Connection.c
+  	${SRC}/Utils.h \
+  	${SRC}/Logger.h \
+		Makefile ${SRC}/Connection.h ${SRC}/Connection.c
 	${CC} -c \
-		${SRC}/Connection.c \
-		-o ${OBJ}/Connection.o
+		${SRC}/Connection.c -o ${OBJ}/Connection.o
 
 ${OBJ}/Packet.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
-		${OBJ}/Command.o \
-		${SRC}/Packet.h \
-		${SRC}/Packet.c
+  	${SRC}/Utils.h \
+  	${SRC}/Logger.h \
+  	${SRC}/Server.h \
+		Makefile ${SRC}/Packet.h ${SRC}/Packet.c
 	${CC} -c \
-		${SRC}/Packet.c \
-		-o ${OBJ}/Packet.o
+		${SRC}/Packet.c -o ${OBJ}/Packet.o
 
 ${OBJ}/Command.o: \
-		Makefile ${OBJ} \
-		${OBJ}/Utils.o \
-		${OBJ}/Logger.o \
-		${OBJ}/Search.o \
-		${SRC}/Command.h \
-		${SRC}/Command.c
+		${SRC}/Utils.h \
+	  ${SRC}/Logger.h \
+  	${SRC}/Server.h \
+		Makefile ${SRC}/Command.h ${SRC}/Command.c
 	${CC} -c \
-		${SRC}/Command.c \
-		-o ${OBJ}/Command.o
+		${SRC}/Command.c -o ${OBJ}/Command.o
+
+${OBJ}/HashTable.o: \
+		${SRC}/Utils.h \
+		${SRC}/Logger.h \
+		${SRC}/HashItem.h \
+		${SRC}/Hasher.h \
+		Makefile ${SRC}/HashTable.h ${SRC}/HashTable.c
+	${CC} -c \
+		${SRC}/HashTable.c -o ${OBJ}/HashTable.o
+
+${OBJ}/Search.o: \
+		${SRC}/Utils.h \
+		${SRC}/HashTable.h \
+		Makefile ${SRC}/Search.h ${SRC}/Search.c
+	${CC} -c \
+		${SRC}/Search\.c -o ${OBJ}/Search.o
+
+${OBJ}/HashItem.o: \
+		${SRC}/Hasher.h \
+		Makefile ${SRC}/HashItem.h ${SRC}/HashItem.c
+	${CC} -c -D_GNU_SOURCE \
+		${SRC}/HashItem.c	-o ${OBJ}/HashItem.o
+
+${OBJ}/Hasher.o: \
+		Makefile ${SRC}/Hasher.h ${SRC}/Hasher.c
+	${CC} -c \
+		${SRC}/Hasher.c -o ${OBJ}/Hasher.o
 
 ########################################################
 
@@ -133,7 +101,8 @@ test: \
 	${BIN}/test-Utils \
 	${BIN}/test-Packet_scan \
 	${BIN}/test-Packet_build \
-	${BIN}/test-HashTable \
+	${BIN}/test-HashTable_core \
+	${BIN}/test-HashTable_reorg \
 
 ${BIN}/test-Utils: \
 		Makefile ${OBJ} ${BIN} \
@@ -182,31 +151,65 @@ ${BIN}/test-Packet_build: \
 		${OBJ}/Search.o \		
 		-o ${BIN}/test-Packet_build
 
-${BIN}/test-HashTable: \
+${BIN}/test-HashTable_core: \
 		Makefile ${OBJ} ${BIN} \
-		${TST}/test-HashTable.cpp \
+		${TST}/test-HashTable_core.cpp \
 		${OBJ}/HashTable.o \
 		${OBJ}/Utils.o
 	${TC} \
-		${TST}/test-HashTable.cpp \
+		${TST}/test-HashTable_core.cpp \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
 		${OBJ}/HashTable.o \
 		${OBJ}/HashItem.o \
 		${OBJ}/Hasher.o \
-		${OBJ}/Search.o \		
-		-o ${BIN}/test-HashTable
+		${OBJ}/Search.o \
+		-o ${BIN}/test-HashTable_core
+
+${BIN}/test-Search: \
+		Makefile ${OBJ} ${BIN} \
+		${TST}/test-Search.cpp \
+		${OBJ}/Logger.o \
+		${OBJ}/HashTable.o \
+		${OBJ}/HashItem.o \
+		${OBJ}/Hasher.o \
+		${OBJ}/Search.o \
+		${OBJ}/Utils.o
+	${TC} \
+		${TST}/test-Search.cpp \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
+		${OBJ}/HashTable.o \
+		${OBJ}/HashItem.o \
+		${OBJ}/Hasher.o \
+		${OBJ}/Search.o \
+		-o ${BIN}/test-Search
+
+${BIN}/test-HashTable_reorg: \
+		Makefile ${OBJ} ${BIN} \
+		${TST}/test-HashTable_reorg.cpp \
+		${OBJ}/HashTable.o \
+		${OBJ}/Utils.o
+	${TC} \
+		${TST}/test-HashTable_reorg.cpp \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
+		${OBJ}/HashTable.o \
+		${OBJ}/HashItem.o \
+		${OBJ}/Hasher.o \
+		${OBJ}/Search.o \
+		-o ${BIN}/test-HashTable_reorg
 
 ########################################################
 
 ${BIN}:
 	mkdir -p ${BIN}
 
-${OBJ}:
+${OBJ}: 
 	mkdir -p ${OBJ}
 
-clean: ${OBJ}
+clean: ${OBJ} ${BIN}
 	rm -rf ${OBJ}/*.o
-	rm -rf ${BIN}/*.o
+	rm -rf ${BIN}/*
 
 all: clean ${BIN}/hashr-server

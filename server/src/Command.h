@@ -30,6 +30,8 @@ typedef struct Packet Packet;
 #define Command_ST_ZAPPED 9
 #define Command_ST_NO_MATCH 10
 #define Command_ST_MATCH_FOUND 11
+#define Command_ST_UNCHANGED 27
+#define Command_ST_REORGANIZED 28
 
 #define Command_ST_ERROR_LEVEL 30
 #define Command_ST_INVALID_COMMAND 31
@@ -80,9 +82,10 @@ typedef struct Packet Packet;
 	void Command_dtor(Command* self);
 	void Command_fail(Command* self,int id,const char* message);
 	void Command_reportStatus(Command* self,int st,int id,const char* message);
-	int Command_findParamChunk(Command* self,char* id);
-	int Command_loadStrChunk(Command* self,char* id);
-	int Command_loadIntChunk(Command* self,char* id);
+	void Command_reportStatusExtra(Command* self,int st,int id,const char* message,const char* extra);
+	int Command_findParamChunk(Command* self,char* id,int mandatory);
+	int Command_loadStrChunk(Command* self,char* id,int mandatory);
+	int Command_loadIntChunk(Command* self,char* id,int mandatory);
 	void Command_beginReply(Command* self);
 	void Command_endReply(Command* self);
 	int Command_prepareSearch(Command* self,Search* search);

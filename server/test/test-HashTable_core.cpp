@@ -17,20 +17,22 @@ extern "C" {
 // One may say, memmem() may be used for this, but strcmp() is
 // simpler, has less parameters, less to type, less errors.
 
-// CAUTION: These tests are using the "debug" hash method.
-// It takes the first character, and repeats it in higher
-// bytes of the hash longword (4 bytes). Using this method
-// makes possible to test the cases, where hashes collide.
-// E.g. we can be sure that key "a1" and "a2" will collide.
+// CAUTION: These tests are using the "debug0" and "debug1" hash 
+// methods. They takes the first or second character, respectively,
+// and return it as the hash code, so data can be sent to a 
+// specific slot. Using this method makes possible to test the 
+// cases where hashes collide, test the linked list's behaviors.
+// E.g. we can be sure that key "a1" and "a2" will collide with
+// "debug0", but they will be separate slots with "debug1".
 
 
-TEST_CASE("HashTable") {
+TEST_CASE("HashTable core") {
 
 	Logger* logger = new_Logger();
 	Logger_setLevel(logger,Logger_MUTE);
 	HashTable* ht = new_HashTable();
 	HashTable_setLogger(ht,logger);
-	HashTable_setMethod(ht,Hasher_METHOD_DEBUG);
+	HashTable_setMethod(ht,Hasher_METHOD_DEBUG0);
 
 
 	SECTION("check empty state") {

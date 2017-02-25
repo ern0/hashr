@@ -1,3 +1,4 @@
+from command import *
 
 class Parser:
 
@@ -88,7 +89,9 @@ class Parser:
 			if chunkType == b"NCON": desc = "connections"
 			if chunkType == b"METD": desc = "hash method"
 			if chunkType == b"CPTY": desc = "capacity"
+			if chunkType == b"MCAP": desc = "min. capacity"
 			if chunkType == b"NELM": desc = "elements"
+			if chunkType == b"COLP": desc = "collision%"
 			if chunkType == b"ZAPD": desc = "zapped"
 			if chunkType == b"SRES": desc = "match count"
 
@@ -101,6 +104,9 @@ class Parser:
 				if chunkType == b'STAT': 
 					print(" ",end="")
 					self.renderText(chunkData[4:])
+
+				if chunkType == b"METD":
+					print(" " + (Command()).getMethodName(self.getInt(chunkData[:4])),end="")
 
 			else:
 				self.renderAuto(chunkData)

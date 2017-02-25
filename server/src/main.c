@@ -37,8 +37,7 @@
 		
 		for (int i = 0; i < 12; i++) close(i);
 		if (-1 == open("/dev/null",O_RDWR)) exit(4);
-		dup(0);
-		dup(0);
+		int avoidWarning = dup(0) | dup(0);
 
 	} // daemonize()
 
@@ -86,11 +85,11 @@
 		Logger_setFilename(logger,logFile);
 		Logger_setLevel(logger,Logger_DEBUG);
 
-		Logger_log(logger,Logger_DEBUG,9001,"Application started");
+		Logger_log(logger,Logger_DEBUG,9001,"application started");
 
 		server = new_Server();
 		if (server == NULL) {
-			Logger_log(logger,Logger_ERROR,9002,"Out of memory");
+			Logger_log(logger,Logger_ERROR,9002,"out of memory");
 			exit(2);
 		}
 
@@ -100,7 +99,7 @@
 		Logger_logi(
 			logger
 			,Logger_NOTICE | Logger_DISPLAY
-			,9003,"Server is listening on port %d..."
+			,9003,"server is listening on port %d..."
 			,Server_getPort(server)
 		);
 
@@ -117,11 +116,11 @@
 		Logger_log(
 			logger
 			,Logger_NOTICE | Logger_DISPLAY
-			,9004,"Exiting..."
+			,9004,"exiting..."
 		);
 		delete_Server(server);
 		delete_Logger(logger);
 
-		Logger_log(logger,Logger_DEBUG,9005,"Application finished normally");
+		Logger_log(logger,Logger_DEBUG,9005,"application finished normally");
 
 	} // main()

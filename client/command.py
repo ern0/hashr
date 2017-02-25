@@ -12,7 +12,8 @@ class Command:
 		self.requestValue = None
 		
 		self.searchPattern = None
-		self.searchMaxResults = None
+		self.searchLimitStart = None
+		self.searchLimitItems = None
 
 		self.reorgMethod = None
 		self.reorgCapacity = None
@@ -43,9 +44,11 @@ class Command:
 		self.searchPattern = pattern
 		return self
 
-	def setSearchMaxResults(self,maxres):
-		self.searchMaxResults = maxres
-		return self
+	def setSearchLimit(self,start,items):
+		if start < 0: start = 0
+		if items < 0: items = -1
+		self.searchLimitStart = start
+		self.searchLimitItems = items
 
 
 	def setReorgMethod(self,method):
@@ -77,11 +80,14 @@ class Command:
 		if self.searchPattern is not None:
 			packet.addTextBlock("SPAT",self.searchPattern)
 
-		if self.searchMaxResults is not None:
-			packet.addIntBlock("SMAX",self.searchMaxResults)
+		if self.searchLimitStart is not None:
+			packet.addIntBlock("LIMS",self.searchLimitStart)
+
+		if self.searchLimitItems is not None:
+			packet.addIntBlock("LIMI",self.searchLimitItems)
 
 		if self.reorgMethod is not None:
-			packet.addTextBlock("RMET",self.reorgMethod)
+			packet.addIntBlock("RMET",self.reorgMethod)
 
 		if self.reorgCapacity is not None:
 			packet.addIntBlock("RCAP",self.reorgCapacity)
@@ -106,3 +112,21 @@ class Command:
 		if self.cmd == "reorg": return 21
 		if self.cmd == "dump": return 22
 		if self.cmd == "freebeer": return 99
+
+
+	def getMethodName(self,method = None):
+
+		if method is None: method = self.reorgMethod
+
+		if method == 0: return "debug0"
+		if method == 1: return "debug1"
+		if method == 2: return "additive"
+		if method == 3: return "xor"
+		if method == 4: return "rotating"
+		if method == 5: return "Bernstein"
+		if method == 6: return "modified bernstein"
+		if method == 7: return "shift-add-xor"
+		if method == 8: return "Fowler-Noll-Vo"
+		if method == 9: return "one-at-a-time"
+		if method == 10: return "elf"
+

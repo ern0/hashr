@@ -38,16 +38,15 @@ Available commands:
   get, g <key> - show item
   del, d <key> - delete item
   zap - delete all items
-  results - show max. number of search item results
-  results <n> - set max. number of search item results
   kcount, kc <pattern> - search in keys and show match count 
   vcount, vc <pattern> - search in values and show match count
-  count, c <pattern> - search pattern in keys and values and show match count
-  ksearch, ks <pattern> - search in keys and provide result
-  vsearch, vs <pattern> - search in values and provide result
-  search, s <pattern> - search pattern in keys and values and provide result
-  reorg <method> <capacity> - reorganize storage
-    capacity will be rounded up to power of 2
+  count, fc <pattern> - search pattern in keys and values and show match count
+  ksearch, ks <pattern> <start> <limit> - search in keys within specified result window
+  vsearch, vs <pattern> <start> <limit> - search in values within specified result window
+  search, fs <pattern> <start> <limit> - search pattern in keys and values within specified result window
+  reorg <method> <min.capacity> - reorganize storage
+    valid methods are 0 to 10 (0 and 1 are for debugging)
+    effective capacity will be set automatically, this is only a limit
 Debug commands:
   i1 - invalid command: 'freebeer'
   i2 - missing parameters: 'set x'
@@ -67,7 +66,6 @@ Debug commands:
 		self.commandMutex = Lock()
 
 		self.singleShotWords = []
-		self.searchMaxResults = 5
 
 
 	def fatal(self,message,abort = False):
@@ -181,10 +179,12 @@ Debug commands:
 		return result
 
 
-	def parmNumCheck(self,words,num):
+	def parmNumCheck(self,words,num,opt = None):
 
 		parms = len(words) - 1
 		if parms == num: return
+		if opt is not None:
+			if parms == opt: return
 
 		if parms < num: print("missing parameter")
 		if parms > num: print("too many parameters")
@@ -198,6 +198,28 @@ Debug commands:
 		if num < minValue: raise ParameterValueException
 
 		return num
+
+
+	def setSearchParms(self,command,words,search):
+
+		if not search: 
+			self.parmNumCheck(words,1)
+		else:
+			if len(words) < 3: self.parmNumCheck(words,1)
+			else: self.parmNumCheck(words,3)
+
+		command.setSearchPattern(words[1])
+		if not search: return
+
+		if len(words) < 3:
+			command.setSearchLimit(0,-1)
+		else:
+			try: ls = int(words[2])
+			except: ls = 0
+			try: li = int(words[3])
+			except: li = -1
+			if li < 1: li = -1
+			command.setSearchLimit(ls,li)
 
 
 	def processCliCommand(self,words):
@@ -216,18 +238,6 @@ Debug commands:
 			
 			elif cmd == "exit":
 				raise UserExitException
-
-			elif cmd == "results":
-
-				if len(words) != 1: 
-					self.parmNumCheck(words,1)
-					self.searchMaxResults = self.validNum(words[1],0)
-				
-				if self.searchMaxResults == 0: res = "all"
-				else: res = str(self.searchMaxResults)
-
-				print("search result item number: " + res)
-				return None
 
 			command = Command()
 			command.setCommand(cmd)
@@ -255,28 +265,42 @@ Debug commands:
 			elif cmd == "zap":
 				self.parmNumCheck(words,0)
 
-			elif cmd == "ksearch" or cmd == "kcount":
-				self.parmNumCheck(words,1)
-				command.setSearchPattern(words[1])
-				if cmd == "ksearch": 
-					command.setSearchMaxResults(self.searchMaxResults)
+			elif cmd == "ksearch" or cmd == "ks":
+				command.setCommand("ksearch")
+				self.setSearchParms(command,words,True)
 
-			elif cmd == "vsearch" or cmd == "vcount":
-				self.parmNumCheck(words,1)
-				command.setSearchPattern(words[1])
-				if cmd == "vsearch": 
-					command.setSearchMaxResults(self.searchMaxResults)
+			elif cmd == "vsearch" or cmd == "vs":
+				command.setCommand("vsearch")
+				self.setSearchParms(command,words,True)
 
-			elif cmd == "search" or cmd == "count":
-				self.parmNumCheck(words,1)
-				command.setSearchPattern(words[1])
-				if cmd == "search": 
-					command.setSearchMaxResults(self.searchMaxResults)
+			elif cmd == "search" or cmd == "fs":
+				command.setCommand("search")
+				self.setSearchParms(command,words,True)
 
-			elif cmd == "reorg":
-				self.parmNumCheck(words,2)
-				command.setReorgMethod(words[1])
-				command.setReorgCapacity( self.validNum(words[2],8) )
+			elif cmd == "kcount" or cmd == "kc":
+				command.setCommand("kcount")			
+				self.setSearchParms(command,words,False)
+
+			elif cmd == "vcount" or cmd == "vc":
+				command.setCommand("vcount")			
+				self.setSearchParms(command,words,False)
+
+			elif cmd == "count" or cmd == "fc":
+				command.setCommand("count")			
+				self.setSearchParms(command,words,False)
+
+			elif cmd == "reorg" or cmd == "r":
+				command.setCommand("reorg")			
+				self.parmNumCheck(words,1,2)
+				try: met = int(words[1])
+				except: met = -1
+				if met < 0: met = 0
+				if met > 10: met = 10
+				command.setReorgMethod(met)
+				print("hash method: " + command.getMethodName())
+				try: num = int(words[2])
+				except: num = -1
+				if num != -1: command.setReorgCapacity(num)
 
 			elif cmd == "dump" or cmd == 'z':
 				print("check server console for result")

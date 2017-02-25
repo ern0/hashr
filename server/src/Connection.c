@@ -81,7 +81,7 @@
 
 		Connection_setSession(self,session);
 
-		Connection_log(self,Logger_NOTICE | Logger_DISPLAY,2001,"Accepting connection");
+		Connection_log(self,Logger_NOTICE | Logger_DISPLAY,2001,"accepting connection");
 
 		char message[20];
 		sprintf(message,"%d\n",self->session);
@@ -91,18 +91,18 @@
 			return;
 		} // if send fail
 
-		Connection_log(self,Logger_DEBUG,2012,"Connection accepted");
+		Connection_log(self,Logger_DEBUG,2012,"connection accepted");
 
 	} // acceptConnection()
 
 
 	void Connection_rejectConnection(Connection* self) {
 
-		Logger_log(self->logger,Logger_ERROR | Logger_DISPLAY,2011,"No more connections available, rejecting");
+		Logger_log(self->logger,Logger_ERROR | Logger_DISPLAY,2014,"no more connections available, rejecting");
 
 		const char* message = "0\n";
 		int sent = send(self->socket,message,strlen(message),0);
-		if (sent == -1) Connection_log(self,Logger_ERROR,2002,"client send failed");
+		if (sent == -1) Connection_log(self,Logger_ERROR,2015,"client send failed");
 
 	} // rejectConnection()
 
@@ -121,13 +121,13 @@
 		int len = read(self->socket,Packet_getBuffer(self->packet),Packet_BUFLEN);
 
 		if (len == -1) {
-			Connection_log(self,Logger_NOTICE | Logger_DISPLAY,2014,"Error reading client socket, disconnecting");
+			Connection_log(self,Logger_NOTICE | Logger_DISPLAY,2016,"error reading client socket, disconnecting");
 			Connection_closeConnection(self);
 			return -1;
 		} // if read error
 
 		if (len == 0) {
-			Connection_log(self,Logger_NOTICE | Logger_DISPLAY,2015,"Client disconnected");
+			Connection_log(self,Logger_NOTICE | Logger_DISPLAY,2017,"client disconnected");
 			Connection_closeConnection(self);
 			return -1;
 		} // if disconnect

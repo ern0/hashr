@@ -28,7 +28,7 @@
 		self->valueData = NULL;
 		self->valueLength = 0;
 
-		self->method = -1;
+		self->reorgMark = 0;
 
 	} // ctor
 
@@ -41,9 +41,14 @@
 	} // dtor
 
 
-	void HashItem_setMethod(HashItem* self,int method) {
-		self->method = method;
-	} // setMethod()
+	void HashItem_setReorgMark(HashItem* self,char reorgMark) {
+		self->reorgMark = reorgMark;
+	} // setReorgMark()
+
+
+	char HashItem_getReorgMark(HashItem* self) {
+		return self->reorgMark;
+	} // getReorgMark()
 
 
 	void HashItem_dump(HashItem* self) {
@@ -53,7 +58,6 @@
 			return;
 		}
 
-		if (self->method != 1) printf("%d:",self->method);
 		for (int i = 0; i < self->keyLength; i++) {
 			printf("%c",self->keyData[i]);
 		}
@@ -64,10 +68,7 @@
 			printf("%c",self->valueData[i]);
 		}
 
-		if (self->next != NULL) {
-			printf(" ");
-			HashItem_dump(self->next);
-		}
+		printf(" ");
 
 	} // dump()
 
@@ -153,3 +154,15 @@
 	int HashItem_searchValue(HashItem* self,char* data,int length) {
 		return (NULL != memmem(self->valueData,self->valueLength,data,length));
 	} // searchValue()
+
+
+	int HashItem_matchKey(HashItem* self,char* data,int length) {
+		if (length != self->keyLength) return 0;
+		return (0 == memcmp(self->keyData,data,length));
+	} // matchKey()
+
+
+	int HashItem_matchValue(HashItem* self,char* data,int length) {
+		if (length != self->valueLength) return 0;
+		return (0 == memcmp(self->valueData,data,length));
+	} // matchValue()
