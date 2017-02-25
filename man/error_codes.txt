@@ -1,0 +1,152 @@
+Error codes
+===========
+
+9001 Application started
+  This is the first log message after starting
+  the application
+   
+9002 Out of memory
+  Application can not start due to failed
+  memory allocation
+
+9003 Server is listening on port <n>...
+  Server is started, waiting for connections
+  on the port displayed
+
+9004 Exiting...
+  Server is about to exit, started cleanup process
+
+9005 Application finished
+  This is the last log message before the 
+  application exits
+
+1001 socket failed
+  Failed to open socket by server
+
+1002 setsockopt failed
+  Failed to set server socket options
+
+1003 bind failed
+  Failed to bind listen port. Probably the port 
+  is used by anoter program or another instance
+
+1004 listen failed
+  Failed to start listening on the port
+
+1005 select error
+  Failed to perform select syscall on the list
+  of client sockets
+
+1006 accept error
+  Failed to accept incoming connection
+
+1007 no memory for new connection
+  Failed to allocate memory for new connection
+
+1008 internal error, invalid client socket
+  Activity on a socket which is previously
+  not connected
+
+2001 accepting connection
+  Server is processing a client connection 
+
+2011 client send failed
+  The server is failed to send handshakee message 
+  to a client
+
+2012 connection accepted
+  The server established a connection with a
+  client
+
+2014 no more connections available, rejecting
+  The server established a connection with
+  a client, but not enough connection slots
+  available, so rejecting it
+
+2015 client send failed
+  The server is failed to send reject message
+  to the client
+
+2016 error reading client socket, disconnecting
+  The server is failed to read a client socket,
+  dropping connection
+
+2017 client disconnected
+  Client is disconnected, connection slot will
+  be available for other client connections
+
+2018 invalid request
+  Incoming request is wrong. Probably, it's not
+  a Hashr client
+
+2019 damaged request
+  Incoming request has consistency error
+
+2020 no command in request
+  A valid request received, but contains no 
+  valid command token
+
+2203 missing parameter
+  A command received, but one of mandatory 
+  parameters is not set
+
+2201 invalid command
+  Wrong command token code
+
+2202 info provided
+  "info" command responded
+
+2210 data updated
+  "set" command performed, existing data
+  replaced
+
+2211 data inserted
+  "set" command performed, new data item added
+
+2212 data found
+  "get" command provided a key-value item
+
+2213 no such key
+  "get" command found no item with the
+  requested key
+
+2214 data deleted
+  "del" command has deleted the requested item
+
+2215 key not exits (del)
+  "del" command failed to delete the item
+  as it has not existed before
+
+2216 alerady empty
+  "zap" command has not deleted anything
+  because the hashtable was empty
+
+2217 all items deleted
+  "zap" command has deleted all the items
+
+2218 missing search pattern
+  "search" or "count" command issued with
+  no search pattern parameter
+
+2219 no match
+  "search" or "count" command found no
+  mathcing item
+
+2220 search result provided
+  "search" or "count" command provided data
+
+2221 unchanged parameters
+  "reorg" command has nothing to do
+
+2222 hashtable reorganized
+  "reorg" command proceed
+
+2809 internal error: setting hash method is not allowed
+  hash method setting is not allowed when there
+  are already items in the hashtable
+
+2802 out of memory
+  memory allocation failed for new item
+
+2803 out of memory
+  memory allocation failed for expanding hashtable
