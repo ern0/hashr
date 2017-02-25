@@ -44,9 +44,9 @@ Available commands:
   ksearch, ks <pattern> <start> <limit> - search in keys within specified result window
   vsearch, vs <pattern> <start> <limit> - search in values within specified result window
   search, fs <pattern> <start> <limit> - search pattern in keys and values within specified result window
-  reorg <method> <capacity> - reorganize storage
-    valid methods are 1 to 11 (1 and 2 are for debugging)
-    capacity will be rounded up to power of 2
+  reorg <method> <min.capacity> - reorganize storage
+    valid methods are 0 to 10 (0 and 1 are for debugging)
+    effective capacity will be set automatically, this is only a limit
 Debug commands:
   i1 - invalid command: 'freebeer'
   i2 - missing parameters: 'set x'
@@ -179,10 +179,12 @@ Debug commands:
 		return result
 
 
-	def parmNumCheck(self,words,num):
+	def parmNumCheck(self,words,num,opt = None):
 
 		parms = len(words) - 1
 		if parms == num: return
+		if opt is not None:
+			if parms == opt: return
 
 		if parms < num: print("missing parameter")
 		if parms > num: print("too many parameters")
@@ -289,7 +291,7 @@ Debug commands:
 
 			elif cmd == "reorg" or cmd == "r":
 				command.setCommand("reorg")			
-				self.parmNumCheck(words,2)
+				self.parmNumCheck(words,1,2)
 				try: met = int(words[1])
 				except: met = -1
 				if met < 0: met = 0
@@ -298,8 +300,7 @@ Debug commands:
 				print("hash method: " + command.getMethodName())
 				try: num = int(words[2])
 				except: num = -1
-				if num < 8: num = 8
-				command.setReorgCapacity(num)
+				if num != -1: command.setReorgCapacity(num)
 
 			elif cmd == "dump" or cmd == 'z':
 				print("check server console for result")

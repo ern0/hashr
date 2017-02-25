@@ -22,11 +22,13 @@
 
 	void HashTable_ctor(HashTable* self) {
 
-		self->method = Hasher_METHOD_DEFAULT;
-		self->capacity = Utils_roundUp2Power(HashTable_CAPACITY_DEFAULT);
-		self->hashMask = Utils_calcHashMask(self->capacity);		
 		self->numberOfElms = 0;
 		self->reorgMark = 0;
+		self->lastCommandEffect = HashTable_CAPACITY_EXPAND;
+		self->method = Hasher_METHOD_DEFAULT;
+		self->capacity = HashTable_applyCapacityLimits(HashTable_CAPACITY_MIN);
+		self->minCapacity = HashTable_applyCapacityLimits(HashTable_CAPACITY_MIN);
+		self->hashMask = Utils_calcHashMask(self->capacity);		
 
 		self->items = (HashItem**)malloc(self->capacity * sizeof(HashItem*));
 		if (self->items == NULL) HashTable_outOfMemory(self,2801);
@@ -83,20 +85,64 @@
 	} // setMethod()
 
 
-	int HashItem_setAndAdjustMethod(HashTable* self,int method) {
-
-		if (method < 0) return self->method;
-		if (method > Hasher_METHOD_MAX) return self->method;
-
-		self->method = method;
-
-		return method;
-	} // setAndAdjustMethod()
+	int HashTable_getMinCapacity(HashTable* self) {
+		return self->minCapacity;
+	} // getMinCapacity()
 
 
 	int HashTable_getCapacity(HashTable* self) {
 		return self->capacity;
 	} // getCapacity()
+
+
+	/* static */ int HashTable_applyCapacityLimits(int capacity) {
+
+		if (capacity < HashTable_CAPACITY_MIN) {
+			capacity = HashTable_CAPACITY_MIN;
+		}
+
+		if (capacity > HashTable_CAPACITY_MAX) {
+			capacity = HashTable_CAPACITY_MAX;
+		}
+
+		capacity = Utils_roundUp2Power(capacity);
+
+		return capacity;
+	} // applyCapacityLimits()
+
+
+	void HashTable_calcMinCapacity(HashTable* self,int minCapacity) {
+
+		// if no minimum set
+		if (minCapacity == -1) minCapacity = self->minCapacity;
+		if (minCapacity == -1) minCapacity = HashTable_CAPACITY_MIN;
+
+		// apply limits
+		minCapacity = HashTable_applyCapacityLimits(minCapacity);
+
+		// it must be least 2x number of elements
+		int optimalMin = HashTable_calcOptimalCapacity(self);
+		if (optimalMin > minCapacity) minCapacity = optimalMin;
+
+		// apply limits
+		self->minCapacity = HashTable_applyCapacityLimits(minCapacity);
+
+	} // calcMinCapacity()
+
+
+	int HashTable_calcOptimalCapacity(HashTable* self) {
+
+		int optimal;
+		if (self->lastCommandEffect == HashTable_CAPACITY_EXPAND) {
+			optimal = self->numberOfElms * 2;
+		} else {
+			optimal = self->numberOfElms * 3;
+		}
+
+		optimal = Utils_roundUp2Power(optimal);
+
+		return optimal;
+	} // calcOptimalCapacity()
 
 
 	int HashTable_getNumberOfElms(HashTable* self) {
@@ -201,6 +247,8 @@
 		HashTable_linkItem(self,item,hash);
 
 		self->numberOfElms++;
+		self->lastCommandEffect = HashTable_CAPACITY_EXPAND;
+		HashTable_performReorg(self,-1);
 
 		return HashTable_SET_INSERTED;
 	} // performSet()
@@ -250,6 +298,8 @@
 
 		delete_HashItem(item);
 		--self->numberOfElms;
+		self->lastCommandEffect = HashTable_CAPACITY_SHRINK;
+		HashTable_performReorg(self,-1);
 
 		return HashTable_DEL_DELETED;
 	} // performDel()
@@ -289,6 +339,9 @@
 
 		} // foreach items
 
+		self->lastCommandEffect = HashTable_CAPACITY_SHRINK;
+		HashTable_performReorg(self,-1);
+
 		return HashTable_ZAP_ZAPPED;
 	} // performZap()
 
@@ -313,13 +366,23 @@
 	} // performSearch()
 
 
-	int HashTable_performReorg(HashTable* self,int method,int capacity) {
+	int HashTable_performReorg(HashTable* self,int method) {
 
+		if (method == -1) method = self->method;
+
+		int capacity = HashTable_calcOptimalCapacity(self);
+		if (capacity < self->minCapacity) capacity = self->minCapacity;
 		capacity = Utils_roundUp2Power(capacity);
 
 		if ((method == self->method) && (capacity == self->capacity)) {
 			return HashTable_REORG_UNCHANGED;
 		} // if unchanged
+
+		if (self->lastCommandEffect == HashTable_CAPACITY_SHRINK) {
+			if (capacity > self->capacity) return HashTable_REORG_UNCHANGED;
+		} else {
+			if (capacity < self->capacity) return HashTable_REORG_UNCHANGED;
+		}
 
 		self->reorgMark ^= 0xff;
 		self->method = method;

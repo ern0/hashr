@@ -42,13 +42,14 @@ Request block types:
   "LIMS" - search limit start index
   "LIMI" - search limit item number
   "RMET" - reorg method
-  "RCAP" - reorg capacity
+  "RCAP" - reorg suggested minumum capacity
 
 Response block types:
   "INFO" - info response
   "NCON" - no. of connections
   "METD" - actual hash method
-  "CPTY" - hash table capacity (slots)
+  "CPTY" - actual hash table capacity (slots)
+  "MCAP" - hash table minimum capacity
   "NELM" - number of elements
   "COLP" - collision percent
   "STAT" - status

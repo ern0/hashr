@@ -14,8 +14,11 @@
 #include "Hasher.h"
 #include "Search.h"
 
-#define HashTable_CAPACITY_DEFAULT 8
-#define HashTable_CAPACITY_MAX 0x10000
+#define HashTable_CAPACITY_MIN 4
+#define HashTable_CAPACITY_MAX (1024*1024)
+
+#define HashTable_CAPACITY_EXPAND 1
+#define HashTable_CAPACITY_SHRINK 2
 
 #define HashTable_SET_INSERTED 11
 #define HashTable_SET_UPDATED 12
@@ -37,18 +40,21 @@
 		Logger* logger;
 		int method;
 		int capacity;
+		int minCapacity;
 		int hashMask;
 		int numberOfElms;
 		HashItem** items;
 		int reorgMethod;
 		int reorgCapacity;
 		char reorgMark;
+		char lastCommandEffect;
 	};
 	typedef struct HashTable HashTable;
 
 	// protected
 	void HashTable_ctor(HashTable* self);
 	void HashTable_dtor(HashTable* self);
+	void HashTable_outOfMemory(HashTable* self,int code);	
 	HashItem** HashTable_findItem(HashTable* self,int hash,char* data,int lenght);
 	int HashTable_getHash(HashTable* self,char* data,int len);
 	void HashTable_resizeMemory(HashTable* self,int capacity);
@@ -60,11 +66,13 @@
 	void HashTable_setLogger(HashTable* self,Logger* logger);
 	void HashTable_setMethod(HashTable* self,int method);
 	int HashTable_getMethod(HashTable* self);
-	int HashTable_setAndAdjustMethod(HashTable* self,int method);
+	int HashTable_getMinCapacity(HashTable* self);
 	int HashTable_getCapacity(HashTable* self);
 	int HashTable_getNumberOfElms(HashTable* self);
 	int HashTable_getCollisionPercent(HashTable* self);
-	void HashTable_outOfMemory(HashTable* self,int code);	
+	/* static */ int HashTable_applyCapacityLimits(int capacity);
+	void HashTable_calcMinCapacity(HashTable* self,int capacity);
+	int HashTable_calcOptimalCapacity(HashTable* self);
 	void HashTable_dump(HashTable* self);	
 
 	int HashTable_performSet(HashTable* self,char* keydata,int keylen,char* valdata,int vallen);
@@ -72,7 +80,7 @@
 	int HashTable_performDel(HashTable* self,char* keydata,int keylen);
 	int HashTable_performZap(HashTable* self);
 	int HashTable_performSearch(HashTable* self,Search* search);
-	int HashTable_performReorg(HashTable* self,int method,int capacity);
+	int HashTable_performReorg(HashTable* self,int method);
 
 
 #endif

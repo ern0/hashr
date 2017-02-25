@@ -167,6 +167,8 @@
 		if (chunkIndex == -1) return -1;
 
 		unsigned char* buffer = Packet_getBuffer(self->packet);
+		int length = Utils_getBufInt(&buffer[chunkIndex - 4]);
+		if (length < 4) return -1;
 		int result = Utils_getBufInt(&buffer[chunkIndex]);
 
 		return result;
@@ -234,6 +236,9 @@
 		int method = HashTable_getMethod(self->hashTable);
 		Packet_appendIntChunk(self->packet,"METD",method);
 
+		int minCapacity = HashTable_getMinCapacity(self->hashTable);
+		Packet_appendIntChunk(self->packet,"MCAP",minCapacity);
+
 		int capacity = HashTable_getCapacity(self->hashTable);
 		Packet_appendIntChunk(self->packet,"CPTY",capacity);
 		
@@ -260,6 +265,8 @@
 
 		Command_beginReply(self);
 
+		int oldCapacity = HashTable_getCapacity(self->hashTable);
+
 		int result = HashTable_performSet(
 			self->hashTable
 			,keyData,keyLength
@@ -281,6 +288,11 @@
 				,2211,"Data inserted"
 			);
 		} // else updated
+
+		int capacity = HashTable_getCapacity(self->hashTable);
+		if (oldCapacity != capacity) {
+			Packet_appendIntChunk(self->packet,"CPTY",capacity);
+		}
 
 		Command_endReply(self);
 
@@ -336,6 +348,8 @@
 
 		Command_beginReply(self);
 
+		int oldCapacity = HashTable_getCapacity(self->hashTable);
+
 		char* valueData = NULL;
 		int valueLength = 0;
 		int result = HashTable_performDel(
@@ -359,6 +373,11 @@
 			);
 		} // else not found
 
+		int capacity = HashTable_getCapacity(self->hashTable);
+		if (oldCapacity != capacity) {
+			Packet_appendIntChunk(self->packet,"CPTY",capacity);
+		}
+
 		Command_endReply(self);
 
 	} // processDel()
@@ -369,6 +388,7 @@
 		Command_beginReply(self);
 
 		int zapped = HashTable_getNumberOfElms(self->hashTable);
+		int oldCapacity = HashTable_getCapacity(self->hashTable);
 
 		if (HashTable_performZap(self->hashTable) == HashTable_ZAP_EMPTY) {
 			Command_reportStatus(
@@ -387,6 +407,11 @@
 		} // else zapped
 
 		Packet_appendIntChunk(self->packet,"ZAPD",zapped);
+
+		int capacity = HashTable_getCapacity(self->hashTable);
+		if (oldCapacity != capacity) {
+			Packet_appendIntChunk(self->packet,"CPTY",capacity);
+		}
 
 		Command_endReply(self);
 
@@ -566,11 +591,12 @@
 		Command_beginReply(self);
 
 		int method = Command_loadIntChunk(self,"RMET",1);
-		if ( method == -1 ) return;
-		int capacity = Command_loadIntChunk(self,"RCAP",1);
-		if ( capacity == -1 ) return;
+		if (method == -1) return;
 
-		int result = HashTable_performReorg(self->hashTable,method,capacity);
+		int minCapacity = Command_loadIntChunk(self,"RCAP",0);
+		HashTable_calcMinCapacity(self->hashTable,minCapacity);
+
+		int result = HashTable_performReorg(self->hashTable,method);
 
 		if (result == HashTable_REORG_UNCHANGED) {
 			Command_reportStatus(
