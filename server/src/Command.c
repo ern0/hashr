@@ -135,7 +135,7 @@
 			Command_reportStatusExtra(
 				self
 				,Command_ST_MISSING_PARAM
-				,2203,"Missing parameter"
+				,2203,"missing parameter"
 				,id
 			);
 
@@ -198,7 +198,7 @@
 		Command_reportStatus(
 			self
 			,Command_ST_INVALID_COMMAND
-			,2201,"Invalid command"
+			,2201,"invalid command"
 		);
 
 		Command_endReply(self);
@@ -228,7 +228,7 @@
 
 		Command_beginReply(self);
 
-		Command_reportStatus(self,Command_ST_INFO_PROVIDED,2202,"Info provided");
+		Command_reportStatus(self,Command_ST_INFO_PROVIDED,2202,"info provided");
 	
 		int noOfConns = Server_getNumberOfConnections(self->server);
 		Packet_appendIntChunk(self->packet,"NCON",noOfConns);
@@ -277,7 +277,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_UPDATED
-				,2210,"Data updated"
+				,2210,"data updated"
 			);
 		} // if inserted
 
@@ -285,7 +285,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_INSERTED
-				,2211,"Data inserted"
+				,2211,"data inserted"
 			);
 		} // else updated
 
@@ -320,7 +320,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_FOUND
-				,2212,"Data found"
+				,2212,"data found"
 			);
 
 			Packet_appendChunk(self->packet,"AVAL",valueData,valueLength);
@@ -331,7 +331,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_NOT_FOUND
-				,2213,"No such key"
+				,2213,"no such key"
 			);
 		} // else not found
 
@@ -361,7 +361,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_DELETED
-				,2214,"Data deleted"
+				,2214,"data deleted"
 			);
 		} // if found
 
@@ -394,7 +394,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_EMPTY
-				,2216,"Already empty"
+				,2216,"already empty"
 			);
 		} // if already empty
 
@@ -402,7 +402,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_ZAPPED
-				,2217,"All items deleted"
+				,2217,"all items deleted"
 			);
 		} // else zapped
 
@@ -522,7 +522,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_MISSING_PARAM
-				,2218,"Missing search pattern"
+				,2218,"missing search pattern"
 			);
 			Command_endReply(self);
 
@@ -545,7 +545,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_NO_MATCH
-				,2218,"No match"
+				,2219,"no match"
 			);
 		} // if empty
 
@@ -553,7 +553,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_MATCH_FOUND
-				,2219,"Search result provided"
+				,2220,"search result provided"
 			);
 		} // if any hits
 
@@ -602,7 +602,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_UNCHANGED
-				,2221,"Unchanged parameters"
+				,2221,"unchanged parameters"
 			);
 		} // if unchanged
 
@@ -610,7 +610,7 @@
 			Command_reportStatus(
 				self
 				,Command_ST_REORGANIZED
-				,2222,"Hashtable reorganized"
+				,2222,"hashtable reorganized"
 			);
 		}
 

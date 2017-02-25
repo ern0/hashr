@@ -74,7 +74,7 @@
 			Logger_log(
 				self->logger
 				,Logger_FATAL
-				,2809,"Internal error: setting hash method is not allowed"
+				,2809,"internal error: setting hash method is not allowed"
 			);
 			exit(2);
 

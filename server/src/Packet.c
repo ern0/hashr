@@ -156,19 +156,19 @@
 	int Packet_process(Packet* self) {
 
 		if (!Packet_isHeaderOk(self)) {
-			Packet_log(self,Logger_ERROR | Logger_DISPLAY,2018,"Invalid request");
+			Packet_log(self,Logger_ERROR | Logger_DISPLAY,2018,"invalid request");
 			return -1;		
 		} // if invalid request
 
 		self->chunkCount = Packet_scanChunks(self);
 		if (self->chunkCount == -1) {
-			Packet_log(self,Logger_ERROR | Logger_DISPLAY,2019,"Damaged request");
+			Packet_log(self,Logger_ERROR | Logger_DISPLAY,2019,"damaged request");
 			return -1;		
 		} // if damaged request
 
 		int cmdIndex = Packet_findChunk(self,"CMND");
 		if (cmdIndex == -1) {
-			Packet_log(self,Logger_ERROR | Logger_DISPLAY,2020,"No command in request");
+			Packet_log(self,Logger_ERROR | Logger_DISPLAY,2020,"no command in request");
 			return -1;
 		} // if no command in packet
 
