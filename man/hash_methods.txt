@@ -1,0 +1,38 @@
+Hash methods
+============
+
+Hash methods can set by "reorg" command.
+
+Example:
+
+  hashr-1> reorg 10
+
+Reorganize the hashtable, using "elf" 
+hashing method.
+
+The hash method can be a number between 0 and 10:
+
+Methods for debugging
+--------------------- 
+ 0: "debug0"
+ 1: "debug1"
+
+These methods use the first or second character
+of the key as hash value, respectively. The value
+will be in range of 0..255.
+
+These methods are not designed for real life,
+but useful for debugging: the test program can
+define, which slot will be used to store the item.
+
+Further implemented methods
+---------------------------
+ 2: "additive"
+ 3: "xor"
+ 4: "rotating"
+ 5: "Bernstein"
+ 6: "modified Berstein"
+ 7: "shift-add-xor"
+ 8: "Fowler-Noll-Vo"
+ 9: "one-at-a-time"
+10: "elf"
