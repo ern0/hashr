@@ -18,7 +18,7 @@ TEST_CASE("Search") {
 	Logger_setLevel(logger,Logger_MUTE);
 	HashTable* ht = new_HashTable();
 	HashTable_setLogger(ht,logger);
-	HashTable_setMethod(ht,Hasher_METHOD_DEBUG);
+	HashTable_setMethod(ht,Hasher_METHOD_DEBUG0);
 	int result;
 	HashItem* item;
 

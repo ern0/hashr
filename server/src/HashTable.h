@@ -14,7 +14,7 @@
 #include "Hasher.h"
 #include "Search.h"
 
-#define HashTable_CAPACITY_MIN 4
+#define HashTable_CAPACITY_MIN 256
 #define HashTable_CAPACITY_MAX (1024*1024)
 
 #define HashTable_CAPACITY_EXPAND 1

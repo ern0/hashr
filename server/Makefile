@@ -101,7 +101,8 @@ test: \
 	${BIN}/test-Utils \
 	${BIN}/test-Packet_scan \
 	${BIN}/test-Packet_build \
-	${BIN}/test-HashTable \
+	${BIN}/test-HashTable_core \
+	${BIN}/test-HashTable_reorg \
 
 ${BIN}/test-Utils: \
 		Makefile ${OBJ} ${BIN} \
@@ -150,20 +151,20 @@ ${BIN}/test-Packet_build: \
 		${OBJ}/Search.o \		
 		-o ${BIN}/test-Packet_build
 
-${BIN}/test-HashTable: \
+${BIN}/test-HashTable_core: \
 		Makefile ${OBJ} ${BIN} \
-		${TST}/test-HashTable.cpp \
+		${TST}/test-HashTable_core.cpp \
 		${OBJ}/HashTable.o \
 		${OBJ}/Utils.o
 	${TC} \
-		${TST}/test-HashTable.cpp \
+		${TST}/test-HashTable_core.cpp \
 		${OBJ}/Utils.o \
 		${OBJ}/Logger.o \
 		${OBJ}/HashTable.o \
 		${OBJ}/HashItem.o \
 		${OBJ}/Hasher.o \
 		${OBJ}/Search.o \
-		-o ${BIN}/test-HashTable
+		-o ${BIN}/test-HashTable_core
 
 ${BIN}/test-Search: \
 		Makefile ${OBJ} ${BIN} \
@@ -183,6 +184,21 @@ ${BIN}/test-Search: \
 		${OBJ}/Hasher.o \
 		${OBJ}/Search.o \
 		-o ${BIN}/test-Search
+
+${BIN}/test-HashTable_reorg: \
+		Makefile ${OBJ} ${BIN} \
+		${TST}/test-HashTable_reorg.cpp \
+		${OBJ}/HashTable.o \
+		${OBJ}/Utils.o
+	${TC} \
+		${TST}/test-HashTable_reorg.cpp \
+		${OBJ}/Utils.o \
+		${OBJ}/Logger.o \
+		${OBJ}/HashTable.o \
+		${OBJ}/HashItem.o \
+		${OBJ}/Hasher.o \
+		${OBJ}/Search.o \
+		-o ${BIN}/test-HashTable_reorg
 
 ########################################################
 

@@ -1,10 +1,11 @@
 #ifndef Hasher_h_included
 #define Hasher_h_included
 
-
-#define Hasher_METHOD_DEBUG 1
-#define Hasher_METHOD_MAX 10
 #define Hasher_METHOD_DEFAULT 10
+
+#define Hasher_METHOD_DEBUG0 0
+#define Hasher_METHOD_DEBUG1 1
+#define Hasher_METHOD_MAX 10
 
 
 // static
