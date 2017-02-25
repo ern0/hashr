@@ -49,9 +49,7 @@
 		if (length <= pos) return 0;
 
 		int result = key[pos];
-		result |= key[0] << 8;
-		result |= key[0] << 16;
-		result |= key[0] << 24;
+		result = result & 0xff;
 
 		return result;
 	} // debug()
