@@ -5,7 +5,7 @@ pkill -KILL hashr
 #bin/`uname -s`-`uname -p`/hashr-server ; exit
 
 bin/`uname -s`-`uname -p`/hashr-server -f /tmp/hashr.pid -l /tmp/hashr.log &
-../client/client.py ; sleep .2 ; kill `cat /tmp/hashr.pid` ; exit
+../client/client.py localhost ; sleep .2 ; kill `cat /tmp/hashr.pid` ; exit
 
 ../client/client.py -c reorg 9 8
 

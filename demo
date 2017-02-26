@@ -1,0 +1,31 @@
+#!/bin/bash
+
+PLATFORM=`uname -s`-`uname -p`
+
+# compile server
+
+clear
+cd server
+make -j4 bin/$PLATFORM/hashr-server
+
+
+# start split-screen server and client
+
+tmux new -d -s hashr bin/$PLATFORM/hashr-server -p 8001
+tmux split-window "../client/client.py localhost 8001 ; tmux kill-session -t hashr"
+tmux a
+
+# compile and run tests
+
+clear
+cd ../test
+make -j4 test
+
+bin/$PLATFORM/test-Utils
+bin/$PLATFORM/test-Packet_scan
+bin/$PLATFORM/test-Packet_build
+bin/$PLATFORM/test-HashTable_core
+bin/$PLATFORM/test-Search
+bin/$PLATFORM/test-HashTable_reorg
+
+echo check man/ direcory for manual
