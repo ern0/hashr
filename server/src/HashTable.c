@@ -183,18 +183,23 @@
 
 	void HashTable_dump(HashTable* self) {
 
+		int displayed = 0;
 		for (int i = 0; i < self->capacity; i++) {
 			HashItem* item = self->items[i];
 			if ( (self->capacity > 32) && (item == NULL)) continue;
 
 			printf("%04X: ",i);
 			while (item != NULL) {
+				displayed++;
 				HashItem_dump(item);
 				item = HashItem_getNext(item);
 			}
 			printf("\n");
 		} // foreach items
 
+		if (displayed == 0) {
+			printf("empty\n");
+		}
 	} // dump()
 
 
