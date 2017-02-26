@@ -23,13 +23,16 @@ class UserExitException(Exception): pass
 class Client(Thread):
 
 
-	def printHelp(self):
+	def printAbout(self):
 		print(
 """This is a client for Hashr, the example key-value database.
 Usage:
   """ + os.path.basename(sys.argv[0]) + """ [host [port]] [-c <command>]
-    If no command is specified, CLI client will be started.
-Available commands:
+    If no command is specified, CLI client will be started.""")
+
+	def printHelp(self):
+		print(
+"""Available commands:
   help - voila
   quit, exit, q - leave client
   info, i - retrieve some info from server
@@ -79,6 +82,14 @@ Debug commands:
 
 
 	def parseArgs(self):
+
+		about = False
+		try: 
+			if sys.argv[1][1] == "h": about = True
+		except IndexError: about = True
+		if about:
+			self.printAbout()
+			exit(0)
 
 		found = None
 		item = 0
@@ -230,6 +241,7 @@ Debug commands:
 			cmd = words[0].lower()
 
 			if cmd == "help" or cmd == 'h':
+				self.printAbout()
 				self.printHelp()
 				return None
 
