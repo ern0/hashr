@@ -1,4 +1,122 @@
 Protocol
 ========
 
+Communication follows the classic client-server
+architecture: the client sends a request packet 
+to the server, the serve performs the operation,
+then sends back the reply packet.
 
+The server listens on a TCP port. Maximum of 20
+client can connect at a time, but as the server
+is single-threaded, requests are processed one
+by one.
+
+The packet format is binary, it's similar to IFF
+file format.
+
+The first 4 byte of the packet is a magic number,
+ascii value of "HSHr". From this point (offset 4),
+the packet is divided into chunks.
+
+A chunk always has a 4-byte ID, a 4-byte length 
+and payload. The length and payload depends on the 
+chunk type. After the payload, next chunk ID comes.
+Storing chunk lengths makes possible to programs
+to scan the packet without knowing chunks, so it
+can search for a specific type of chunk.
+
+Most of chunk types contain a single 4-byte integer
+value or a single data packet.
+
+At the end of the packet, there is a special 
+chunk with id of "cntr": this chunk marks the end
+of the file. It has no payload or even length.
+This chunk ID is the last 4 byte of the packet.
+
+Chunk lenght is stored on 4-byte big-endian order
+(native ARM or MC68000 format, high bytes first).
+So, the maximum lenght of the chunk can be 4 Gbyte.
+There is no restriction on data format inside the 
+chunk, but the application uses the same 4-byte
+format for integer values.
+
+The request packet may contain a chunk with ID of 
+"cntr", and a 4-byte integer data. In this case, 
+the server replies the same chunk, which can be used 
+for pairing responses for requests on client side.
+
+
+Exmple packet
+=============
+
+Let's perform a simple command from the CLI tool:
+
+  hashr-1> set thekey thevalue  
+
+The set command asks the server to store an
+item with the given key and value.
+
+This is how this request looks in native binary
+format:
+  ---------------------------------------
+  0000: 48 53 48 72 43 4D 4E 44  HSHrCMND
+  0008: 00 00 00 04 00 00 00 04  ........
+  0010: 63 6E 74 72 00 00 00 04  cntr....
+  0018: 00 00 00 10 51 4B 45 59  ....QKEY
+  0020: 00 00 00 06 74 68 65 6B  ....thek
+  0028: 65 79 51 56 41 4C 00 00  eyQVAL..
+  0030: 00 08 74 68 65 76 61 6C  ..theval
+  0038: 75 65 65 6E 64 6D        ueendm
+  ---------------------------------------
+This is the whole packet, now we will break it
+into its elements.
+
+
+The first 4 byte is the signature:
+  ---------------------------------------
+  0000: 48 53 48 72              HSHr
+  ---------------------------------------
+
+The first chunk is a "CMND" chunk, its lenght
+is 4 byte:
+  ---------------------------------------
+  0000:             43 4D 4E 44      CMND
+  0008: 00 00 00 04 00 00 00 04  ........
+  ---------------------------------------
+The value is also 4, which is the token of
+the "set" command.
+
+Now comes the "cntr" chunk, it's also 4 byte long:
+  ---------------------------------------
+  0010: 63 6E 74 72 00 00 00 04  cntr....
+  0018: 00 00 00 10              ....
+  ---------------------------------------
+It contains the value of 16, which the server will
+echo in its response.
+
+The next chunk is the "QKEY", it contains the
+set command's key parameter, in binary format.
+  ---------------------------------------
+  0018:             51 4B 45 59      QKEY
+  0020: 00 00 00 06 74 68 65 6B  ....thek
+  0028: 65 79                    ey
+  ---------------------------------------
+This chunk's data is 6 bytes long, the payload 
+contains the string "thekey" (without any ending
+mark).
+
+The last normal chunk is the "QVAL", the set 
+command's value parameter.
+  ---------------------------------------
+  0028:       51 56 41 4C 00 00    QVAL..
+  0030: 00 08 74 68 65 76 61 6C  ..theval
+  0038: 75 65                    ue
+  ---------------------------------------
+It's 8 bytes long, and contains "thevalue".
+
+And last, comes the "endm" endmark.
+  ---------------------------------------
+  0038:       65 6E 64 6D          endm
+  ---------------------------------------
+It has no length or data, this is the end of
+the packet.
