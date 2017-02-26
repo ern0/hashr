@@ -37,7 +37,6 @@ Request block types:
   "CMND" - specifies command, e.g. "set", "del" etc.
   "QKEY" - request key 
   "QVAL" - request value (payload)
-  "SFIL" - search filter ("key"/"value"/"all")
   "SPAT" - search pattern
   "LIMS" - search limit start index
   "LIMI" - search limit item number

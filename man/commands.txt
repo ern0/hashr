@@ -1,0 +1,432 @@
+Commands and status values
+==========================
+
+This document describes the list of commands
+and possible responses. Commands ralways return
+status code. There is different status set for 
+each command.
+
+Communication follows the classic client-server
+architecture: the client sends a request packet 
+to the server, the serve performs the operation,
+then sends back the reply packet.
+
+The packet consist of chunks. A chunk has an
+ID, and payload. The payload depends on chunk
+type, usually a chunk contains a single integer
+value or a single data packet.
+
+  The packet format is described in 
+  protocol.txt
+
+There are the following command groups:
+
+Hashtable "CRUD", data manipulation commands:
+  set, get, del, zap
+
+Search and count:
+  search, ksearch, vsearch, count, kcount,
+  vcount
+
+Administration commands:
+  info, reorg
+
+Debug:
+  dump
+
+Technical:
+  beat
+
+
+Hashtable CRUD commands
+=======================
+
+set
+---
+Inserts or updates a key-value pair.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 4 (set)
+- key:
+  chunk ID: "QKEY"
+  chunk type: binary data
+- value:
+  chunk ID: "QVAL"
+  chunk type: binary data
+
+Response:
+- status:
+  chunk ID: "STAT"
+  chunk type: 4-byte integer
+  possible values:
+    2: inserted
+    3: upadted
+- hash table capacity:
+  only when: hashtable resized (expanded)
+  chunk ID: "CPTY"
+  chunk type: 4-byte integer
+
+
+get
+---
+Retrieves value for the specified key.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 2 (get)
+- key:
+  chunk ID: "QKEY"
+  chunk type: binary data
+
+Response:
+- status:
+  chunk ID: "STAT"
+  chunk type: 4-byte integer
+  possible values:
+    4 (found)
+    5 (not found)
+- value:
+  only when: status is 4
+  chunk ID: "QVAL"
+  chunk type: binary data
+
+
+del
+---
+Removes the item with the given key.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 5 (del)
+- key:
+  chunk ID: "QKEY"
+  chunk type: binary data
+
+Response:
+- status:
+  chunk ID: "STAT"
+  chunk type: 4-byte integer
+  possible values:
+    6 (deleted)
+    7 (not exists)
+- hash table capacity:
+  only when: hashtable resized (shrinked)
+  chunk ID: "CPTY"
+  chunk type: 4-byte integer
+
+
+zap
+---
+Removes all items.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 6 (zap)
+
+Response:
+- status:
+  chunk ID: "STAT"
+  chunk type: 4-byte integer
+  possible values:
+    8 (empty already)
+    9 (zapped)
+- hash table capacity:
+  only when: hashtable resized (shrinked)
+  chunk ID: "CPTY"
+  chunk type: 4-byte integer
+
+
+ksearch
+--------
+Performs a full-scan search with the given pattern.
+Provides items which key matches.
+Result list can be limited by index of first item to
+retrieve and number of items to retrieve.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 11 (ksearch)
+- search pattern:
+  chunk ID: "QKEY"
+  chunk type: binary data
+- limit start index:
+  chunk ID: "LIMS"
+  chunk type: 4-byte integer
+- limit iten number:
+  chunk ID: "LIMI"
+  chunk type: 4-byte integer
+
+Response:
+- status:
+  chunk ID: "STAT"
+  chunk type: 4-byte integer
+  possible values:
+    10 (no match)
+    11 (found)
+- number of results:
+  chunk ID: "SRES"
+  chunk type: 4-byte integer
+- result item key:
+  only when: status is 11 (found)
+  chunk ID: "AKEY"
+  chunk type: binary data
+- result item value:
+  only when: status is 11 (found)
+  chunk ID: "AVAL"
+  chunk type: binary data
+
+When the status is 11 (found), the response 
+may contain one or more AKEY-AVAL pairs.
+
+
+vsearch
+-------
+Performs a full-scan search with the given pattern.
+Provides items which value matches.
+Result list can be limited by index of first item to
+retrieve and number of items to retrieve.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 13 (vsearch)
+- search pattern:
+  chunk ID: "QKEY"
+  chunk type: binary data
+- limit start index:
+  chunk ID: "LIMS"
+  chunk type: 4-byte integer
+- limit iten number:
+  chunk ID: "LIMI"
+  chunk type: 4-byte integer
+
+Response:
+- status:
+  chunk ID: "STAT"
+  chunk type: 4-byte integer
+  possible values:
+    10 (no match)
+    11 (found)
+- number of results:
+  chunk ID: "SRES"
+  chunk type: 4-byte integer
+- result item key:
+  only when: status is 11 (found)
+  chunk ID: "AKEY"
+  chunk type: binary data
+- result item value:
+  only when: status is 11 (found)
+  chunk ID: "AVAL"
+  chunk type: binary data
+
+When the status is 11 (found), the response 
+may contain one or more AKEY-AVAL pairs.
+
+
+search
+------
+Performs a full-scan search with the given pattern.
+Provides items which key or value matches.
+Result list can be limited by index of first item to
+retrieve and number of items to retrieve.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 15 (search)
+- search pattern:
+  chunk ID: "QKEY"
+  chunk type: binary data
+- limit start index:
+  chunk ID: "LIMS"
+  chunk type: 4-byte integer
+- limit iten number:
+  chunk ID: "LIMI"
+  chunk type: 4-byte integer
+
+Response:
+- status:
+  chunk ID: "STAT"
+  chunk type: 4-byte integer
+  possible values:
+    10 (no match)
+    11 (found)
+- number of results:
+  chunk ID: "SRES"
+  chunk type: 4-byte integer
+- result item key:
+  only when: status is 11 (found)
+  chunk ID: "AKEY"
+  chunk type: binary data
+- result item value:
+  only when: status is 11 (found)
+  chunk ID: "AVAL"
+  chunk type: binary data
+
+When the status is 11 (found), the response 
+may contain one or more AKEY-AVAL pairs.
+
+
+kcount
+------
+Performs a full-scan search with the given pattern.
+Provides number of items which key matches.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 12 (kcount)
+- search pattern:
+  chunk ID: "QKEY"
+  chunk type: binary data
+
+Response:
+- status:
+  chunk ID: "STAT"
+  chunk type: 4-byte integer
+  possible values:
+    10 (no match)
+    11 (found)
+- number of results:
+  chunk ID: "SRES"
+  chunk type: 4-byte integer
+
+
+vcount
+------
+Performs a full-scan search with the given pattern.
+Provides number of items which value matches.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 14 (vcount)
+- search pattern:
+  chunk ID: "QKEY"
+  chunk type: binary data
+
+Response:
+- status:
+  chunk ID: "STAT"
+  chunk type: 4-byte integer
+  possible values:
+    10 (no match)
+    11 (found)
+- number of results:
+  chunk ID: "SRES"
+  chunk type: 4-byte integer
+
+
+count
+-----
+Performs a full-scan search with the given pattern.
+Provides number items which key or value matches.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 16 (count)
+- search pattern:
+  chunk ID: "QKEY"
+  chunk type: binary data
+
+Response:
+- status:
+  chunk ID: "STAT"
+  chunk type: 4-byte integer
+  possible values:
+    10 (no match)
+    11 (found)
+- number of results:
+  chunk ID: "SRES"
+  chunk type: 4-byte integer
+
+
+info
+----
+Fetches some status value from the system.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 1 (info)
+Response:
+- status:
+  chunk ID: "STAT"
+  chunk type: 4-byte integer
+  value: 1 (info provided)
+- number of connections:
+  chunk ID: "NCON"
+  chunk type: 4-byte integer
+- actual hash method:
+  chunk ID: "METD"
+  chunk type: 4-byte integer
+  value: see note
+- actual hash table capacity:
+  chunk ID: "CPTY"
+  chunk type: 4-byte integer
+- minimum hash table capacity:
+  chunk ID: "MCAP"
+  chunk type: 4-byte integer
+- actual number of hash table elements:
+  chunk ID: "NELM"
+  chunk type: 4-byte integer
+- collision percent:
+  chunk ID: "COLP"
+  chunk type: 4-byte integer
+
+See hash_methods.txt for the list of implemented
+hash methods and its codes.
+
+Collision percent is the percent of elements, which
+are not directly assigned to a hash slot (but linked
+to another element).
+
+
+dump
+----
+Initiates a dump on the console.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 22 (dump)
+
+Response: no status replied
+
+Does not have effect when server is started in 
+daemon mode.
+
+
+beat
+----
+Heartbeat.
+
+Request:
+- command:
+  chunk ID: "CMND"
+  chunk type: 4-byte integer
+  value: 0 (beat)
+
+Response: no status replied
+
+Used by the client to check connection. Has no
+effect on server side.

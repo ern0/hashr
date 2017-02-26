@@ -101,6 +101,7 @@ test: \
 	${BIN}/test-Utils \
 	${BIN}/test-Packet_scan \
 	${BIN}/test-Packet_build \
+	${BIN}/test-Search \
 	${BIN}/test-HashTable_core \
 	${BIN}/test-HashTable_reorg \
 
@@ -129,7 +130,7 @@ ${BIN}/test-Packet_scan: \
 		${OBJ}/HashItem.o \
 		${OBJ}/Hasher.o \
 		${OBJ}/Command.o \
-		${OBJ}/Search.o \		
+		${OBJ}/Search.o \
 		-o ${BIN}/test-Packet_scan
 
 ${BIN}/test-Packet_build: \
@@ -148,7 +149,7 @@ ${BIN}/test-Packet_build: \
 		${OBJ}/HashItem.o \
 		${OBJ}/Hasher.o \
 		${OBJ}/Command.o \
-		${OBJ}/Search.o \		
+		${OBJ}/Search.o \
 		-o ${BIN}/test-Packet_build
 
 ${BIN}/test-HashTable_core: \

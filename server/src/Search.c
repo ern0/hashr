@@ -115,7 +115,7 @@
 
 	int Search_process(Search* self,HashItem* item) {
 
-		// checkpoint: process item
+		// process item
 
 		int found = 0;
 		if ((self->match & SEARCH_MATCH_KEY) != 0) {
@@ -130,14 +130,14 @@
 		self->numberOfChecked++;
 		if (!found) return 0;
 
-		// checkpoint: found
+		// found
 
 		if (self->mode == SEARCH_MODE_COUNT) {
 			self->numberOfResults++;
 			return 0;
 		}
 
-		// checkpoint: search mode
+		// search mode
 
 		if (self->limitItems > 0) {  // overprotection
 			if (self->numberOfResults >= self->limitItems) return 1;
@@ -146,7 +146,7 @@
 		self->numberOfMatching++;
 		if (self->numberOfMatching <= self->limitStart) return 0;
 
-		// checkpoint: store
+		// store
 
 		if (self->numberOfResults == 0) {
 
@@ -157,18 +157,18 @@
 			self->results = (HashItem**)malloc(sizeof(HashItem*) * remaining);
 		} // if first item to store (lazy allocation)
 
-		// checkpoint: memory allocated for results
+		// memory allocated for results
 
 		self->results[self->numberOfResults] = item;
 		self->numberOfResults++;
 
-		// checkpoint: item stored
+		// item stored
 
 		if (self->limitItems > 0) {
 			if (self->numberOfResults >= self->limitItems) return 1;
 		}
 
-		// checkpoint: ready to process next item
+		// ready to process next item
 
 		return 0;
 	} // process()
